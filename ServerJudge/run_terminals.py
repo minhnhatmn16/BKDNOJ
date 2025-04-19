@@ -13,10 +13,11 @@ def run_in_terminal(script_path):
 
 if __name__ == "__main__":
     # scripts = ["judge_5555.py", "judge_5556.py", "judge_5557.py", "server.py"]
-    scripts = ["judge_5555.py",  "server.py"]
+    # scripts = ["judge_5555.py", "judge_5556.py", "server.py"]
+    scripts = ["judge_5555.py", "server.py"]
     
     scripts = [s for s in scripts if os.path.exists(s)]
-    
+
     if not scripts:
         print("Không tìm thấy file Python nào để chạy!")
         sys.exit(1)

@@ -180,10 +180,13 @@ class MonoProcessMonitor:
         stderr_data = process.stderr.read()
         if process.returncode != 0 and result["Code"] == "OK":
             result["Code"] = "RE"
+
+        # if (result["Code"] == ""):
         result["Code"] = check(self.output_file,stdout_lines)
         result["memory_usage"] = memory_usage
         result["cpu_time"] = cpu_time
         result["wall_time"] = wall_time
+        # result["wall_time"] = time.time() - start_time
         result["output_size"] = output_size
         # result["Output"] = stdout_text
         result["Error"] = stderr_data

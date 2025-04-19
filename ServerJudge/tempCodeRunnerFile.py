@@ -1,2 +1,2 @@
 
-    # scripts = ["judge_5555.py", "judge_5556.py", "judge_5557.py", "server.py"]
+            subprocess.Popen(f"start cmd /k python {script_path}", shell=True)

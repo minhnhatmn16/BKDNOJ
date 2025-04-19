@@ -15,17 +15,21 @@ PROBLEMS_FOLDER = "problems"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# Biến toàn cục để theo dõi submission ID
+submission_counter = 0
+submission_lock = threading.Lock()
+
 JUDGE_SERVER_HOST = 'localhost'
 JUDGE_SERVER = [
-    {'host': 'localhost', 'port': 5555, 'active': False},
-    {'host': 'localhost', 'port': 5556, 'active': False},
-    {'host': 'localhost', 'port': 5557, 'active': False}
+    {'host': 'localhost', 'port': 5555, 'active': False, 'core' : 0},
+    {'host': 'localhost', 'port': 5556, 'active': False, 'core' : 1},
+    {'host': 'localhost', 'port': 5557, 'active': False, 'core' : 2}
 ]
 class JudgeClient:
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
-    def submit_to_judge(self, problem_id, source_path, language):
+    def submit_to_judge(self, problem_id, source_path, language, submission_id):
         _judge_id = 0
         for i in range(len(JUDGE_SERVER)):
             if (JUDGE_SERVER[i]['active'] == False):
@@ -36,6 +40,7 @@ class JudgeClient:
             print("Nhận được dữ liệu từ postman " , time.time())
             self.socket.connect((JUDGE_SERVER[_judge_id]['host'], JUDGE_SERVER[_judge_id]['port']))
             request = {
+                'submission_id' : submission_id,
                 'problem_id': problem_id,
                 'source_path': source_path,
                 'language': language
@@ -51,21 +56,29 @@ class JudgeClient:
 
 @app.route('/submit', methods=['POST'])
 def submit_code():
+    global submission_counter
+
     if 'file' not in request.files:
         return jsonify({"error": "No file provided"}), 400
 
     try:
         file = request.files['file']
-        problem_id = request.form.get('problem_id', '00001')
+        problem_id = request.form.get('problem_id', '00003')
         language = request.form.get('language')
 
-        filename = secure_filename(file.filename)
+        # filename = secure_filename(file.filename)
+        
+        # Tăng submission ID một cách an toàn
+        with submission_lock:
+            submission_counter += 1
+            submission_id = submission_counter
+
+        filename = "code" + str(submission_id) + "." + language
         source_path = os.path.join(UPLOAD_FOLDER, filename)
         file.save(source_path)
-        print(source_path)
         client = JudgeClient()
-        response = client.submit_to_judge(problem_id, source_path, language)
-
+        response = client.submit_to_judge(problem_id, source_path, language, submission_id)
+        
         if os.path.exists(source_path):
             os.remove(source_path)
 

@@ -2,18 +2,23 @@ import socket
 import threading
 import json
 import os
+import psutil
 from checker_mono import JudgeProcessor
 
 class JudgeServer:
-    def __init__(self, host='0.0.0.0', port=5555):
+    def __init__(self, host='0.0.0.0', port=5555, core_id = 0):
         self.host = host
         self.port = port
+        self.core_id = core_id
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.active_connections = 0
         self.max_connections = 1
 
     def start(self):
+        # p = psutil.Process(os.getpid())
+        # p.cpu_affinity([self.core_id])
+
         self.server_socket.bind((self.host, self.port))
         self.server_socket.listen(5)
         print(f"Judge Server listening on {self.host}:{self.port}")
@@ -44,14 +49,12 @@ class JudgeServer:
             # Xử lý yêu cầu chấm bài
             processor = JudgeProcessor()
             response = processor.process_submission(
+                request['submission_id'],
                 request['problem_id'],
                 request['source_path'],
                 request['language']
             )
 
-            # response = {
-            #     "status" : "ok"
-            # }
             client_socket.send(json.dumps(response).encode())
         except Exception as e:
             print(f"Error handling client: {str(e)}")
