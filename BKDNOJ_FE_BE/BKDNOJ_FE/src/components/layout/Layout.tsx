@@ -17,22 +17,38 @@ export const Layout = ({ children }: LayoutProps) => {
     });
   };
 
+  // return (
+  //   <div id="root" className="bg-white">
+  //     {/* <Header /> */}
+  //     <Navbar />
+  //     {/* <Subheader /> */}
+  //     <div className="content-wrapper mt-8">
+  //       <div className="content container py-4">{children}</div>
+  //     </div>
+  //     <Footer />
+  //     {/* <button
+  //       type="button"
+  //       className="btn-svg scroll-top-btn fixed bottom-4 right-4 z-50 rounded-full bg-white p-2 shadow-md"
+  //       onClick={scrollToTop}
+  //     >
+  //       <ArrowUp size={20} />
+  //     </button> */}
+  //   </div>
+  // );
   return (
-    <div id="root">
-      {/* <Header /> */}
+    <div id="root" className="flex min-h-screen flex-col bg-white">
       <Navbar />
-      {/* <Subheader /> */}
-      <div className="content-wrapper mt-8">
+      <div className="mt-8 flex-grow">
         <div className="content container py-4">{children}</div>
       </div>
-      {/* <Footer /> */}
-      {/* <button
+      <Footer />
+      <button
         type="button"
         className="btn-svg scroll-top-btn fixed bottom-4 right-4 z-50 rounded-full bg-white p-2 shadow-md"
         onClick={scrollToTop}
       >
         <ArrowUp size={20} />
-      </button> */}
+      </button>
     </div>
   );
 };

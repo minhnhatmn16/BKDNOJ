@@ -52,14 +52,12 @@ a {
   color: #d19196;
 }
 
-/* Header styles */
 .header {
   background-color: #1d243a;
   color: white;
   padding: 0.5rem 0;
 }
 
-/* Footer styles */
 .footer {
   background-color: #1d243a;
   color: white;
@@ -82,19 +80,7 @@ a {
   color: white;
 }
 
-/* Table styles */
 .table-wrapper {
   border-radius: 0.25rem;
   overflow: hidden;
-}
-
-.zig-zag-border {
-  background-image:
-    linear-gradient(135deg, #1d243a 25%, transparent 25%),
-    linear-gradient(225deg, #1d243a 25%, transparent 25%),
-    linear-gradient(315deg, #1d243a 25%, transparent 25%),
-    linear-gradient(45deg, #1d243a 25%, transparent 25%);
-  background-size: 20px 20px;
-  height: 10px;
-  margin-top: 2rem;
 }

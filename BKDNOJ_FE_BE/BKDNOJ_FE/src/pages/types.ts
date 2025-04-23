@@ -6,6 +6,7 @@ export interface Contest {
   participants: number;
   isPast: boolean;
   isUserRegistered: boolean;
+  listProblem: Problem[];
 }
 
 export interface Problem {
@@ -14,6 +15,9 @@ export interface Problem {
   title: string;
   acPercentage: number;
   solved_count: number;
+  timeLimit: string;
+  memoryLimit: string;
+  pdfUrl?: string;
 }
 
 export interface Submission {
@@ -41,4 +45,50 @@ export interface Standing {
   point: string;
   penalty: string;
   problems: ProblemResult[];
+}
+
+export interface Profile {
+  id: string;
+  username: string;
+  email: string;
+
+  solvedProblems: number;
+  heatmapData: HeatmapDay[];
+  imageUrl: string;
+  // bio?: string;
+  // avatarUrl?: string;
+
+  // // Thống kê bài tập
+  // solvedProblems: number;
+  // rank: number;
+  // totalScore: number;
+  // contributions: number;
+
+  // // Thống kê submission
+  // submissionsLastYear: number;
+  // submissionStats: {
+  //   total: number;
+  //   percentage: number;
+  // };
+
+  // // Thông tin contest
+  // contestsJoined: number;
+  // contestStats: {
+  //   rank: number;
+  //   currentRating: number;
+  //   minRating: number;
+  //   maxRating: number;
+  //   ratingHistory: number[];
+  // };
+
+  // // Các mối quan hệ (nếu cần)
+  // contests?: Contest[];
+  // problems?: Problem[];
+  // submissions?: Submission[];
+  // standings?: Standing[];
+}
+
+export interface HeatmapDay {
+  date: string;
+  count: number;
 }

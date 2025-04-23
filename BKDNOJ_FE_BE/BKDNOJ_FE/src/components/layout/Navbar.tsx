@@ -22,8 +22,17 @@ export const Navbar = () => {
             {/* Desktop Navigation items */}
             <div className="hidden space-x-6 md:flex">
               {/* <button className="nav-link">Practice</button> */}
-              <Link className="nav-link" to="/problems">
-                Problem
+              <Link className="nav-link" to="/listproblem">
+                List Problem
+              </Link>
+              <Link className="nav-link" to="/detailproblem">
+                Detail Problem
+              </Link>
+              <Link className="nav-link" to="/listcontest">
+                List Contest
+              </Link>
+              <Link className="nav-link" to="/detailcontest">
+                Detail Contest
               </Link>
               <Link className="nav-link" to="/submissions">
                 Submission
@@ -37,9 +46,10 @@ export const Navbar = () => {
               <Link className="nav-link" to="/standing">
                 Standing
               </Link>
-              <Link className="nav-link" to="/contests">
-                Contest
+              <Link className="nav-link" to="/profile">
+                Profile
               </Link>
+
               {/* <Link className="nav-link" to="/orgs">
                 Organization
               </Link> */}
