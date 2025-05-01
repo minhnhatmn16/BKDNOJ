@@ -3,7 +3,8 @@ const router = express.Router();
 const userController = require("../controllers/userController");
 const authenticateToken = require("../middleware/authenticateToken");
 
-// Đăng ký và đăng nhập
+// My submission
 router.get("/mysubmission", authenticateToken, userController.getMySubmission);
+router.post("/submit", authenticateToken, userController.submit);
 
 module.exports = router;

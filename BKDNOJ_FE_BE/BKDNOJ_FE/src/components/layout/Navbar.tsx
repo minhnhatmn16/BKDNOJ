@@ -11,13 +11,13 @@ export const Navbar = () => {
         <div className="container flex flex-wrap items-center justify-between">
           {/* Left side: Brand + Navigation items */}
           <div className="flex items-center space-x-8">
-            <Link
+            <div
               id="brand"
               className="text-2xl font-semibold text-gray-800 hover:text-primary"
-              to="/"
+              // to="/"
             >
               bkdnOJ
-            </Link>
+            </div>
 
             {/* Desktop Navigation items */}
             <div className="hidden space-x-6 md:flex">

@@ -3,33 +3,9 @@ const User = require("../models/user");
 const Problem = require("../models/problem");
 const authenticateToken = require("../middleware/authenticateToken");
 
-// Thêm submission mới
-exports.addSubmission = async (req, res) => {
-  const { user_id, problem_id, language, code } = req.body;
-  try {
-    const user = await User.findByPk(user_id);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+// Lấy tất cả các submission
+getAllSubmission
 
-    const problem = await Problem.findByPk(problem_id);
-    if (!problem) {
-      return res.status(404).json({ error: "Problem not found" });
-    }
-
-    const newSubmission = await Submission.create({
-      user_id,
-      problem_id,
-      language,
-      code,
-    });
-    res
-      .status(201)
-      .json({ message: "Submission added", submission: newSubmission });
-  } catch (err) {
-    res.status(500).json({ error: "Server error", details: err });
-  }
-};
 
 // Cập nhật submission (thay đổi status, time_ms, memory_kb)
 exports.updateSubmission = async (req, res) => {

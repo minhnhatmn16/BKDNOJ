@@ -5,6 +5,7 @@ const User = require("../models/user");
 // Đăng nhập
 exports.signup = async (req, res) => {
   const { username, email, password } = req.body;
+
   try {
     const existingUser = await User.findOne({ where: { username } });
     if (existingUser)
