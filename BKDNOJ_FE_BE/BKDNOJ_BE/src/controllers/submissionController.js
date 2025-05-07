@@ -4,8 +4,7 @@ const Problem = require("../models/problem");
 const authenticateToken = require("../middleware/authenticateToken");
 
 // Lấy tất cả các submission
-getAllSubmission
-
+// getAllSubmission
 
 // Cập nhật submission (thay đổi status, time_ms, memory_kb)
 exports.updateSubmission = async (req, res) => {

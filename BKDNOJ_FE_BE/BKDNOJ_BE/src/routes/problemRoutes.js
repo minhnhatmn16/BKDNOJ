@@ -1,9 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const problemController = require("../controllers/problemController");
+const authenticateToken = require("../middleware/authenticateToken");
 
-router.post("/", problemController.createProblem); // Thêm bài
 router.get("/:id", problemController.getProblemById); // Lấy bài theo ID
-router.get("/", problemController.getAllProblems); // Lấy tất cả bài
+
+router.post("/:id/submit", authenticateToken, problemController.addSubmit); // Submit
+
+router.get("/:id/submissions", problemController.getAllSubmission); // Lấy tất cả các submission tương ứng với bài
+
+router.get(
+  "/:id/mysubmissions",
+  authenticateToken,
+  problemController.getMySubmission
+); // Lấy Mysubmission
 
 module.exports = router;

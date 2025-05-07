@@ -42,7 +42,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
           <Route path="/profile" element={<UserProfilePage />} />
-          <Route path="*" element={<NotFoundPage />} />
+          {/* <Route path="*" element={<NotFoundPage />} /> */}
         </Routes>
       </Layout>
     </Router>

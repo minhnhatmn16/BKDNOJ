@@ -15,23 +15,31 @@ const Problem = sequelize.define(
     },
     link: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
-    time_limit_ms: {
+    is_public: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+    timelimit_ms: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    memory_limit_kb: {
+    memorylimit_kb: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
   },
   {
-    tableName: "Problems",
-    timestamps: true,
-    createdAt: "created_at",
-    updatedAt: "updated_at",
+    tableName: "problems",
+    timestamps: false,
   }
 );
+
+Problem.associate = function (models) {
+  Problem.hasMany(models.Submission, { foreignKey: "problem_id" });
+  Problem.hasMany(models.ContestProblem, { foreignKey: "problem_id" });
+};
 
 module.exports = Problem;

@@ -1,52 +1,17 @@
-const { where } = require("sequelize");
-const Problem = require("../models/problem");
+const Contest = require("../models/contest");
 const Submission = require("../models/submission");
+const ContestParticipant = require("../models/contest_participant");
+
 const { models } = require("../models");
+const { literal } = require("sequelize");
 
-// Lấy bài theo ID
-exports.getProblemById = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const problem = await Problem.findByPk(id);
-    if (problem) {
-      res.status(200).json({ problem });
-    } else {
-      res.status(404).json({ error: "Problem not found" });
-    }
-  } catch (err) {
-    res.status(500).json({ error: "Server error", details: err });
-  }
-};
-
-// Submit
-exports.addSubmit = async (req, res) => {
-  const user_id = req.user.user_id;
-  const problem_id = req.params.id;
-  const { language, code } = req.body;
-
-  try {
-    const newSubmission = await Submission.create({
-      user_id,
-      problem_id,
-      language,
-      code,
-    });
-    res
-      .status(201)
-      .json({ message: "Submission added", submission: newSubmission });
-  } catch (err) {
-    res.status(500).json({ error: "Server error", details: err });
-  }
-};
-
-// Lấy tất cả các submission tương ứng với bài
+// Lấy tất cả các submission tương ứng với contest
 exports.getAllSubmission = async (req, res) => {
   const { id } = req.params;
   try {
     const submissions = await Submission.findAll({
       where: {
-        problem_id: id,
-        contest_id: null,
+        contest_id: id,
       },
       attributes: [
         "submission_id",
@@ -77,17 +42,16 @@ exports.getAllSubmission = async (req, res) => {
   }
 };
 
-// Lấy submission của user tương ứng với bài
-exports.getMySubmission = async (req, res) => {
-  const user_id = req.user.user_id;
+// Lấy tất cả các submission tương ứng với contest
+exports.getMySubmissions = async (req, res) => {
   const { id } = req.params;
+  const user_id = req.user.user_id;
 
   try {
     const mysubmissions = await Submission.findAll({
       where: {
         user_id: user_id,
-        problem_id: id,
-        contest_id: null,
+        contest_id: id,
       },
       attributes: [
         "submission_id",
@@ -112,14 +76,29 @@ exports.getMySubmission = async (req, res) => {
       ],
       order: [["submit_time", "DESC"]],
     });
-
     res.status(200).json({ mysubmissions });
   } catch (err) {
-    console.error("Error fetching submissions:", err);
-    res.status(500).json({
-      success: false,
-      error: "Internal server error",
-      message: err.message,
+    res.status(500).json({ error: "Server error", details: err });
+  }
+};
+
+exports.getAllParticipant = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const participants = await ContestParticipant.findAll({
+      where: {
+        contest_id: id,
+      },
+      include: [
+        {
+          model: models.User,
+          attributes: ["user_name"],
+        },
+      ],
+      order: [["registered_at", "DESC"]],
     });
+    res.status(200).json({ participants });
+  } catch (err) {
+    res.status(500).json({ error: "Server error", details: err });
   }
 };

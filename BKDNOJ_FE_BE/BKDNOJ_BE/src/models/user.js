@@ -9,17 +9,17 @@ const User = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
-    username: {
+    user_name: {
       type: DataTypes.STRING(50),
       unique: true,
       allowNull: false,
     },
     email: {
       type: DataTypes.STRING(100),
-      unique: false,
+      unique: true,
       allowNull: false,
     },
-    password_hash: {
+    password: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -27,21 +27,17 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    email_verified_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-    role: {
-      type: DataTypes.ENUM("User", "Admin", "Manager"),
-      defaultValue: "User",
-    },
   },
   {
-    tableName: "Users",
-    timestamps: true,
-    createdAt: "created_at",
-    updatedAt: "updated_at",
+    tableName: "users",
+    timestamps: false,
   }
 );
+
+User.associate = function (models) {
+  User.hasMany(models.Submission, { foreignKey: "user_id" });
+  User.hasMany(models.Contest, { foreignKey: "create_by" });
+  User.hasMany(models.ContestParticipant, { foreignKey: "user_id" });
+};
 
 module.exports = User;

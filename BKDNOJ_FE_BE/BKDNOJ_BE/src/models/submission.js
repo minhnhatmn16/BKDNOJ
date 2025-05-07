@@ -17,6 +17,10 @@ const Submission = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    contest_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     language: {
       type: DataTypes.STRING(50),
       allowNull: false,
@@ -25,29 +29,33 @@ const Submission = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    submit_time: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
     status: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
+      type: DataTypes.ENUM("Pending", "AC", "WA", "TLE", "MLE", "RE", "CE"),
       defaultValue: "Pending",
     },
     time_ms: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.FLOAT,
       allowNull: true,
     },
-    memory_kb: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
+    memory_kb: { type: DataTypes.INTEGER, defaultValue: 0 },
+    total_test: { type: DataTypes.INTEGER, defaultValue: 0 },
+    passed_test: { type: DataTypes.INTEGER, defaultValue: 0 },
+    submit_time: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      allowNull: false,
     },
   },
   {
-    tableName: "Submissions",
+    tableName: "submissions",
     timestamps: false,
   }
 );
+
+Submission.associate = function (models) {
+  Submission.belongsTo(models.User, { foreignKey: "user_id" });
+  Submission.belongsTo(models.Problem, { foreignKey: "problem_id" });
+  Submission.belongsTo(models.Contest, { foreignKey: "contest_id" });
+};
 
 module.exports = Submission;
