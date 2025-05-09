@@ -30,6 +30,10 @@ const Contest = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    penalty: {
+      type: DataTypes.INTEGER,
+      defaultValue: 20,
+    },
     created_by: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -46,7 +50,7 @@ const Contest = sequelize.define(
 );
 
 Contest.associate = function (models) {
-  Contest.belongsTo(models.User, { foreignKey: "create_by", as: "creator" });
+  Contest.belongsTo(models.User, { foreignKey: "created_by" });
   Contest.hasMany(models.Submission, { foreignKey: "contest_id" });
   Contest.hasMany(models.ContestProblem, { foreignKey: "contest_id" });
   Contest.hasMany(models.ContestParticipant, { foreignKey: "contest_id" });
