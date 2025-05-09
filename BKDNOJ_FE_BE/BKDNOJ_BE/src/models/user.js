@@ -27,6 +27,16 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    role: {
+      type: DataTypes.ENUM("user", "admin"),
+      allowNull: false,
+      defaultValue: "user",
+    },
+    can_create_contest: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     tableName: "users",

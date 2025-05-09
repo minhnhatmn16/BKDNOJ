@@ -12,7 +12,7 @@ exports.register = async (req, res) => {
   try {
     const existingUser = await User.findOne({ where: { user_name } });
     if (existingUser)
-      return res.status(400).json({ error: "Username already exists" });
+      return res.status(400).json({ message: "Username already exists" });
 
     const hash = await bcrypt.hash(password, 10);
     const newUser = await User.create({
@@ -20,9 +20,12 @@ exports.register = async (req, res) => {
       email,
       password: hash,
     });
-    res.status(201).json({ message: "User created", user_id: newUser.user_id });
+    res.status(201).json({
+      message: "User registered successfully",
+      data: { user_id: newUser.user_id },
+    });
   } catch (err) {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: "Server error", details: err.message });
   }
 };
 
@@ -32,21 +35,26 @@ exports.login = async (req, res) => {
 
   try {
     const user = await User.findOne({ where: { user_name } });
-    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid)
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid credentials" });
 
     const token = jwt.sign(
-      { user_id: user.user_id, user_name: user.user_name },
+      {
+        user_id: user.user_id,
+        user_name: user.user_name,
+        role: user.role,
+        can_create_contest: user.can_create_contest,
+      },
       process.env.JWT_SECRET || "your_jwt_secret",
       { expiresIn: "1h" }
     );
 
-    res.status(200).json({ message: "Signin successful", token });
+    res.status(200).json({ message: "Signin successful", data: { token } });
   } catch (err) {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: "Server error", details: err.message });
   }
 };
 
@@ -56,7 +64,7 @@ exports.changePassword = async (req, res) => {
 
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "No token provided" });
+    return res.status(401).json({ message: "No token provided" });
   }
 
   const token = authHeader.split(" ")[1];
@@ -68,11 +76,11 @@ exports.changePassword = async (req, res) => {
     );
 
     const user = await User.findByPk(decoded.user_id);
-    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
-      return res.status(401).json({ error: "Old password is incorrect" });
+      return res.status(401).json({ message: "Old password is incorrect" });
     }
 
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
@@ -82,7 +90,7 @@ exports.changePassword = async (req, res) => {
     res.status(200).json({ message: "Password changed successfully" });
   } catch (err) {
     console.error("Change password error:", err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: "Server error", details: err.message });
   }
 };
 
@@ -99,12 +107,38 @@ exports.profile = async (req, res) => {
       attributes: ["user_id", "user_name", "avatar"],
     });
 
-    res.status(200).json({ profile });
+    res.status(200).json({
+      message: "User profile fetched successfully",
+      data: profile,
+    });
   } catch (err) {
     res.status(500).json({
-      success: false,
-      error: "Internal server error",
-      message: err.message,
+      message: "Server error",
+      details: err.message,
     });
+  }
+};
+
+// Thay đổi quyền tạo contest
+exports.changePermission = async (req, res) => {
+  const { user_id, can_create_contest } = req.body;
+
+  try {
+    const user = await User.findByPk(user_id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.can_create_contest = can_create_contest;
+    await user.save();
+
+    res.status(200).json({
+      message: `Change permission successfully`,
+      data: {
+        user_id: user.user_id,
+        can_create_contest: user.can_create_contest,
+      },
+    });
+  } catch (err) {
+    console.error("Change permission error:", err);
+    res.status(500).json({ message: "Server error", details: err.message });
   }
 };

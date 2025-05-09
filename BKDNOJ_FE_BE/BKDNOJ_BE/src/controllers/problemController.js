@@ -1,20 +1,82 @@
 const { where } = require("sequelize");
 const Problem = require("../models/problem");
 const Submission = require("../models/submission");
+const User = require("../models/user");
 const { models } = require("../models");
+
+// Thêm problem
+exports.createProblem = async (req, res) => {
+  const { problem_name, link, is_public, timelimit_ms, memorylimit_kb } =
+    req.body;
+
+  try {
+    const newProblem = await Problem.create({
+      problem_name,
+      link,
+      is_public,
+      timelimit_ms,
+      memorylimit_kb,
+    });
+
+    res.status(201).json({
+      message: "Problem created successfully",
+      data: { problem: newProblem },
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Server error while creating problem",
+      details: err.message || err,
+    });
+  }
+};
+
+// Cập nhật problem
+exports.updateProblem = async (req, res) => {
+  const problem_id = req.params.id;
+  const { problem_name, link, is_public, timelimit_ms, memorylimit_kb } =
+    req.body;
+
+  try {
+    const updateProblem = await Problem.findByPk(problem_id);
+    if (!updateProblem)
+      return res.status(404).json({ message: "Problem not found" });
+
+    if (problem_name) updateProblem.problem_name = problem_name;
+    if (link) updateProblem.link = link;
+    if (is_public !== undefined) updateProblem.is_public = is_public;
+    if (timelimit_ms) updateProblem.timelimit_ms = timelimit_ms;
+    if (memorylimit_kb) updateProblem.memorylimit_kb = memorylimit_kb;
+
+    await updateProblem.save();
+
+    res.status(200).json({
+      message: "Problem updated successfully",
+      data: { problem: updateProblem },
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Server error while updating problem",
+      details: err.message || err,
+    });
+  }
+};
 
 // Lấy bài theo ID
 exports.getProblemById = async (req, res) => {
   const { id } = req.params;
   try {
     const problem = await Problem.findByPk(id);
-    if (problem) {
-      res.status(200).json({ problem });
-    } else {
-      res.status(404).json({ error: "Problem not found" });
-    }
+    if (!problem) return res.status(404).json({ message: "Problem not found" });
+
+    res.status(200).json({
+      message: "Problem fetched successfully",
+      data: { problem },
+    });
   } catch (err) {
-    res.status(500).json({ error: "Server error", details: err });
+    res.status(500).json({
+      message: "Server error while fetching problem",
+      details: err.message || err,
+    });
   }
 };
 
@@ -31,11 +93,16 @@ exports.addSubmit = async (req, res) => {
       language,
       code,
     });
-    res
-      .status(201)
-      .json({ message: "Submission added", submission: newSubmission });
+
+    res.status(201).json({
+      message: "Submission added successfully",
+      data: { submission: newSubmission },
+    });
   } catch (err) {
-    res.status(500).json({ error: "Server error", details: err });
+    res.status(500).json({
+      message: "Server error while adding submission",
+      details: err.message || err,
+    });
   }
 };
 
@@ -71,9 +138,16 @@ exports.getAllSubmission = async (req, res) => {
       ],
       order: [["submit_time", "DESC"]],
     });
-    res.status(200).json({ submissions });
+
+    res.status(200).json({
+      message: "Submissions fetched successfully",
+      data: { submissions },
+    });
   } catch (err) {
-    res.status(500).json({ error: "Server error", details: err });
+    res.status(500).json({
+      message: "Server error while fetching submissions",
+      details: err.message || err,
+    });
   }
 };
 
@@ -85,7 +159,7 @@ exports.getMySubmission = async (req, res) => {
   try {
     const mysubmissions = await Submission.findAll({
       where: {
-        user_id: user_id,
+        user_id,
         problem_id: id,
         contest_id: null,
       },
@@ -113,13 +187,14 @@ exports.getMySubmission = async (req, res) => {
       order: [["submit_time", "DESC"]],
     });
 
-    res.status(200).json({ mysubmissions });
+    res.status(200).json({
+      message: "User's submissions fetched successfully",
+      data: { mysubmissions },
+    });
   } catch (err) {
-    console.error("Error fetching submissions:", err);
     res.status(500).json({
-      success: false,
-      error: "Internal server error",
-      message: err.message,
+      message: "Server error while fetching user's submissions",
+      details: err.message || err,
     });
   }
 };

@@ -4,6 +4,8 @@ const ContestParticipant = require("../models/contest_participant");
 const ContestProblem = require("../models/contest_problem");
 const { models } = require("../models");
 const { Op } = require("sequelize");
+const bcrypt = require("bcrypt");
+
 const {
   calculateICPCRanking,
   calculateIOIRanking,
@@ -36,11 +38,141 @@ exports.getContestById = async (req, res) => {
       order: [[models.ContestProblem, "order", "ASC"]],
     });
     if (contest) {
-      res.status(200).json({ contest });
+      res
+        .status(200)
+        .json({ message: "Contest fetched successfully", data: contest });
     } else {
       res.status(404).json({ error: "Contest not found" });
     }
   } catch (err) {
+    res.status(500).json({ error: "Server error", details: err });
+  }
+};
+
+// Tạo contest
+exports.createContest = async (req, res) => {
+  const user_id = req.user.user_id;
+  const {
+    contest_name,
+    start_time,
+    duration,
+    is_public,
+    password,
+    penalty,
+    format,
+    problems,
+  } = req.body;
+
+  if (!is_public && (!password || password.trim() === "")) {
+    return res.status(400).json({
+      error: "Password is required for private contests.",
+    });
+  }
+
+  let hash = null;
+  if (password && password.trim() !== "") {
+    hash = await bcrypt.hash(password, 10);
+  }
+
+  try {
+    const newContest = await Contest.create({
+      contest_name,
+      start_time,
+      duration,
+      is_public,
+      password: hash,
+      penalty,
+      format,
+      created_by: user_id,
+    });
+
+    if (problems && Array.isArray(problems)) {
+      const contestProblems = problems.map((problem) => ({
+        contest_id: newContest.contest_id,
+        problem_id: problem.problem_id,
+        order: problem.order,
+        point: problem.point || 1.0,
+      }));
+
+      await ContestProblem.bulkCreate(contestProblems);
+    }
+
+    res
+      .status(201)
+      .json({ message: "Contest created successfully", data: newContest });
+  } catch (err) {
+    res.status(500).json({ error: "Server error", details: err });
+  }
+};
+
+// Cập nhật contest
+exports.updateContest = async (req, res) => {
+  const user_id = req.user.user_id;
+  const contest_id = req.params.id;
+  const {
+    contest_name,
+    start_time,
+    duration,
+    is_public,
+    password,
+    penalty,
+    format,
+    problems,
+  } = req.body;
+
+  try {
+    const contest = await Contest.findByPk(contest_id);
+    if (!contest) {
+      return res.status(404).json({ error: "Contest not found" });
+    }
+
+    if (contest.created_by !== user_id) {
+      return res
+        .status(403)
+        .json({ error: "You do not have permission to update this contest" });
+    }
+
+    if (new Date(contest.start_time) < new Date() && (start_time || duration)) {
+      return res
+        .status(400)
+        .json({ error: "Cannot modify contest after it has started" });
+    }
+
+    let hash = contest.password;
+    if (is_public === false && password && password.trim() !== "") {
+      hash = await bcrypt.hash(password, 10);
+    }
+
+    await contest.update({
+      contest_name,
+      start_time,
+      duration,
+      is_public,
+      password: hash,
+      penalty,
+      format,
+    });
+
+    if (problems && Array.isArray(problems)) {
+      await ContestProblem.destroy({
+        where: { contest_id: contest.contest_id },
+      });
+
+      const contestProblems = problems.map((problem) => ({
+        contest_id: contest.contest_id,
+        problem_id: problem.problem_id,
+        order: problem.order,
+        point: problem.point || 1.0,
+      }));
+
+      await ContestProblem.bulkCreate(contestProblems);
+    }
+
+    res
+      .status(200)
+      .json({ message: "Contest updated successfully", data: contest });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error", details: err });
   }
 };
@@ -114,7 +246,10 @@ exports.getRanking = async (req, res) => {
       );
     }
 
-    res.status(200).json({ problems, rankings });
+    res.status(200).json({
+      message: "Ranking calculated successfully",
+      data: { problems, rankings },
+    });
   } catch (err) {
     res.status(500).json({ error: "Server error", details: err });
   }
@@ -163,13 +298,15 @@ exports.getAllSubmission = async (req, res) => {
       ],
       order: [["submit_time", "DESC"]],
     });
-    res.status(200).json({ submissions });
+    res
+      .status(200)
+      .json({ message: "Submissions fetched successfully", data: submissions });
   } catch (err) {
     res.status(500).json({ error: "Server error", details: err });
   }
 };
 
-// Lấy tất cả các submission tương ứng với contest
+// Lấy các submission của chính mình
 exports.getMySubmissions = async (req, res) => {
   const { id } = req.params;
   const user_id = req.user.user_id;
@@ -203,7 +340,10 @@ exports.getMySubmissions = async (req, res) => {
       ],
       order: [["submit_time", "DESC"]],
     });
-    res.status(200).json({ mysubmissions });
+    res.status(200).json({
+      message: "Your submissions fetched successfully",
+      data: mysubmissions,
+    });
   } catch (err) {
     res.status(500).json({ error: "Server error", details: err });
   }
@@ -262,7 +402,10 @@ exports.getAllParticipant = async (req, res) => {
       ],
       order: [["registered_at", "DESC"]],
     });
-    res.status(200).json({ participants });
+    res.status(200).json({
+      message: "Participants fetched successfully",
+      data: participants,
+    });
   } catch (err) {
     res.status(500).json({ error: "Server error", details: err });
   }

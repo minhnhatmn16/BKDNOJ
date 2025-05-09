@@ -56,8 +56,17 @@ exports.getAllContest = async (req, res) => {
       ],
     });
 
-    res.status(200).json({ pastContests, upcomingContests });
+    res.status(200).json({
+      message: "Contest list fetched successfully",
+      data: {
+        pastContests,
+        upcomingContests,
+      },
+    });
   } catch (err) {
-    res.status(500).json({ error: "Server error", details: err });
+    res.status(500).json({
+      message: "Server error while fetching contests",
+      details: err.message || err,
+    });
   }
 };
