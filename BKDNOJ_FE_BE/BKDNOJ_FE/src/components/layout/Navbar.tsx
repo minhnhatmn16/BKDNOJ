@@ -23,13 +23,13 @@ export const Navbar = () => {
             <div className="hidden space-x-6 md:flex">
               {/* <button className="nav-link">Practice</button> */}
               <Link className="nav-link" to="/listproblem">
-                List Problem
+                PROBLEMSET
               </Link>
               <Link className="nav-link" to="/detailproblem">
                 Detail Problem
               </Link>
               <Link className="nav-link" to="/listcontest">
-                List Contest
+                CONTESTS
               </Link>
               <Link className="nav-link" to="/detailcontest">
                 Detail Contest

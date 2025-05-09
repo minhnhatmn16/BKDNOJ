@@ -11,7 +11,7 @@ interface DetailContestProps {
   detail_contest: Contest;
 }
 
-const listProlem: Problem[] = [
+const listProblem: Problem[] = [
   {
     id: "1",
     solved: true,
@@ -87,11 +87,19 @@ const submissions: Submission[] = [
 ];
 
 const DetailContest = ({ title, detail_contest }: DetailContestProps) => {
-  const [activeTab, setActiveTab] = useState<"problems" | "standing" | "submissions">("problems");
+  const [activeTab, setActiveTab] = useState<"problems" | "status" | "standing" | "submissions">(
+    "problems",
+  );
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = 10;
 
   const getCurrentTime = () => {
     const now = new Date();
-    return now.toLocaleString("en-GB", { hour12: false }); // Format: dd/mm/yyyy, HH:MM:SS
+    return now.toLocaleString("en-GB", { hour12: false });
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -114,16 +122,6 @@ const DetailContest = ({ title, detail_contest }: DetailContestProps) => {
           </button>
           <button
             className={`nav-link rounded px-4 py-2 ${
-              activeTab === "standing"
-                ? "bg-gray-200 font-semibold text-black"
-                : "text-gray-600 hover:text-black"
-            }`}
-            onClick={() => setActiveTab("standing")}
-          >
-            Standing
-          </button>
-          <button
-            className={`nav-link rounded px-4 py-2 ${
               activeTab === "submissions"
                 ? "bg-gray-200 font-semibold text-black"
                 : "text-gray-600 hover:text-black"
@@ -132,17 +130,46 @@ const DetailContest = ({ title, detail_contest }: DetailContestProps) => {
           >
             My Submissions
           </button>
+          <button
+            className={`nav-link rounded px-4 py-2 ${
+              activeTab === "status"
+                ? "bg-gray-200 font-semibold text-black"
+                : "text-gray-600 hover:text-black"
+            }`}
+            onClick={() => setActiveTab("status")}
+          >
+            Status
+          </button>
+          <button
+            className={`nav-link rounded px-4 py-2 ${
+              activeTab === "standing"
+                ? "bg-gray-200 font-semibold text-black"
+                : "text-gray-600 hover:text-black"
+            }`}
+            onClick={() => setActiveTab("standing")}
+          >
+            Standing
+          </button>
         </div>
       </nav>
 
       {activeTab === "problems" && (
-        <ListProblemsTable title="Problems List" list_problem={listProlem} />
-      )}
-      {activeTab === "standing" && (
-        <StandingTable title="Contest Standings" standings={standings} />
+        <ListProblemsTable
+          title="Problems"
+          list_problem={listProblem}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       )}
       {activeTab === "submissions" && (
-        <SubmissionTable title="My Submissions" submissions={submissions} />
+        <SubmissionTable title="My contest submissions" submissions={submissions} />
+      )}
+      {activeTab === "status" && (
+        <SubmissionTable title="Contest status" submissions={submissions} />
+      )}
+      {activeTab === "standing" && (
+        <StandingTable title="Contest standings" standings={standings} />
       )}
     </div>
   );

@@ -9,7 +9,7 @@ const SomeProblemPage = () => {
     console.log("Code:", code);
     setShowModal(false);
   };
-
+  const problemTitle = "Problem XYZ";
   return (
     <div className="p-4">
       <h1 className="mb-4 text-2xl">Problem XYZ</h1>
@@ -20,7 +20,12 @@ const SomeProblemPage = () => {
         Open Submit Form
       </button>
 
-      <SubmitModal isOpen={showModal} onClose={() => setShowModal(false)} onSubmit={handleSubmit} />
+      <SubmitModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onSubmit={handleSubmit}
+        problemTitle={problemTitle}
+      />
     </div>
   );
 };
