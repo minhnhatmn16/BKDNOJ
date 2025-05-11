@@ -17,6 +17,7 @@ import UserProfilePage from "./pages/profile/UserProfilePage ";
 import DetailProblemPage from "./pages/problem/DetailProblemPage";
 import DetailContestPage from "./pages/contest/DetailContestPage";
 import CreateContest from "./pages/create_contest/CreateContest";
+import DetailContestWrapper from "./pages/contest/DetailContestWrapper";
 
 function App() {
   return (
@@ -28,7 +29,10 @@ function App() {
           <Route path="/detailproblem" element={<DetailProblemPage />} />
 
           <Route path="/contests" element={<ListContestsPage />} />
-          <Route path="/contest/:id" element={<DetailContestPage />} />
+          <Route path="/contest/:id" element={<DetailContestPage />}>
+            <Route index element={<DetailContestWrapper />} />
+            <Route path=":tab" element={<DetailContestWrapper />} />
+          </Route>
 
           <Route path="/submissions" element={<SubssmionPage />} />
           <Route path="/submit" element={<SubmitForm />} />

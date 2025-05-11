@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Contest, Problem, Standing, Submission } from "../types";
 import api from "../../api";
 
@@ -10,11 +10,10 @@ import StandingTable from "../standings/StandingTable";
 interface DetailContestProps {
   title: string;
   detail_contest: Contest;
+  activeTab: "problems" | "status" | "standing" | "mysubmissions";
 }
-const DetailContest = ({ title, detail_contest }: DetailContestProps) => {
-  const [activeTab, setActiveTab] = useState<"problems" | "status" | "standing" | "mysubmissions">(
-    "problems",
-  );
+
+const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = 10;
 
@@ -28,13 +27,19 @@ const DetailContest = ({ title, detail_contest }: DetailContestProps) => {
     standing: false,
   });
 
-  const getCurrentTime = () => {
-    const now = new Date();
-    return now.toLocaleString("en-GB", { hour12: false });
+  const navigate = useNavigate();
+
+  const handleTabChange = (tab: string) => {
+    navigate(`/contest/${detail_contest.contest_id}/${tab}`);
   };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  const getCurrentTime = () => {
+    const now = new Date();
+    return now.toLocaleString("en-GB", { hour12: false });
   };
 
   useEffect(() => {
@@ -76,46 +81,21 @@ const DetailContest = ({ title, detail_contest }: DetailContestProps) => {
 
       <nav className="navbar border-b bg-white py-4">
         <div className="container flex flex-wrap items-center space-x-8">
-          <button
-            className={`nav-link rounded px-4 py-2 ${
-              activeTab === "problems"
-                ? "bg-gray-200 font-semibold text-black"
-                : "text-gray-600 hover:text-black"
-            }`}
-            onClick={() => setActiveTab("problems")}
-          >
-            Problems
-          </button>
-          <button
-            className={`nav-link rounded px-4 py-2 ${
-              activeTab === "mysubmissions"
-                ? "bg-gray-200 font-semibold text-black"
-                : "text-gray-600 hover:text-black"
-            }`}
-            onClick={() => setActiveTab("mysubmissions")}
-          >
-            My Submissions
-          </button>
-          <button
-            className={`nav-link rounded px-4 py-2 ${
-              activeTab === "status"
-                ? "bg-gray-200 font-semibold text-black"
-                : "text-gray-600 hover:text-black"
-            }`}
-            onClick={() => setActiveTab("status")}
-          >
-            Status
-          </button>
-          <button
-            className={`nav-link rounded px-4 py-2 ${
-              activeTab === "standing"
-                ? "bg-gray-200 font-semibold text-black"
-                : "text-gray-600 hover:text-black"
-            }`}
-            onClick={() => setActiveTab("standing")}
-          >
-            Standing
-          </button>
+          {["problems", "mysubmissions", "status", "standing"].map((tab) => (
+            <button
+              key={tab}
+              className={`nav-link rounded px-4 py-2 ${
+                activeTab === tab
+                  ? "bg-gray-200 font-semibold text-black"
+                  : "text-gray-600 hover:text-black"
+              }`}
+              onClick={() => handleTabChange(tab)}
+            >
+              {tab === "mysubmissions"
+                ? "My Submissions"
+                : tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
         </div>
       </nav>
 
