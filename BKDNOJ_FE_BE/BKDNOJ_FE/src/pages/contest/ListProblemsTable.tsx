@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import { Problem } from "../types";
+import { ContestProblem } from "../types";
 import GotoPageInput from "../../components/pagination/GotoPageInput";
 import SubmitModal from "../submit/SubmitModal";
 import { useState } from "react";
 
 interface ListProblemsTableProps {
   title: string;
-  list_problem: Problem[];
+  list_problem: ContestProblem[];
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -20,13 +20,12 @@ const ProblemsTable = ({
   onPageChange,
 }: ListProblemsTableProps) => {
   const [showModal, setShowModal] = useState(false);
-  const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
+  const [selectedProblem, setSelectedProblem] = useState<ContestProblem | null>(null);
 
   const handleSubmit = (language: string, code: string) => {
     setShowModal(false);
   };
 
-  const problemTitle = "Tính tổng 2 số";
   return (
     <div className="flex flex-col gap-4 lg:flex-row">
       {/* Table section */}
@@ -46,10 +45,13 @@ const ProblemsTable = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {list_problem.map((problem, index) => (
-                    <tr key={problem.problem_id} className={index % 2 === 0 ? "bg-gray-50" : ""}>
+                  {list_problem.map((contestProblem, index) => (
+                    <tr
+                      key={contestProblem.problem_id}
+                      className={index % 2 === 0 ? "bg-gray-50" : ""}
+                    >
                       <td className="border border-gray-300 p-3 text-center">
-                        {problem.solved || 0 ? (
+                        {contestProblem.Problem.solved || 0 ? (
                           <span className="text-green-500">&#10004;</span>
                         ) : (
                           ""
@@ -58,13 +60,13 @@ const ProblemsTable = ({
                       <td className="border border-gray-300 p-3 text-center">{index + 1}</td>
                       <td className="border border-gray-300 p-3">
                         <Link to={`/detailproblem`} className="text-blue-600 hover:underline">
-                          {problem.problem_name}
+                          {contestProblem.Problem.problem_name}
                         </Link>
                       </td>
                       <td className="border border-gray-300 p-3 text-center">
                         <button
                           onClick={() => {
-                            setSelectedProblem(problem);
+                            setSelectedProblem(contestProblem);
                             setShowModal(true);
                           }}
                           className="text-gray-600 hover:text-blue-600"
@@ -76,7 +78,7 @@ const ProblemsTable = ({
                       <td className="border border-gray-300 p-3 text-center">
                         <div className="flex items-center justify-center space-x-2">
                           <img src="/user-register.png" alt="User Icon" className="h-4 w-4" />
-                          <span>{problem.solved_count}</span>
+                          <span>{contestProblem.Problem.solved_count}</span>
                         </div>
                       </td>
                     </tr>
@@ -164,7 +166,7 @@ const ProblemsTable = ({
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onSubmit={handleSubmit}
-        problemTitle={problemTitle}
+        problemTitle={title}
       />
     </div>
   );

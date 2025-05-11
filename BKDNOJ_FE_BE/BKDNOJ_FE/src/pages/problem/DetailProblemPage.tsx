@@ -10,7 +10,7 @@ export const DetailProblemPage = () => {
     solved_count: 100,
     timeLimit: "3s",
     memoryLimit: "262144 KB",
-    pdfUrl: "./public/file_PDF/thongbao.pdf",
+    pdfUrl: "/file_PDF/thongbao.pdf",
   };
 
   return (

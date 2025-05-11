@@ -1,32 +1,33 @@
 import { Contest } from "../types";
 import DetailContest from "./DetailContest";
+import { useCallback, useEffect, useState } from "react";
+import api from "../../api";
+import { useParams, Outlet } from "react-router-dom";
 
 export const DetailContestPage = () => {
-  const detailContest: Contest = {
-    id: "bkdniwf",
-    name: "BKDN ICPC World Finals Congratulations Challenge",
-    date: "3/22/2025, 12:30:00 PM",
-    duration: "04:00:00",
-    participants: 135,
-    isPast: false,
-    isUserRegistered: false,
-    listProblem: [
-      {
-        id: "001",
-        solved: false,
-        title: "Bai 1",
-        acPercentage: 0,
-        solved_count: 0,
-        timeLimit: "1s",
-        memoryLimit: "262144 KB",
-        pdfUrl: "./public/file_PDF/thongbao.pdf",
-      },
-    ],
-  };
+  const { id } = useParams();
+
+  const [detailContest, setDetailContest] = useState<Contest>();
+
+  const fetchProblems = useCallback(async () => {
+    try {
+      const res = await api.get(`/contest/${id}`);
+      setDetailContest(res.data.data);
+    } catch (error) {
+      console.error("Failed to fetch problems:", error);
+    }
+  }, [id]);
+  useEffect(() => {
+    fetchProblems();
+  }, [fetchProblems]);
 
   return (
     <div className="one-column-wrapper">
-      <DetailContest title="Past Contests" detail_contest={detailContest} />
+      {detailContest ? (
+        <DetailContest title="Past Contests" detail_contest={detailContest} />
+      ) : (
+        <div>Loading contest...</div>
+      )}
     </div>
   );
 };

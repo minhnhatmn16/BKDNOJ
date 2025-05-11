@@ -1,61 +1,28 @@
 import StandingTable from "./StandingTable";
-import { Standing } from "../types";
-
-const standings: Standing[] = [
-  {
-    rank: 1,
-    user: "Minh Nhat",
-    point: "100",
-    penalty: "01:03:30",
-    problems: [
-      {
-        point: "100",
-        time: "19:02:17",
-      },
-    ],
-  },
-  {
-    rank: 2,
-    user: "Xuan Toan",
-    point: "100",
-    penalty: "01:03:30",
-    problems: [
-      {
-        point: "100",
-        time: "19:02:17",
-      },
-      {
-        point: "100",
-        time: "19:02:17",
-      },
-      {
-        point: "100",
-        time: "19:02:17",
-      },
-      {
-        point: "100",
-        time: "19:02:17",
-      },
-      {
-        point: "100",
-        time: "19:02:17",
-      },
-      {
-        point: "100",
-        time: "19:02:17",
-      },
-      {
-        point: "100",
-        time: "19:02:17",
-      },
-    ],
-  },
-];
+import { Standing, Problem } from "../types";
+import api from "../../api";
+import { useEffect, useState } from "react";
 
 export const StandingPage = () => {
+  const [standings, setStandings] = useState<Standing[]>([]);
+  const [problems, setProblems] = useState<Problem[]>([]);
+
+  const fetchStandings = async () => {
+    try {
+      const res = await api.get("/contest/1/ranking");
+
+      setStandings(res.data.data.rankings);
+      setProblems(res.data.data.problems);
+    } catch (error) {
+      console.error("Failed to fetch standings", error);
+    }
+  };
+  useEffect(() => {
+    fetchStandings();
+  }, []);
   return (
     <div className="one-column-wrapper">
-      <StandingTable title="Standing" standings={standings} />
+      <StandingTable title="Standing" problems={problems} standings={standings} />
     </div>
   );
 };

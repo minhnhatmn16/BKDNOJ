@@ -31,10 +31,10 @@ exports.register = async (req, res) => {
 
 // Đăng nhập
 exports.login = async (req, res) => {
-  const { user_name, password } = req.body;
+  const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ where: { user_name } });
+    const user = await User.findOne({ where: { email } });
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const isPasswordValid = await bcrypt.compare(password, user.password);

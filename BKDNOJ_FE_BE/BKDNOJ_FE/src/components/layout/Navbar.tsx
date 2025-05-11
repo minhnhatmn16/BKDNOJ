@@ -22,34 +22,36 @@ export const Navbar = () => {
             {/* Desktop Navigation items */}
             <div className="hidden space-x-6 md:flex">
               {/* <button className="nav-link">Practice</button> */}
-              <Link className="nav-link" to="/listproblem">
+              <Link className="nav-link" to="/problems">
                 PROBLEMSET
               </Link>
               <Link className="nav-link" to="/detailproblem">
                 Detail Problem
               </Link>
-              <Link className="nav-link" to="/listcontest">
+              <Link className="nav-link" to="/contests">
                 CONTESTS
               </Link>
-              <Link className="nav-link" to="/detailcontest">
+              {/* <Link className="nav-link" to="/detailcontest">
                 Detail Contest
-              </Link>
+              </Link> */}
               <Link className="nav-link" to="/submissions">
-                Submission
+                SUBMISSIONS
               </Link>
-              <Link className="nav-link" to="/submit">
+              {/* <Link className="nav-link" to="/submit">
                 Submit
               </Link>
               <Link className="nav-link" to="/submitForm">
                 SubmitForm
-              </Link>
-              <Link className="nav-link" to="/standing">
+              </Link> */}
+              {/* <Link className="nav-link" to="/standing">
                 Standing
-              </Link>
+              </Link> */}
               <Link className="nav-link" to="/profile">
                 Profile
               </Link>
-
+              <Link className="nav-link" to="/createcontest">
+                Create Contest
+              </Link>
               {/* <Link className="nav-link" to="/orgs">
                 Organization
               </Link> */}
@@ -71,15 +73,15 @@ export const Navbar = () => {
             <div className="hidden space-x-4 md:flex">
               <Link
                 className="nav-link text-sm font-medium text-gray-800 hover:text-primary"
-                to="/sign-up"
+                to="/register"
               >
-                Sign Up
+                Register
               </Link>
               <Link
                 className="nav-link text-sm font-medium text-gray-800 hover:text-primary"
-                to="/sign-in"
+                to="/login"
               >
-                Sign In
+                Login
               </Link>
             </div>
           </div>

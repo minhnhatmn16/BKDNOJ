@@ -1,50 +1,65 @@
 export interface Contest {
-  id: string;
-  name: string;
-  date: string;
-  duration: string;
-  participants: number;
-  isPast: boolean;
-  isUserRegistered: boolean;
-  listProblem: Problem[];
+  contest_id: string;
+  contest_name: string;
+  start_time: string;
+  duration: number;
+  participantCount: number;
+  isRegistered: boolean;
+  Contest_Problems: ContestProblem[];
+}
+export interface User {
+  user_id: number;
+  user_name: string;
+  email: string;
+  avatar: string;
+  role: string;
+  can_create_contest: boolean;
+}
+export interface ContestProblem {
+  order: string;
+  point: number;
+  problem_id: number;
+  Problem: Problem;
 }
 
 export interface Problem {
-  id: string;
+  problem_id: string;
   solved: boolean;
-  title: string;
+  problem_name: string;
   acPercentage: number;
   solved_count: number;
-  timeLimit: string;
-  memoryLimit: string;
-  pdfUrl?: string;
+  timelimit_ms: string;
+  memorylimit_kb: string;
+  link?: string;
 }
 
 export interface Submission {
-  id: string;
-  status: string;
+  submission_id: number;
+  user_id: number;
   language: string;
-  user_name: string;
-  problemTitle: string;
-  date: string;
-  time: string;
-  execTime: string;
-  memory: string;
-  score: string;
-  colorClass: string;
+  status: string;
+  total_test: number;
+  passed_test: number;
+  time_ms: number;
+  memory_kb: number;
+  submit_time: string;
+  User: User;
+  Problem: Problem;
 }
 
 export interface ProblemResult {
-  point: string;
-  time: string;
+  problem_id: string;
+  order: string;
+  wrongAttempts: number;
+  firstACTime: number;
 }
 
 export interface Standing {
-  rank: number;
-  user: string;
-  point: string;
-  penalty: string;
-  problems: ProblemResult[];
+  user_id: number;
+  user_name: string;
+  solved: number;
+  penalty: number;
+  listProblem: ProblemResult[];
 }
 
 export interface Profile {

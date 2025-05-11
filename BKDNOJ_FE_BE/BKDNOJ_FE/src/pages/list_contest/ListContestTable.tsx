@@ -2,12 +2,14 @@ import { Link } from "react-router-dom";
 import { Contest } from "../types";
 
 interface ListContestTableProps {
+  isPast: boolean;
   title: string;
   list_contest: Contest[];
   showEmptyMessage?: boolean;
 }
 
 const ListContestTable = ({
+  isPast,
   title,
   list_contest,
   showEmptyMessage = false,
@@ -22,9 +24,9 @@ const ListContestTable = ({
               <tr>
                 <th className="w-[5%] border border-gray-300 p-3 text-center">#</th>
                 <th className="w-[40%] border border-gray-300 p-3 text-center">Name</th>
-                <th className="w-[20%] border border-gray-300 p-3 text-center">When</th>
-                <th className="w-[15%] border border-gray-300 p-3 text-center">Duration</th>
-                <th className="w-[20%] border border-gray-300 p-3 text-center">Participate</th>
+                <th className="w-[20%] border border-gray-300 p-3 text-center">Start</th>
+                <th className="w-[10%] border border-gray-300 p-3 text-center">Length</th>
+                <th className="w-[10%] border border-gray-300 p-3 text-center"></th>
               </tr>
             </thead>
             <tbody>
@@ -41,38 +43,60 @@ const ListContestTable = ({
                 ) : null
               ) : (
                 list_contest.map((contest, index) => (
-                  <tr key={contest.id} className={index % 2 === 0 ? "bg-gray-50" : ""}>
+                  <tr key={contest.contest_id} className={index % 2 === 0 ? "bg-gray-50" : ""}>
                     <td className="border border-gray-300 p-3 text-center">{index + 1}</td>
                     <td className="border border-gray-300 p-3 text-center">
-                      <Link to={`/contest/${contest.id}`} className="text-blue-600 hover:underline">
-                        {contest.name}
+                      <Link
+                        to={`/contest/${contest.contest_id}`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        {contest.contest_name}
                       </Link>
                     </td>
-                    <td className="border border-gray-300 p-3 text-center">{contest.date}</td>
-                    <td className="border border-gray-300 p-3 text-center">{contest.duration}</td>
+                    <td className="border border-gray-300 p-3 text-center">
+                      {new Date(contest.start_time).toLocaleDateString("vi-VN", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })}
+                      <br />
+                      {new Date(contest.start_time).toLocaleTimeString("vi-VN", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      })}
+                    </td>
+
+                    <td className="border border-gray-300 p-3 text-center">
+                      {Math.floor(contest.duration / 60)
+                        .toString()
+                        .padStart(2, "0")}
+                      :{(contest.duration % 60).toString().padStart(2, "0")}
+                    </td>
+
                     <td className="border border-gray-300 p-3 text-center">
                       <div className="flex flex-col items-center">
                         <div className="flex items-center space-x-2">
-                          <img src="public\user-register.png" alt="User Icon" className="h-4 w-4" />
+                          <img src="user-register.png" alt="User Icon" className="h-4 w-4" />
                           <span> x 135</span>
                         </div>
-                        {contest.isPast ? (
+                        {isPast ? (
                           <Link
-                            to={`/contest/${contest.id}/standing`}
+                            to={`/contest/${contest.contest_id}/standing`}
                             className="ml-2 text-blue-600 hover:underline"
                           >
-                            Standing
+                            Standing &gt;&gt;
                           </Link>
-                        ) : contest.isUserRegistered ? (
+                        ) : contest.isRegistered ? (
                           <Link
-                            to={`/contest/${contest.id}/standing`}
+                            to={`/contest/${contest.contest_id}/standing`}
                             className="ml-2 text-blue-600 hover:underline"
                           >
                             Standing &gt;&gt;
                           </Link>
                         ) : (
                           <Link
-                            to={`/contest/${contest.id}/register`}
+                            to={`/contest/${contest.contest_id}/register`}
                             className="ml-2 text-blue-600 hover:underline"
                           >
                             Register &gt;&gt;

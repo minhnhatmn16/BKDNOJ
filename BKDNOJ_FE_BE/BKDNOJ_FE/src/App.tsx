@@ -5,8 +5,8 @@ import ListContestsPage from "./pages/list_contest/ListContestsPage";
 import StandingPage from "./pages/standings/StandingPage";
 import StatusPage from "./pages/status/StatusPage";
 import OrganizationPage from "./pages/organization/OrganizationPage";
-import SignInPage from "./pages/auth/SignInPage";
-import SignUpPage from "./pages/auth/SignUpPage";
+import LoginPage from "./pages/auth/LoginPage";
+import RegisterPage from "./pages/auth/RegisterPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ListProblemsPage from "./pages/list_problem/ListProblemPage";
 import SubssmionPage from "./pages/submission/SubmissionPage";
@@ -16,6 +16,7 @@ import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import UserProfilePage from "./pages/profile/UserProfilePage ";
 import DetailProblemPage from "./pages/problem/DetailProblemPage";
 import DetailContestPage from "./pages/contest/DetailContestPage";
+import CreateContest from "./pages/create_contest/CreateContest";
 
 function App() {
   return (
@@ -23,11 +24,11 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/listproblem" element={<ListProblemsPage />} />
+          <Route path="/problems" element={<ListProblemsPage />} />
           <Route path="/detailproblem" element={<DetailProblemPage />} />
 
-          <Route path="/listcontest" element={<ListContestsPage />} />
-          <Route path="/detailcontest" element={<DetailContestPage />} />
+          <Route path="/contests" element={<ListContestsPage />} />
+          <Route path="/contest/:id" element={<DetailContestPage />} />
 
           <Route path="/submissions" element={<SubssmionPage />} />
           <Route path="/submit" element={<SubmitForm />} />
@@ -37,12 +38,12 @@ function App() {
 
           <Route path="/orgs" element={<OrganizationPage />} />
 
-          <Route path="/sign-up" element={<SignUpPage />} />
-          <Route path="/sign-in" element={<SignInPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
           <Route path="/profile" element={<UserProfilePage />} />
-          {/* <Route path="*" element={<NotFoundPage />} /> */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Layout>
     </Router>

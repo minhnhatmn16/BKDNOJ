@@ -1,63 +1,39 @@
 import ContestTable from "./ListContestTable";
 import { Contest, Problem } from "../types";
+import api from "../../api";
+import { useEffect, useState } from "react";
 
 export const ContestsPage = () => {
-  const upcomingContests: Contest[] = [
-    {
-      id: "bkdniwf",
-      name: "BKDN ICPC World Finals Congratulations Challenge",
-      date: "3/22/2025, 12:30:00 PM",
-      duration: "04:00:00",
-      participants: 135,
-      isPast: false,
-      isUserRegistered: false,
-      listProblem: [
-        {
-          id: "001",
-          solved: false,
-          title: "Bai 1",
-          acPercentage: 0,
-          solved_count: 0,
-          timeLimit: "1s",
-          memoryLimit: "262144 KB",
-          pdfUrl: "./public/file_PDF/thongbao.pdf",
-        },
-      ],
-    },
-  ];
+  const [upcomingContests, setUpcomingContests] = useState<Contest[]>([]);
+  const [pastContests, setPastContests] = useState<Contest[]>([]);
+  const fetchProblems = async () => {
+    try {
+      const res = await api.get(`/contests`);
 
-  const pastContests: Contest[] = [
-    {
-      id: "bkdniwf",
-      name: "BKDN ICPC World Finals Congratulations Challenge",
-      date: "3/22/2025, 12:30:00 PM",
-      duration: "04:00:00",
-      participants: 135,
-      isPast: false,
-      isUserRegistered: true,
-      listProblem: [
-        {
-          id: "001",
-          solved: false,
-          title: "Bai 1",
-          acPercentage: 0,
-          solved_count: 0,
-          timeLimit: "1s",
-          memoryLimit: "262144 KB",
-          pdfUrl: "./public/file_PDF/thongbao.pdf",
-        },
-      ],
-    },
-  ];
+      setUpcomingContests(res.data.data.upcomingContests);
+      setPastContests(res.data.data.pastContests);
+    } catch (error) {
+      console.error("Failed to fetch problems:", error);
+    }
+  };
+  useEffect(() => {
+    fetchProblems();
+  }, []);
 
   return (
     <div className="one-column-wrapper">
       <ContestTable
+        isPast={false}
         title="Ongoing/Upcoming Contests"
-        list_contest={upcomingContests}
+        list_contest={upcomingContests || []}
         showEmptyMessage
       />
-      <ContestTable title="Past Contests" list_contest={pastContests} showEmptyMessage />
+      <ContestTable
+        isPast={true}
+        title="Past Contests"
+        list_contest={pastContests || []}
+        showEmptyMessage
+      />
     </div>
   );
 };

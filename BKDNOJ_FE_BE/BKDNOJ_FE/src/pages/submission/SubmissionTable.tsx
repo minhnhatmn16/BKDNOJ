@@ -25,27 +25,63 @@ const SubmissionTable = ({ title, submissions }: SubmissionTableProps) => {
             </thead>
             <tbody>
               {submissions.map((sub, index) => (
-                <tr key={sub.id} className={index % 2 === 0 ? "bg-gray-50" : ""}>
-                  <td className="border border-gray-300 px-2 py-1 text-center">{sub.id}</td>
-                  <td className={`border border-gray-300 px-2 py-1 text-center ${sub.colorClass}`}>
-                    <div className="font-semibold">{sub.score}</div>
+                <tr key={sub.submission_id} className={index % 2 === 0 ? "bg-gray-50" : ""}>
+                  <td className="border border-gray-300 px-2 py-1 text-center">
+                    {sub.submission_id}
+                  </td>
+                  {/* <td className={`border border-gray-300 px-2 py-1 text-center ${sub.colorClass}`}> */}
+                  {/* <td className={`border border-gray-300 px-2 py-1 text-center`}>
+                    <div className="font-semibold">{sub.passed_test}</div>
                     <div className="text-xs">
                       {sub.status} | {sub.language}
                     </div>
                   </td>
+                   */}
                   <td className="border border-gray-300 px-2 py-1 text-center">
-                    <div className="text-xs text-gray-500">{sub.date}</div>
-                    <div className="font-medium">{sub.time}</div>
+                    <div
+                      className={`rounded-md px-1 py-1 text-sm font-semibold ${
+                        sub.status === "AC"
+                          ? "bg-green-400 text-green-900"
+                          : sub.status === "WA"
+                            ? "bg-gray-300 text-red-600"
+                            : "bg-gray-200 text-black"
+                      }`}
+                    >
+                      <div>{sub.passed_test}</div>
+                      <div className="text-xs font-normal">
+                        {sub.status} | {sub.language}
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="border border-gray-300 px-2 py-1 text-center">
+                    <div className="text-xs text-gray-500">
+                      {new Date(sub.submit_time).toLocaleDateString("vi-VN", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })}
+                    </div>
+                    <div className="font-medium">
+                      {new Date(sub.submit_time).toLocaleTimeString("vi-VN", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      })}
+                    </div>
                   </td>
                   <td className="border border-gray-300 px-2 py-1">
-                    <Link to={`/problem/${sub.id}`} className="text-blue-600 hover:underline">
-                      {sub.problemTitle}
+                    <Link
+                      to={`/problem/${sub.Problem.problem_id}`}
+                      className="text-blue-600 hover:underline"
+                    >
+                      {sub.Problem.problem_name}
                     </Link>
                   </td>
-                  <td className="border border-gray-300 px-2 py-1">{sub.user_name}</td>
+                  <td className="border border-gray-300 px-2 py-1">{sub.User.user_name}</td>
                   <td className="border border-gray-300 px-2 py-1 text-center">
-                    <div className="text-xs">{sub.execTime}</div>
-                    <div className="text-xs">{sub.memory}</div>
+                    <div className="text-xs">{sub.time_ms}s</div>
+                    <div className="text-xs">{sub.memory_kb}MB</div>
                   </td>
                 </tr>
               ))}
