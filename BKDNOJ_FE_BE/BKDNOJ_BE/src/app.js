@@ -20,10 +20,4 @@ app.use("/api/contests", contestsRoutes);
 const contestRoutes = require("./routes/contestRoutes");
 app.use("/api/contest", contestRoutes);
 
-// const submissionRoutes = require("./routes/submissionRoutes");
-// app.use("/api/submission", submissionRoutes);
-
-// const userRoutes = require("./routes/userRoutes");
-// app.use("/api/user", userRoutes);
-
 module.exports = app;

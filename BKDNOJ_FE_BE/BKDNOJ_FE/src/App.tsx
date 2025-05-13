@@ -26,13 +26,14 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/problems" element={<ListProblemsPage />} />
-          <Route path="/detailproblem" element={<DetailProblemPage />} />
+          <Route path="/problem/:problem_id" element={<DetailProblemPage />} />
 
           <Route path="/contests" element={<ListContestsPage />} />
-          <Route path="/contest/:id" element={<DetailContestPage />}>
+          <Route path="/contest/:contest_id" element={<DetailContestPage />}>
             <Route index element={<DetailContestWrapper />} />
             <Route path=":tab" element={<DetailContestWrapper />} />
           </Route>
+          <Route path="/contest/:contest_id/problem/:problem_id" element={<DetailProblemPage />} />
 
           <Route path="/submissions" element={<SubssmionPage />} />
           <Route path="/submit" element={<SubmitForm />} />

@@ -1,5 +1,5 @@
 export interface Contest {
-  contest_id: string;
+  contest_id: number;
   contest_name: string;
   start_time: string;
   duration: number;

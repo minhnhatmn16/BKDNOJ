@@ -10,6 +10,7 @@ const {
   calculateICPCRanking,
   calculateIOIRanking,
 } = require("../utils/ranking");
+const Problem = require("../models/problem");
 
 // Lấy thông tin cuộc thi
 exports.getContestById = async (req, res) => {
@@ -408,5 +409,29 @@ exports.getAllParticipant = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: "Server error", details: err });
+  }
+};
+
+exports.getProblemByNameOrder = async (req, res) => {
+  const { contest_id, problem_id } = req.params;
+  try {
+    const contestProblem = await ContestProblem.findOne({
+      where: {
+        order: problem_id,
+        contest_id: contest_id,
+      },
+    });
+    const problem = await Problem.findByPk(contestProblem.problem_id);
+    if (!problem) return res.status(404).json({ message: "Problem not found" });
+
+    res.status(200).json({
+      message: "Problem fetched successfully",
+      data: { problem },
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Server error while fetching problem",
+      details: err.message || err,
+    });
   }
 };

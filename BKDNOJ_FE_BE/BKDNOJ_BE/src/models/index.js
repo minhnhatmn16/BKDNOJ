@@ -28,7 +28,7 @@ Object.keys(models).forEach((modelName) => {
 const initModels = async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync({ alter: true });
+    // await sequelize.sync({ alter: true });
   } catch (error) {
     console.error("Error create models:", error);
   }

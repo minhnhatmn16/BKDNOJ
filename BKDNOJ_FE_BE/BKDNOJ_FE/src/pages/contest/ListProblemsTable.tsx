@@ -6,6 +6,7 @@ import { useState } from "react";
 
 interface ListProblemsTableProps {
   title: string;
+  contest_id: number;
   list_problem: ContestProblem[];
   currentPage: number;
   totalPages: number;
@@ -14,6 +15,7 @@ interface ListProblemsTableProps {
 
 const ProblemsTable = ({
   title,
+  contest_id,
   list_problem,
   currentPage,
   totalPages,
@@ -59,7 +61,10 @@ const ProblemsTable = ({
                       </td>
                       <td className="border border-gray-300 p-3 text-center">{index + 1}</td>
                       <td className="border border-gray-300 p-3">
-                        <Link to={`/detailproblem`} className="text-blue-600 hover:underline">
+                        <Link
+                          to={`/contest/${contest_id}/problem/${contestProblem.order}`}
+                          className="text-blue-600 hover:underline"
+                        >
                           {contestProblem.Problem.problem_name}
                         </Link>
                       </td>

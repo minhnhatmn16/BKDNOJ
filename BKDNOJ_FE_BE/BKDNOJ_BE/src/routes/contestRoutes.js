@@ -38,4 +38,10 @@ router.post(
 
 router.get("/:id/participants", contestController.getAllParticipant); // Lấy danh sách user tham gia contest
 
+router.get(
+  "/:contest_id/problem/:problem_id",
+  authenticateToken,
+  contestController.getProblemByNameOrder
+); // Lấy problem theo contest
+
 module.exports = router;

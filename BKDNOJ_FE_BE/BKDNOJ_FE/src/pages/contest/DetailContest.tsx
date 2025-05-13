@@ -102,6 +102,7 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
       {activeTab === "problems" && (
         <ListProblemsTable
           title="Problems"
+          contest_id={detail_contest.contest_id}
           list_problem={detail_contest.Contest_Problems}
           currentPage={currentPage}
           totalPages={totalPages}

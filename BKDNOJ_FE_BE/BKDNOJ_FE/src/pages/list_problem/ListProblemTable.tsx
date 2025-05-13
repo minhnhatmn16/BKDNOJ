@@ -57,7 +57,10 @@ const ProblemsTable = ({
                       </td>
                       <td className="border border-gray-300 p-3 text-center">{index + 1}</td>
                       <td className="border border-gray-300 p-3">
-                        <Link to={`/detailproblem`} className="text-blue-600 hover:underline">
+                        <Link
+                          to={`/problem/${problem.problem_id}`}
+                          className="text-blue-600 hover:underline"
+                        >
                           {problem.problem_name}
                         </Link>
                       </td>

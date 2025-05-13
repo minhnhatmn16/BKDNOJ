@@ -5,18 +5,18 @@ import { Contest } from "../types";
 import DetailContest from "./DetailContest";
 
 const DetailContestWrapper = () => {
-  const { id, tab } = useParams();
+  const { contest_id, tab } = useParams();
   const navigate = useNavigate();
   const [detailContest, setDetailContest] = useState<Contest>();
 
   const fetchContest = useCallback(async () => {
     try {
-      const res = await api.get(`/contest/${id}`);
+      const res = await api.get(`/contest/${contest_id}`);
       setDetailContest(res.data.data);
     } catch (error) {
       console.error("Failed to fetch contest:", error);
     }
-  }, [id]);
+  }, [contest_id]);
 
   useEffect(() => {
     fetchContest();
@@ -24,9 +24,9 @@ const DetailContestWrapper = () => {
 
   useEffect(() => {
     if (!["problems", "mysubmissions", "status", "standing"].includes(tab || "")) {
-      navigate(`/contest/${id}/problems`, { replace: true });
+      navigate(`/contest/${contest_id}/problems`, { replace: true });
     }
-  }, [tab, id, navigate]);
+  }, [tab, contest_id, navigate]);
 
   return detailContest ? (
     <DetailContest
