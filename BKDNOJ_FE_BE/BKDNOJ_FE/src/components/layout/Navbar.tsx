@@ -1,19 +1,28 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
+import { getCurrentUser } from "../../api";
+import { useAuth } from "../../pages/auth/contexts/authContext";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, setUser } = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname.startsWith(path);
-
   const navLinkClass = (path: string) =>
     `nav-link pb-1 transition-all duration-150 ${
       isActive(path)
         ? "border-b-2 border-blue-700 text-black"
         : "border-b-2 border-transparent text-gray-600 hover:border-gray-400"
     }`;
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+    navigate("/login");
+  };
 
   return (
     <div className="sticky top-0 z-50 bg-white shadow-md">
@@ -59,7 +68,7 @@ export const Navbar = () => {
             </button>
 
             {/* Desktop auth */}
-            <div className="hidden space-x-4 md:flex">
+            {/* <div className="hidden space-x-4 md:flex">
               <Link
                 className="nav-link text-sm font-medium text-gray-800 hover:text-primary"
                 to="/register"
@@ -72,11 +81,50 @@ export const Navbar = () => {
               >
                 Login
               </Link>
+            </div> */}
+            <div className="hidden items-center space-x-4 md:flex">
+              {user ? (
+                <div className="flex items-center space-x-3">
+                  <img
+                    src={user.avatar || "/default-avatar.png"}
+                    alt="avatar"
+                    className="h-8 w-8 rounded-full"
+                  />
+                  <Link
+                    to="/profile"
+                    className="text-sm font-medium text-gray-800 hover:text-primary"
+                  >
+                    {user.user_name}
+                  </Link>
+                  <span className="text-gray-400">|</span>
+                  <button
+                    onClick={handleLogout}
+                    className="text-sm font-medium text-gray-800 hover:text-primary"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Link
+                    className="nav-link text-sm font-medium text-gray-800 hover:text-primary"
+                    to="/register"
+                  >
+                    Register
+                  </Link>
+                  <Link
+                    className="nav-link text-sm font-medium text-gray-800 hover:text-primary"
+                    to="/login"
+                  >
+                    Login
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Mobile menu */}
+        {/* Mobile menu
         {isMenuOpen && (
           <div className="mt-4 w-full md:hidden">
             <div className="flex flex-col space-y-4">
@@ -94,7 +142,7 @@ export const Navbar = () => {
               </Link>
             </div>
           </div>
-        )}
+        )} */}
       </nav>
     </div>
   );

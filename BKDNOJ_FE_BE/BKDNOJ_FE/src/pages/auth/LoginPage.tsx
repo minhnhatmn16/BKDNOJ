@@ -1,32 +1,45 @@
+// src/pages/LoginPage.tsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../../api";
+import api, { getCurrentUser } from "../../api";
+import { useAuth } from "./contexts/authContext";
 
-export const LoginPage = () => {
+const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { setUser } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
     try {
       const res = await api.post("/auth/login", { email, password });
-
       const { token } = res.data.data;
-
       localStorage.setItem("token", token);
-      navigate("/dashboard");
-    } catch (err) {
-      setError("Login failed. Please check your credentials.");
-      console.error("Login error:", err);
+
+      const userRes = await getCurrentUser();
+      console.log(userRes.data.data);
+      setUser(userRes.data.data);
+
+      navigate("/problems");
+    } catch (err: any) {
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Login failed. Please try again.");
+      }
     }
   };
 
   return (
     <div className="mx-auto max-w-md rounded-md bg-white p-8 shadow">
       <h2 className="mb-6 text-2xl font-bold">Login</h2>
+      {error && (
+        <div className="mb-4 rounded-md bg-red-100 px-4 py-2 text-sm text-red-700">{error}</div>
+      )}
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="username" className="mb-2 block text-sm font-medium">
@@ -35,7 +48,7 @@ export const LoginPage = () => {
           <input
             type="text"
             id="username"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full rounded-md border border-gray-300 px-3 py-2"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -48,26 +61,15 @@ export const LoginPage = () => {
           <input
             type="password"
             id="password"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full rounded-md border border-gray-300 px-3 py-2"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center">
-            <input type="checkbox" id="remember" className="mr-2" />
-            <label htmlFor="remember" className="text-sm">
-              Remember me
-            </label>
-          </div>
-          <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
-            Forgot password?
-          </Link>
-        </div>
         <button
           type="submit"
-          className="w-full rounded-md bg-primary px-4 py-2 text-white hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          className="w-full rounded bg-blue-600 py-2 text-white hover:bg-blue-700"
         >
           Login
         </button>

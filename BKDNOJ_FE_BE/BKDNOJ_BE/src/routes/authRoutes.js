@@ -8,6 +8,7 @@ const addPermission = require("../middleware/addPermission");
 router.post("/register", authController.register); // Đăng kí
 router.post("/login", authController.login); // Đăng nhập
 router.put("/change-password", authController.changePassword); // Thay đổi mật khẩu
+router.get("/profile/myprofile", authenticateToken, authController.myProfile);
 router.get("/profile/:id", authController.profile);
 router.put(
   "/change-permission",
@@ -15,4 +16,5 @@ router.put(
   addPermission,
   authController.changePermission
 );
+
 module.exports = router;
