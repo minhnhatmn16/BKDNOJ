@@ -29,7 +29,7 @@ export const UserProfilePage = () => {
 
   const fetchProfile = useCallback(async () => {
     try {
-      const res = await api.get(`auth/profile/${user_name}`);
+      const res = await api.get(`/auth/profile/${user_name}`);
       setUserProfile(res.data.data.profile);
       setSubmssionsInYear(generateHeatmapData(res.data.data.submissions));
     } catch (error) {

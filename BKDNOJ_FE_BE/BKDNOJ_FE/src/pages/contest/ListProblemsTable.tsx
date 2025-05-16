@@ -1,8 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ContestProblem } from "../types";
 import GotoPageInput from "../../components/pagination/GotoPageInput";
 import SubmitModal from "../submit/SubmitModal";
 import { useState } from "react";
+import api from "../../api";
 
 interface ListProblemsTableProps {
   title: string;
@@ -22,10 +23,21 @@ const ProblemsTable = ({
   onPageChange,
 }: ListProblemsTableProps) => {
   const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState("");
   const [selectedProblem, setSelectedProblem] = useState<ContestProblem | null>(null);
+  const navigate = useNavigate();
 
-  const handleSubmit = (language: string, code: string) => {
-    setShowModal(false);
+  const handleSubmit = async (problem_id: number, language: string, code: string) => {
+    try {
+      const res = await api.post(`/contest/${contest_id}/${problem_id}`, { language, code });
+      navigate(`/contest/${contest_id}/mysubmissions`);
+    } catch (err: any) {
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Login failed. Please try again.");
+      }
+    }
   };
 
   return (
@@ -53,16 +65,19 @@ const ProblemsTable = ({
                       className={index % 2 === 0 ? "bg-gray-50" : ""}
                     >
                       <td className="border border-gray-300 p-3 text-center">
-                        {contestProblem.Problem.solved || 0 ? (
+                        {contestProblem.Problem.userStatus === "ac" ? (
                           <span className="text-green-500">&#10004;</span>
+                        ) : contestProblem.Problem.userStatus === "sub" ? (
+                          <span className="text-red-500">&#10006;</span>
                         ) : (
                           ""
                         )}
                       </td>
+
                       <td className="border border-gray-300 p-3 text-center">{index + 1}</td>
                       <td className="border border-gray-300 p-3">
                         <Link
-                          to={`/contest/${contest_id}/problem/${contestProblem.order}`}
+                          to={`/problem/${contestProblem.problem_id}`}
                           className="text-blue-600 hover:underline"
                         >
                           {contestProblem.Problem.problem_name}
@@ -83,7 +98,7 @@ const ProblemsTable = ({
                       <td className="border border-gray-300 p-3 text-center">
                         <div className="flex items-center justify-center space-x-2">
                           <img src="/user-register.png" alt="User Icon" className="h-4 w-4" />
-                          <span>{contestProblem.Problem.solved_count}</span>
+                          <span>x {contestProblem.Problem.acceptedUserCount}</span>
                         </div>
                       </td>
                     </tr>
@@ -148,31 +163,17 @@ const ProblemsTable = ({
         </div>
       </div>
 
-      {/* Search box */}
-      <div className="w-full lg:w-1/4">
-        <div className="rounded-md border border-gray-300 bg-white p-4">
-          <h4 className="mb-3 text-lg font-semibold">Filter Problems</h4>
-          <input
-            type="text"
-            placeholder="Search problem..."
-            className="mb-2 w-full rounded border p-2"
-          />
-          <div className="flex flex-col space-y-1">
-            <label>
-              <input type="checkbox" /> Hide solved problems
-            </label>
-          </div>
-          <div className="mt-4 flex justify-center">
-            <button className="rounded bg-blue-500 px-4 py-2 text-white">Apply</button>
-          </div>
-        </div>
-      </div>
-      <SubmitModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        onSubmit={handleSubmit}
-        problemTitle={title}
-      />
+      {selectedProblem && (
+        <SubmitModal
+          isOpen={showModal}
+          onClose={() => {
+            setShowModal(false);
+            setSelectedProblem(null);
+          }}
+          onSubmit={handleSubmit}
+          problem={selectedProblem.Problem}
+        />
+      )}
     </div>
   );
 };

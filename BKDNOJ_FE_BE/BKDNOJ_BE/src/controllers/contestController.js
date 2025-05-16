@@ -3,7 +3,7 @@ const Submission = require("../models/submission");
 const ContestParticipant = require("../models/contest_participant");
 const ContestProblem = require("../models/contest_problem");
 const { models } = require("../models");
-const { Op } = require("sequelize");
+const { Op, fn, col } = require("sequelize");
 const bcrypt = require("bcrypt");
 
 const {
@@ -12,8 +12,56 @@ const {
 } = require("../utils/ranking");
 const Problem = require("../models/problem");
 
+// Số lượng người ac problem
+async function getAcceptedUserCountMap(contest_id, problemIds) {
+  const acCounts = await Submission.findAll({
+    attributes: [
+      "problem_id",
+      [fn("COUNT", fn("DISTINCT", col("user_id"))), "acceptedUserCount"],
+    ],
+    where: {
+      contest_id,
+      status: "AC",
+      problem_id: { [Op.in]: problemIds },
+    },
+    group: ["problem_id"],
+  });
+
+  const acMap = {};
+  acCounts.forEach((item) => {
+    acMap[item.problem_id] = parseInt(item.get("acceptedUserCount"));
+  });
+  return acMap;
+}
+
+// Xem trạng thái người dùng có giải quyết problem chưa ac, sub, none
+async function getUserStatusMap(contest_id, problemIds, user_id) {
+  const userSubmissions = await Submission.findAll({
+    attributes: ["problem_id", "status"],
+    where: {
+      contest_id,
+      user_id,
+      problem_id: { [Op.in]: problemIds },
+    },
+  });
+
+  const statusMap = {};
+  for (const sub of userSubmissions) {
+    const pid = sub.problem_id;
+    const status = sub.status;
+    if (!statusMap[pid]) {
+      statusMap[pid] = status === "AC" ? "ac" : "sub";
+    } else if (statusMap[pid] !== "ac" && status === "AC") {
+      statusMap[pid] = "ac";
+    }
+  }
+
+  return statusMap;
+}
+
 // Lấy thông tin cuộc thi
 exports.getContestById = async (req, res) => {
+  const { user_id = null } = req.user;
   const { id } = req.params;
   try {
     const contest = await Contest.findByPk(id, {
@@ -31,13 +79,29 @@ exports.getContestById = async (req, res) => {
           include: [
             {
               model: models.Problem,
-              attributes: ["problem_name"],
+              attributes: ["problem_name", "problem_id"],
             },
           ],
         },
       ],
       order: [[models.ContestProblem, "order", "ASC"]],
     });
+    if (!contest) {
+      return res.status(404).json({ error: "Contest not found" });
+    }
+
+    const problemIds = contest.Contest_Problems.map((cp) => cp.problem_id);
+
+    const [acMap, statusMap] = await Promise.all([
+      getAcceptedUserCountMap(id, problemIds),
+      getUserStatusMap(id, problemIds, user_id),
+    ]);
+    contest.Contest_Problems.forEach((cp) => {
+      const pid = cp.problem_id;
+      cp.Problem.dataValues.acceptedUserCount = acMap[pid] || 0;
+      cp.Problem.dataValues.userStatus = statusMap[pid] || "none";
+    });
+
     if (contest) {
       res
         .status(200)
@@ -264,17 +328,10 @@ exports.getAllSubmission = async (req, res) => {
     if (!contest) {
       return res.status(404).json({ error: "Contest not found" });
     }
-    const startTime = new Date(contest.start_time);
-    const endTime = new Date(
-      startTime.getTime() + contest.duration * 60 * 1000
-    );
 
     const submissions = await Submission.findAll({
       where: {
         contest_id: id,
-        submit_time: {
-          [Op.between]: [startTime, endTime],
-        },
       },
       attributes: [
         "submission_id",
@@ -431,6 +488,54 @@ exports.getProblemByNameOrder = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       message: "Server error while fetching problem",
+      details: err.message || err,
+    });
+  }
+};
+
+// Submit
+exports.addSubmit = async (req, res) => {
+  const user_id = req.user.user_id;
+  const { problem_id, contest_id } = req.params;
+  const { language, code } = req.body;
+
+  try {
+    const problemInContest = await ContestProblem.findOne({
+      where: {
+        problem_id,
+        contest_id,
+      },
+    });
+    if (!problemInContest) {
+      return res.status(404).json({ message: "Problem or contest not found" });
+    }
+
+    const userInContest = await ContestParticipant.findOne({
+      where: {
+        contest_id,
+        user_id,
+      },
+    });
+    if (!userInContest) {
+      return res
+        .status(404)
+        .json({ message: "You haven't registered for this contest yet." });
+    }
+    const newSubmission = await Submission.create({
+      user_id,
+      problem_id,
+      contest_id,
+      language,
+      code,
+    });
+
+    res.status(201).json({
+      message: "Submission added successfully",
+      data: newSubmission.submission_id,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Server error while adding submission",
       details: err.message || err,
     });
   }

@@ -20,7 +20,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           const decoded: DecodedToken = jwtDecode(token);
           const res = await api.get(`auth/profile/${decoded.user_name}`);
-          console.log(res.data.data);
           setUser({
             user_name: res.data.data.profile.user_name,
             avatar: res.data.data.profile.avatar || "/default-avatar.png",

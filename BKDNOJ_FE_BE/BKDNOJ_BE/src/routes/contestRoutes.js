@@ -4,7 +4,7 @@ const contestController = require("../controllers/contestController");
 const authenticateToken = require("../middleware/authenticateToken");
 const checkCreatePermission = require("../middleware/checkCreatePermission");
 
-router.get("/:id", contestController.getContestById); // Lấy thông tin contest
+router.get("/:id", authenticateToken, contestController.getContestById); // Lấy thông tin contest
 
 router.post(
   "/",
@@ -43,5 +43,11 @@ router.get(
   authenticateToken,
   contestController.getProblemByNameOrder
 ); // Lấy problem theo contest
+
+router.post(
+  "/:contest_id/:problem_id",
+  authenticateToken,
+  contestController.addSubmit
+); // Submit
 
 module.exports = router;

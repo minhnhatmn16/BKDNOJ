@@ -93,10 +93,9 @@ exports.addSubmit = async (req, res) => {
       language,
       code,
     });
-
     res.status(201).json({
       message: "Submission added successfully",
-      data: newSubmission,
+      data: newSubmission.submission_id,
     });
   } catch (err) {
     res.status(500).json({

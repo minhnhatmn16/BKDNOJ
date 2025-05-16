@@ -5,8 +5,6 @@ const SomeProblemPage = () => {
   const [showModal, setShowModal] = useState(false);
 
   const handleSubmit = (language: string, code: string) => {
-    console.log("Submitting code in", language);
-    console.log("Code:", code);
     setShowModal(false);
   };
   const problemTitle = "Problem XYZ";

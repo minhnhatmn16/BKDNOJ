@@ -9,7 +9,6 @@ export const RegisterPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Sign up with:", username, email, password);
   };
 
   return (

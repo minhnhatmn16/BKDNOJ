@@ -10,15 +10,9 @@ interface SubmitPageProps {
 const SubmitPage = ({ problem }: SubmitPageProps) => {
   const [language, setLanguage] = useState("C++17");
   const [code, setCode] = useState("// Write your code here");
-  const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const navigate = useNavigate();
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      setFile(e.target.files[0]);
-    }
-  };
   const handleSubmit = async () => {
     if (!problem?.problem_id) {
       console.error("Missing problem_id");
@@ -63,10 +57,8 @@ const SubmitPage = ({ problem }: SubmitPageProps) => {
               onChange={(e) => setLanguage(e.target.value)}
               className="rounded border border-gray-300 px-2 py-1"
             >
-              <option value="C++17">C++17</option>
-              <option value="C++20">C++20</option>
-              <option value="Python 3">Python 3</option>
-              <option value="Java">Java</option>
+              <option value="C++">C++</option>
+              <option value="Python">Python</option>
             </select>
           </div>
 

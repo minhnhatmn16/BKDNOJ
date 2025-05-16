@@ -78,7 +78,7 @@ const ListContestTable = ({
                       <div className="flex flex-col items-center">
                         <div className="flex items-center space-x-2">
                           <img src="user-register.png" alt="User Icon" className="h-4 w-4" />
-                          <span> x 135</span>
+                          <span> x {contest.participantCount}</span>
                         </div>
                         {isPast ? (
                           <Link

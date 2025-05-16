@@ -23,11 +23,11 @@ export interface ContestProblem {
 }
 
 export interface Problem {
-  problem_id: string;
-  solved: boolean;
+  problem_id: number;
+  userStatus: string;
   problem_name: string;
   acPercentage: number;
-  solved_count: number;
+  acceptedUserCount: number;
   timelimit_ms: string;
   memorylimit_kb: string;
   link?: string;

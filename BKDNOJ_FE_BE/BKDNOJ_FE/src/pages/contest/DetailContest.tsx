@@ -6,6 +6,7 @@ import api from "../../api";
 import ListProblemsTable from "./ListProblemsTable";
 import SubmissionTable from "../submission/SubmissionTable";
 import StandingTable from "../standings/StandingTable";
+import ContestStatusTimer from "../../components/layout/ContestStatusTimer";
 
 interface DetailContestProps {
   title: string;
@@ -74,10 +75,14 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
       <h4 className="p-3 text-center text-2xl font-bold text-primary">
         {detail_contest.contest_name}
       </h4>
-      <h4 className="p-3 text-center text-2xl text-primary">Contest is running</h4>
+      {/* <h4 className="p-3 text-center text-2xl text-primary">Contest is running</h4>
       <p className="mb-2 text-center text-sm text-gray-500">
         The contest will end in: {getCurrentTime()}
-      </p>
+      </p> */}
+      <ContestStatusTimer
+        startTime={detail_contest.start_time}
+        duration={detail_contest.duration}
+      />
 
       <nav className="navbar border-b bg-white py-4">
         <div className="container flex flex-wrap items-center space-x-8">

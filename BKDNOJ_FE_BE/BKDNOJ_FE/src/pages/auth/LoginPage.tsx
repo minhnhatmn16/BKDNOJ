@@ -30,7 +30,6 @@ const LoginPage = () => {
 
       const decoded: DecodedToken = jwtDecode(token);
       const userRes = await api.get(`/auth/profile/${decoded.user_name}`);
-      console.log(userRes.data.data);
       setUser(userRes.data.data);
 
       navigate("/problems");

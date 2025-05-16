@@ -8,8 +8,7 @@ export const SubmissionsPage = () => {
 
   const fetchSubmissions = async () => {
     try {
-      const res = await api.get("/contest/1/submissions");
-      console.log(res);
+      const res = await api.get("/submissions");
       setSubmissions(res.data.data);
     } catch (error) {
       console.error("Failed to fetch submissions", error);

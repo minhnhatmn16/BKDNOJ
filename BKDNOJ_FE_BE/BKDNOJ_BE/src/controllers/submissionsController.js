@@ -6,9 +6,9 @@ const { models } = require("../models");
 exports.getAllSubmission = async (req, res) => {
   try {
     const submissions = await Submission.findAll({
-      where: {
-        contest_id: null,
-      },
+      // where: {
+      //   contest_id: null,
+      // },
       attributes: [
         "submission_id",
         "user_id",
