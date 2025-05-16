@@ -14,8 +14,4 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export const getCurrentUser = async () => {
-  return api.get("/auth/profile/myProfile");
-};
-
 export default api;

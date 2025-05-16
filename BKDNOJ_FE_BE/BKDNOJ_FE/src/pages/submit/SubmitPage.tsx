@@ -1,41 +1,60 @@
 import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Problem } from "../types";
+import api from "../../api";
 
-interface SubmitModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (language: string, code: string, file?: File | null) => void;
-  problemTitle?: string;
+interface SubmitPageProps {
+  problem: Problem;
 }
 
-const SubmitModal = ({ isOpen, onClose, onSubmit, problemTitle }: SubmitModalProps) => {
+const SubmitPage = ({ problem }: SubmitPageProps) => {
   const [language, setLanguage] = useState("C++17");
   const [code, setCode] = useState("// Write your code here");
   const [file, setFile] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  if (!isOpen) return null;
-
+  const navigate = useNavigate();
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
       setFile(e.target.files[0]);
     }
   };
+  const handleSubmit = async () => {
+    if (!problem?.problem_id) {
+      console.error("Missing problem_id");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const response = await api.post(`/problem/${problem.problem_id}/submit`, {
+        language,
+        code,
+      });
+      navigate("/submissions");
+    } catch (error) {
+      console.error("Submission failed:", error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="w-full max-w-3xl rounded-md bg-white shadow-lg">
-        <div className="flex items-center justify-between border-b bg-gray-100 px-4 py-2">
-          <h2 className="text-lg font-semibold">Submit</h2>
-          <button onClick={onClose} className="text-xl font-bold text-gray-600 hover:text-black">
-            &times;
+    <div className="flex justify-center p-6">
+      <div className="w-full max-w-3xl rounded-md border border-gray-200 bg-white shadow-lg">
+        {/* <div className="flex items-center justify-between border-b bg-gray-100 px-4 py-2">
+          <h2 className="text-lg font-semibold">Submit Solution</h2>
+          <button onClick={() => navigate(-1)} className="text-sm text-blue-600 hover:underline">
+            &larr; Go Back
           </button>
-        </div>
+        </div> */}
         <div className="p-4">
-          {problemTitle && (
+          {/* {problem && (
             <div className="mb-4 flex items-center gap-2">
               <label className="mb-1 block font-medium text-gray-700">Problem:</label>
-              <div className="mb-1 block font-semibold text-gray-800">{problemTitle}</div>
+              <div className="mb-1 block font-semibold text-gray-800">{problem.problem_name}</div>
             </div>
-          )}
+          )} */}
 
           <div className="mb-4">
             <label className="mb-1 block font-medium">Language:</label>
@@ -50,6 +69,7 @@ const SubmitModal = ({ isOpen, onClose, onSubmit, problemTitle }: SubmitModalPro
               <option value="Java">Java</option>
             </select>
           </div>
+
           <div className="mb-4">
             <label className="mb-1 block font-medium">Code:</label>
             <textarea
@@ -59,23 +79,25 @@ const SubmitModal = ({ isOpen, onClose, onSubmit, problemTitle }: SubmitModalPro
               onChange={(e) => setCode(e.target.value)}
             />
           </div>
-          <div className="mb-4">
+
+          {/* <div className="mb-4">
             <label className="mb-1 block font-medium">Attach File (Optional):</label>
             <input
               type="file"
               onChange={handleFileChange}
               className="w-full rounded border border-gray-300 px-2 py-1"
             />
-          </div>
+          </div> */}
+
           <div className="flex justify-end space-x-3">
-            <button onClick={onClose} className="rounded bg-gray-300 px-4 py-2 hover:bg-gray-400">
-              Close
-            </button>
             <button
-              onClick={() => onSubmit(language, code, file)}
-              className="rounded bg-primary px-4 py-2 text-white hover:bg-blue-700"
+              onClick={handleSubmit}
+              disabled={submitting}
+              className={`rounded px-4 py-2 text-white ${
+                submitting ? "bg-gray-400" : "bg-primary hover:bg-blue-700"
+              }`}
             >
-              Submit
+              {submitting ? "Submitting..." : "Submit"}
             </button>
           </div>
         </div>
@@ -84,4 +106,4 @@ const SubmitModal = ({ isOpen, onClose, onSubmit, problemTitle }: SubmitModalPro
   );
 };
 
-export default SubmitModal;
+export default SubmitPage;

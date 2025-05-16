@@ -18,6 +18,7 @@ import DetailProblemPage from "./pages/problem/DetailProblemPage";
 import DetailContestPage from "./pages/contest/DetailContestPage";
 import CreateContest from "./pages/create_contest/CreateContest";
 import DetailContestWrapper from "./pages/contest/DetailContestWrapper";
+import DetailProblemWrapper from "./pages/problem/DetailProblemWrapper";
 import { AuthProvider } from "./pages/auth/contexts/AuthProvider";
 
 function App() {
@@ -28,7 +29,10 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/problems" element={<ListProblemsPage />} />
-            <Route path="/problem/:problem_id" element={<DetailProblemPage />} />
+            <Route path="/problem/:problem_id" element={<DetailProblemPage />}>
+              <Route index element={<DetailProblemWrapper />} />
+              <Route path=":tab" element={<DetailProblemWrapper />} />
+            </Route>
 
             <Route path="/contests" element={<ListContestsPage />} />
             <Route path="/contest/:contest_id" element={<DetailContestPage />}>
@@ -52,7 +56,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-            <Route path="/profile" element={<UserProfilePage />} />
+            <Route path="/profile/:user_name" element={<UserProfilePage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Layout>

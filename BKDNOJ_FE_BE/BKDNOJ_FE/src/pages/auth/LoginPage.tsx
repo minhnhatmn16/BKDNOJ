@@ -1,8 +1,16 @@
 // src/pages/LoginPage.tsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api, { getCurrentUser } from "../../api";
+import api from "../../api";
 import { useAuth } from "./contexts/authContext";
+import { jwtDecode } from "jwt-decode";
+
+interface DecodedToken {
+  user_id: string;
+  user_name: string;
+  role: string;
+  can_create_contest: boolean;
+}
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +28,8 @@ const LoginPage = () => {
       const { token } = res.data.data;
       localStorage.setItem("token", token);
 
-      const userRes = await getCurrentUser();
+      const decoded: DecodedToken = jwtDecode(token);
+      const userRes = await api.get(`/auth/profile/${decoded.user_name}`);
       console.log(userRes.data.data);
       setUser(userRes.data.data);
 

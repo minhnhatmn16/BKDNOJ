@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
-import { getCurrentUser } from "../../api";
 import { useAuth } from "../../pages/auth/contexts/authContext";
 
 export const Navbar = () => {
@@ -39,18 +38,18 @@ export const Navbar = () => {
               <Link className={navLinkClass("/problems")} to="/problems">
                 PROBLEMSET
               </Link>
-              <Link className={navLinkClass("/detailproblem")} to="/detailproblem">
+              {/* <Link className={navLinkClass("/detailproblem")} to="/detailproblem">
                 Detail Problem
-              </Link>
+              </Link> */}
               <Link className={navLinkClass("/contests")} to="/contests">
                 CONTESTS
               </Link>
               <Link className={navLinkClass("/submissions")} to="/submissions">
                 SUBMISSIONS
               </Link>
-              <Link className={navLinkClass("/profile")} to="/profile">
+              {/* <Link className={navLinkClass("/profile")} to="/profile">
                 Profile
-              </Link>
+              </Link> */}
               <Link className={navLinkClass("/createcontest")} to="/createcontest">
                 Create Contest
               </Link>
@@ -91,7 +90,7 @@ export const Navbar = () => {
                     className="h-8 w-8 rounded-full"
                   />
                   <Link
-                    to="/profile"
+                    to={`/profile/${user.user_name}`}
                     className="text-sm font-medium text-gray-800 hover:text-primary"
                   >
                     {user.user_name}

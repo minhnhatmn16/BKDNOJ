@@ -20,7 +20,7 @@ exports.createProblem = async (req, res) => {
 
     res.status(201).json({
       message: "Problem created successfully",
-      data: { problem: newProblem },
+      data: newProblem,
     });
   } catch (err) {
     res.status(500).json({
@@ -51,7 +51,7 @@ exports.updateProblem = async (req, res) => {
 
     res.status(200).json({
       message: "Problem updated successfully",
-      data: { problem: updateProblem },
+      data: updateProblem,
     });
   } catch (err) {
     res.status(500).json({
@@ -70,7 +70,7 @@ exports.getProblemById = async (req, res) => {
 
     res.status(200).json({
       message: "Problem fetched successfully",
-      data: { problem },
+      data: problem,
     });
   } catch (err) {
     res.status(500).json({
@@ -96,7 +96,7 @@ exports.addSubmit = async (req, res) => {
 
     res.status(201).json({
       message: "Submission added successfully",
-      data: { submission: newSubmission },
+      data: newSubmission,
     });
   } catch (err) {
     res.status(500).json({
@@ -141,7 +141,7 @@ exports.getAllSubmission = async (req, res) => {
 
     res.status(200).json({
       message: "Submissions fetched successfully",
-      data: { submissions },
+      data: submissions,
     });
   } catch (err) {
     res.status(500).json({
@@ -189,7 +189,7 @@ exports.getMySubmission = async (req, res) => {
 
     res.status(200).json({
       message: "User's submissions fetched successfully",
-      data: { mysubmissions },
+      data: mysubmissions,
     });
   } catch (err) {
     res.status(500).json({

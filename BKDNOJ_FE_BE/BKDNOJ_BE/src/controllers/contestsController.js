@@ -34,7 +34,7 @@ exports.getAllContest = async (req, res) => {
 
     const upcomingContests = await Contest.findAll({
       where: literal(`DATE_ADD(start_time, INTERVAL duration MINUTE) >= NOW()`),
-      order: [["start_time", "DESC"]],
+      order: [["start_time", "ASC"]],
       attributes: [
         "contest_id",
         "contest_name",

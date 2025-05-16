@@ -1,9 +1,10 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const Submission = require("../models/submission");
+const { literal, Op, fn } = require("sequelize");
 const { models } = require("../models");
 const moment = require("moment");
-const { literal } = require("sequelize");
 
 // Đăng kí
 exports.register = async (req, res) => {
@@ -96,40 +97,43 @@ exports.changePassword = async (req, res) => {
 
 // Profile
 exports.profile = async (req, res) => {
-  const user_id = req.params.id;
-  const currentYear = moment().year();
+  const user_name = req.params.id;
+  const startOfYear = moment().startOf("year").toDate();
+  const endOfYear = moment().endOf("year").toDate();
 
   try {
-    const profile = await User.findAll({
+    const profile = await User.findOne({
       where: {
-        user_id: user_id,
+        user_name: user_name,
       },
       attributes: ["user_id", "user_name", "avatar"],
     });
 
+    if (!profile) {
+      return res
+        .status(404)
+        .json({ message: `User not found with user_name: ${user_name}` });
+    }
+
+    const submissions = await Submission.findAll({
+      attributes: [
+        [literal("DATE(submit_time)"), "date"],
+        [fn("COUNT", "*"), "count"],
+      ],
+      where: {
+        user_id: profile.user_id,
+        submit_time: {
+          [Op.between]: [startOfYear, endOfYear],
+        },
+      },
+      group: [literal("DATE(submit_time)")],
+      order: [[literal("DATE(submit_time)"), "DESC"]],
+      raw: true,
+    });
+
     res.status(200).json({
       message: "User profile fetched successfully",
-      data: profile,
-    });
-  } catch (err) {
-    res.status(500).json({
-      message: "Server error",
-      details: err.message,
-    });
-  }
-};
-
-//My profile
-exports.myProfile = async (req, res) => {
-  const user_id = req.user.user_id;
-  const currentYear = moment().year();
-
-  try {
-    const profile = await User.findByPk(user_id);
-
-    res.status(200).json({
-      message: "User myprofile fetched successfully",
-      data: profile,
+      data: { profile, submissions },
     });
   } catch (err) {
     res.status(500).json({
