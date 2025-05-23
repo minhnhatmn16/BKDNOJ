@@ -44,7 +44,7 @@ const ListContestTable = ({
               ) : (
                 list_contest.map((contest, index) => (
                   <tr key={contest.contest_id} className={index % 2 === 0 ? "bg-gray-50" : ""}>
-                    <td className="border border-gray-300 p-3 text-center">{index + 1}</td>
+                    <td className="border border-gray-300 p-3 text-center">{contest.contest_id}</td>
                     <td className="border border-gray-300 p-3 text-center">
                       <Link
                         to={`/contest/${contest.contest_id}`}

@@ -20,6 +20,8 @@ import CreateContest from "./pages/create_contest/CreateContest";
 import DetailContestWrapper from "./pages/contest/DetailContestWrapper";
 import DetailProblemWrapper from "./pages/problem/DetailProblemWrapper";
 import { AuthProvider } from "./pages/auth/contexts/AuthProvider";
+import AdminContestPage from "./pages/manage/Contests/AdminContestPage";
+import AdminProblemPage from "./pages/manage/Contests/AdminProblemPage";
 
 function App() {
   return (
@@ -27,25 +29,30 @@ function App() {
       <Router>
         <Layout>
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            {/* <Route path="/" element={<HomePage />} /> */}
             <Route path="/problems" element={<ListProblemsPage />} />
+
             <Route path="/problem/:problem_id" element={<DetailProblemPage />}>
               <Route index element={<DetailProblemWrapper />} />
               <Route path=":tab" element={<DetailProblemWrapper />} />
             </Route>
 
             <Route path="/contests" element={<ListContestsPage />} />
+
             <Route path="/contest/:contest_id" element={<DetailContestPage />}>
               <Route index element={<DetailContestWrapper />} />
               <Route path=":tab" element={<DetailContestWrapper />} />
             </Route>
+
             <Route
               path="/contest/:contest_id/problem/:problem_id"
               element={<DetailProblemPage />}
             />
 
             <Route path="/submissions" element={<SubssmionPage />} />
+
             <Route path="/submit" element={<SubmitForm />} />
+
             <Route path="/submitForm" element={<SomeProblemPage />} />
 
             <Route path="/standing" element={<StandingPage />} />
@@ -53,10 +60,17 @@ function App() {
             <Route path="/orgs" element={<OrganizationPage />} />
 
             <Route path="/register" element={<RegisterPage />} />
+
             <Route path="/login" element={<LoginPage />} />
+
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
             <Route path="/profile/:user_name" element={<UserProfilePage />} />
+
+            <Route path="/admin/contests" element={<AdminContestPage />} />
+
+            <Route path="/admin/problems" element={<AdminProblemPage />} />
+
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Layout>

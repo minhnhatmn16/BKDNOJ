@@ -27,10 +27,10 @@ exports.getAllSubmission = async (req, res) => {
         },
         {
           model: models.Problem,
-          attributes: ["problem_name"],
+          attributes: ["problem_name", "problem_id"],
         },
       ],
-      order: [["submit_time", "DESC"]],
+      order: [["submission_id", "DESC"]],
     });
 
     res.status(200).json({

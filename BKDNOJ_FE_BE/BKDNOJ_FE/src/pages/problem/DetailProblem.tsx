@@ -77,8 +77,12 @@ const DetailProblem = ({ title, detail_problem, activeTab }: DetailProblemProps)
         {detail_problem.problem_name}
       </h4>
       <div className="flex flex-col p-4 text-center">
-        <h1 className="ml-4 text-base">Time Limit per test: {detail_problem.timelimit_ms}</h1>
-        <h1 className="ml-4 text-base">Memory Limit per test: {detail_problem.memorylimit_kb}</h1>
+        <h1 className="space-y-1 text-center text-sm text-gray-500">
+          Time Limit per test: {detail_problem.timelimit_ms}
+        </h1>
+        <h1 className="space-y-1 text-center text-sm text-gray-500">
+          Memory Limit per test: {detail_problem.memorylimit_kb}
+        </h1>
       </div>
 
       <nav className="navbar border-b bg-white py-4">

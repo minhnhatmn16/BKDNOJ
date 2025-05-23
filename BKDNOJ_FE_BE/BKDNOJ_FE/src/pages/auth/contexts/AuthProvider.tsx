@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser({
             user_name: res.data.data.profile.user_name,
             avatar: res.data.data.profile.avatar || "/default-avatar.png",
+            role: res.data.data.profile.role,
           });
         } catch (err) {
           console.error("Invalid token", err);

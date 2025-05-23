@@ -36,23 +36,41 @@ export const Navbar = () => {
             {/* Desktop nav items */}
             <div className="hidden space-x-6 md:flex">
               <Link className={navLinkClass("/problems")} to="/problems">
-                PROBLEMSET
+                Problemset
               </Link>
               {/* <Link className={navLinkClass("/detailproblem")} to="/detailproblem">
                 Detail Problem
               </Link> */}
               <Link className={navLinkClass("/contests")} to="/contests">
-                CONTESTS
+                Contests
               </Link>
               <Link className={navLinkClass("/submissions")} to="/submissions">
-                SUBMISSIONS
+                Submissions
               </Link>
               {/* <Link className={navLinkClass("/profile")} to="/profile">
                 Profile
               </Link> */}
-              <Link className={navLinkClass("/createcontest")} to="/createcontest">
-                Create Contest
-              </Link>
+              {user?.role === "admin" && (
+                <div className="group relative">
+                  <button className="nav-link border-b-2 border-transparent pb-1 text-gray-600 hover:text-black group-hover:border-gray-400">
+                    Manage
+                  </button>
+                  <div className="invisible absolute left-0 z-50 mt-2 w-48 -translate-y-2 transform rounded-md bg-white opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                    <Link
+                      to="/admin/problems"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Manage Problems
+                    </Link>
+                    <Link
+                      to="/admin/contests"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Manage Contests
+                    </Link>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

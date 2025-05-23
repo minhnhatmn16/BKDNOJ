@@ -43,7 +43,9 @@ const ProblemsTable = ({
   return (
     <div className="flex flex-col gap-4 lg:flex-row">
       {/* Table section */}
-      <div className="w-full lg:w-3/4">
+      {/* <div className="w-full lg:w-3/4"> */}
+      <div className="w-full
+      ">
         <div className="one-column-element mb-6">
           <div className="overflow-hidden rounded-md border border-gray-300">
             <h4 className="bg-primary p-3 text-xl text-white">{title}</h4>

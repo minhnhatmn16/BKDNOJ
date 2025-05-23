@@ -313,7 +313,7 @@ exports.getRanking = async (req, res) => {
 
     res.status(200).json({
       message: "Ranking calculated successfully",
-      data: { problems, rankings },
+      data: { problems, rankings, format: contest.format },
     });
   } catch (err) {
     res.status(500).json({ error: "Server error", details: err });
@@ -469,6 +469,7 @@ exports.getAllParticipant = async (req, res) => {
   }
 };
 
+// Tìm kiếm bài tập theo tên
 exports.getProblemByNameOrder = async (req, res) => {
   const { contest_id, problem_id } = req.params;
   try {

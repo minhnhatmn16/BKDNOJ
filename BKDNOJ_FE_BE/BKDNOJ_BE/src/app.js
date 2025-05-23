@@ -23,4 +23,10 @@ app.use("/api/contest", contestRoutes);
 const submissionsRoutes = require("./routes/submissionsRoutes");
 app.use("/api/submissions", submissionsRoutes);
 
+const manageContestRoutes = require("./routes/manageContestRoutes");
+app.use("/api/admin/contest", manageContestRoutes);
+
+const manageProblemRoutes = require("./routes/manageProblemRoutes");
+app.use("/api/admin/problem", manageProblemRoutes);
+
 module.exports = app;

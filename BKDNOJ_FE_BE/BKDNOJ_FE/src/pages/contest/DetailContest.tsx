@@ -22,6 +22,7 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [problems, setProblems] = useState<Problem[]>([]);
   const [standings, setStandings] = useState<Standing[]>([]);
+  const [format, setFormat] = useState("");
   const [hasLoaded, setHasLoaded] = useState({
     mysubmissions: false,
     status: false,
@@ -60,6 +61,7 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
           const res = await api.get(`/contest/${detail_contest.contest_id}/ranking`);
           setStandings(res.data.data.rankings);
           setProblems(res.data.data.problems);
+          setFormat(res.data.data.format);
           setHasLoaded((prev) => ({ ...prev, standing: true }));
         }
       } catch (err) {
@@ -75,10 +77,8 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
       <h4 className="p-3 text-center text-2xl font-bold text-primary">
         {detail_contest.contest_name}
       </h4>
-      {/* <h4 className="p-3 text-center text-2xl text-primary">Contest is running</h4>
-      <p className="mb-2 text-center text-sm text-gray-500">
-        The contest will end in: {getCurrentTime()}
-      </p> */}
+      <h4 className="space-y-1 text-center text-sm text-gray-500">Format: {format}</h4>
+
       <ContestStatusTimer
         startTime={detail_contest.start_time}
         duration={detail_contest.duration}
@@ -121,7 +121,12 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
         <SubmissionTable title="Contest status" submissions={submissions} />
       )}
       {activeTab === "standing" && (
-        <StandingTable title="Contest standings" problems={problems} standings={standings} />
+        <StandingTable
+          title="Contest standings"
+          problems={problems}
+          standings={standings}
+          format={format}
+        />
       )}
     </div>
   );

@@ -106,7 +106,7 @@ exports.profile = async (req, res) => {
       where: {
         user_name: user_name,
       },
-      attributes: ["user_id", "user_name", "avatar"],
+      attributes: ["user_id", "user_name", "avatar", "role"],
     });
 
     if (!profile) {

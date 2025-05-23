@@ -4,9 +4,14 @@ export interface Contest {
   start_time: string;
   duration: number;
   participantCount: number;
+  is_public: boolean;
+  password: string;
+  penalty: string;
   isRegistered: boolean;
+  format: string;
   Contest_Problems: ContestProblem[];
 }
+
 export interface User {
   user_id: number;
   user_name: string;
@@ -52,6 +57,8 @@ export interface ProblemResult {
   order: string;
   wrongAttempts: number;
   firstACTime: number;
+  score: number;
+  firstTimeScoreMax: number;
 }
 
 export interface Standing {
@@ -59,6 +66,8 @@ export interface Standing {
   user_name: string;
   solved: number;
   penalty: number;
+  score: number;
+  total_time: number;
   listProblem: ProblemResult[];
 }
 

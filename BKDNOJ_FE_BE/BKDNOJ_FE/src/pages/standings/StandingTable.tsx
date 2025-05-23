@@ -5,9 +5,10 @@ interface StandingTableProps {
   title: string;
   problems: Problem[];
   standings: Standing[];
+  format: string;
 }
 
-const StandingTable = ({ title, problems, standings }: StandingTableProps) => {
+const StandingTable = ({ title, problems, standings, format }: StandingTableProps) => {
   const maxProblemCount = problems.length;
 
   const problemLabels = Array.from({ length: maxProblemCount }, (_, i) =>
@@ -43,14 +44,60 @@ const StandingTable = ({ title, problems, standings }: StandingTableProps) => {
                   <td className="border border-gray-300 p-3 text-center">{index + 1}</td>
                   <td className="border border-gray-300 px-2 py-1">{standing.user_name}</td>
                   <td className="border border-gray-300 px-2 py-1 text-center">
-                    <div className="font-medium">{standing.solved}</div>
-                    <div className="text-xs text-gray-500">{standing.penalty}</div>
+                    {format === "ICPC" ? (
+                      <>
+                        <div className="font-medium">{standing.solved}</div>
+                        <div className="text-xs text-gray-500">{standing.penalty}</div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="font-medium">{standing.score}</div>
+                        <div className="text-xs text-gray-500">{standing.total_time}</div>
+                      </>
+                    )}
                   </td>
                   {Array.from({ length: maxProblemCount }, (_, idx) => {
                     const problem = problems[idx];
                     return (
                       <td key={idx} className="border border-gray-300 px-2 py-1 text-center">
-                        {standing.listProblem[idx].firstACTime !== null ? (
+                        {format === "ICPC" ? (
+                          <>
+                            {standing.listProblem[idx].firstACTime !== null ? (
+                              <>
+                                <div className="font-medium text-green-600">
+                                  +
+                                  {standing.listProblem[idx].wrongAttempts > 0 &&
+                                    ` ${standing.listProblem[idx].wrongAttempts}`}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  {standing.listProblem[idx].firstACTime}
+                                </div>
+                              </>
+                            ) : standing.listProblem[idx].wrongAttempts > 0 ? (
+                              <div className="font-medium text-red-600">
+                                - {standing.listProblem[idx].wrongAttempts}
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            {standing.listProblem[idx].firstTimeScoreMax !== null ? (
+                              <>
+                                <div className="font-medium text-green-600">
+                                  ${standing.listProblem[idx].score}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  {standing.listProblem[idx].firstTimeScoreMax}
+                                </div>
+                              </>
+                            ) : (
+                              ""
+                            )}
+                          </>
+                        )}
+                        {/* {standing.listProblem[idx].firstACTime !== null ? (
                           <>
                             <div className="font-medium text-green-600">
                               +
@@ -67,7 +114,7 @@ const StandingTable = ({ title, problems, standings }: StandingTableProps) => {
                           </div>
                         ) : (
                           ""
-                        )}
+                        )} */}
                       </td>
                     );
                   })}
