@@ -40,6 +40,21 @@ const UpdateContestModal = ({ isOpen, onClose, onUpdate, contest }: UpdateContes
   }, [contest]);
 
   const handleSubmit = async () => {
+    if (!title.trim()) {
+      alert("Title contest is required.");
+      return;
+    }
+
+    if (Number(duration) <= 0) {
+      alert("Duration must be greater than 0.");
+      return;
+    }
+
+    if (isPublic && !password.trim()) {
+      alert("Password is required.");
+      return;
+    }
+
     try {
       await api.put(`/admin/contest/${contest?.contest_id}`, {
         contest_name: title,

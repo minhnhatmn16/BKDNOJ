@@ -8,7 +8,6 @@ export const Navbar = () => {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-
   const isActive = (path: string) => location.pathname.startsWith(path);
   const navLinkClass = (path: string) =>
     `nav-link pb-1 transition-all duration-150 ${

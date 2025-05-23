@@ -46,7 +46,6 @@ const AdminContestPage = () => {
                 <th className="border p-3 text-center">Start Time</th>
                 <th className="border p-3 text-center">Duration</th>
                 <th className="border p-3 text-center">Status</th>
-                <th className="border p-3 text-center">Participants</th>
                 <th className="border p-3 text-center">Visibility</th>
                 <th className="border p-3 text-center">Format</th>
                 <th className="border p-3 text-center">Actions</th>
@@ -68,7 +67,6 @@ const AdminContestPage = () => {
                     <td className="border p-3 text-center">{start.toLocaleString()}</td>
                     <td className="border p-3 text-center">{contest.duration} minutes</td>
                     <td className="border p-3 text-center">{status}</td>
-                    <td className="border p-3 text-center">{contest.participantCount ?? 0}</td>
                     <td className="border p-3 text-center">
                       {contest.is_public ? "Public" : "Private"}
                     </td>

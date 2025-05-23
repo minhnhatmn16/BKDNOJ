@@ -36,6 +36,7 @@ export interface Problem {
   timelimit_ms: string;
   memorylimit_kb: string;
   link?: string;
+  is_public: boolean;
 }
 
 export interface Submission {
