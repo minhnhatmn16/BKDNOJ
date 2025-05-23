@@ -51,9 +51,7 @@ export const Navbar = () => {
               </Link> */}
               {user?.role === "admin" && (
                 <div className="group relative">
-                  <button className="nav-link border-b-2 border-transparent pb-1 text-gray-600 hover:text-black group-hover:border-gray-400">
-                    Manage
-                  </button>
+                  <button className={navLinkClass("/admin")}>Manage</button>
                   <div className="invisible absolute left-0 z-50 mt-2 w-48 -translate-y-2 transform rounded-md bg-white opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
                     <Link
                       to="/admin/problems"

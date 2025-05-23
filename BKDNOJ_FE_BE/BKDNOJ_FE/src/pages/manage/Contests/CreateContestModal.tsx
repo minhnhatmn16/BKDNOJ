@@ -90,7 +90,7 @@ const CreateContestModal = ({ isOpen, onClose, onCreate }: CreateContestModalPro
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-40">
       <div className="w-full max-w-3xl rounded-md bg-white p-6 shadow-lg">
         <h2 className="mb-4 text-center text-xl font-bold">Create Contest</h2>
         <div className="space-y-4">
@@ -187,23 +187,68 @@ const CreateContestModal = ({ isOpen, onClose, onCreate }: CreateContestModalPro
             <label className="pr-4 pt-2 text-right">Select Problems</label>
             <div className="col-span-2 space-y-2">
               <button
-                type="button"
+                className="mb-2 rounded border bg-blue-500 px-3 py-1 text-white"
                 onClick={() => {
                   setTempSelectedProblems(selectedProblems);
                   setShowProblemTable(true);
                 }}
-                className="rounded bg-blue-500 px-3 py-1 text-white"
               >
-                Browse Problems
+                Add / Edit Problems
               </button>
-              <div className="grid max-h-64 grid-cols-2 gap-2 overflow-y-auto">
+
+              <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
                 {selectedProblems.map((id, index) => {
-                  const p = problems.find((prob) => prob.problem_id === id);
-                  if (!p) return null;
+                  const problem = problems.find((p) => p.problem_id === id);
                   const letter = String.fromCharCode(65 + index);
+
+                  const moveUp = () => {
+                    if (index === 0) return;
+                    const newList = [...selectedProblems];
+                    [newList[index - 1], newList[index]] = [newList[index], newList[index - 1]];
+                    setSelectedProblems(newList);
+                  };
+
+                  const moveDown = () => {
+                    if (index === selectedProblems.length - 1) return;
+                    const newList = [...selectedProblems];
+                    [newList[index], newList[index + 1]] = [newList[index + 1], newList[index]];
+                    setSelectedProblems(newList);
+                  };
+
+                  const remove = () => {
+                    const newList = selectedProblems.filter((pid) => pid !== id);
+                    setSelectedProblems(newList);
+                  };
+
                   return (
-                    <div key={p.problem_id} className="rounded border p-2">
-                      {letter}. {p.problem_name}
+                    <div key={id} className="flex items-center justify-between rounded border p-2">
+                      <div>
+                        <span className="font-medium">{letter}. </span>
+                        <span>{problem?.problem_name || "Unknown Problem"}</span>
+                      </div>
+                      <div className="flex gap-1">
+                        <button
+                          onClick={moveUp}
+                          className="rounded bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                          title="Move Up"
+                        >
+                          ↑
+                        </button>
+                        <button
+                          onClick={moveDown}
+                          className="rounded bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                          title="Move Down"
+                        >
+                          ↓
+                        </button>
+                        <button
+                          onClick={remove}
+                          className="rounded bg-red-400 px-2 py-1 text-white hover:bg-red-500"
+                          title="Remove"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
