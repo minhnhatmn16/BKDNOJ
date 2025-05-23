@@ -33,6 +33,7 @@ const LoginPage = () => {
       setUser(userRes.data.data);
 
       navigate("/problems");
+      window.location.reload();
     } catch (err: any) {
       if (err.response?.data?.message) {
         setError(err.response.data.message);
