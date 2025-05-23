@@ -4,6 +4,7 @@ import api from "../../../api";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
+import ProblemSelectModal from "./ProblemSelectModal";
 
 interface CreateContestModalProps {
   isOpen: boolean;
@@ -21,6 +22,9 @@ const CreateContestModal = ({ isOpen, onClose, onCreate }: CreateContestModalPro
   const [problems, setProblems] = useState<Problem[]>([]);
   const [selectedProblems, setSelectedProblems] = useState<number[]>([]);
 
+  const [showProblemTable, setShowProblemTable] = useState(false);
+  const [tempSelectedProblems, setTempSelectedProblems] = useState<number[]>([]);
+
   useEffect(() => {
     const fetchProblems = async () => {
       try {
@@ -37,6 +41,17 @@ const CreateContestModal = ({ isOpen, onClose, onCreate }: CreateContestModalPro
     setSelectedProblems((prev) =>
       prev.includes(problemId) ? prev.filter((id) => id !== problemId) : [...prev, problemId],
     );
+  };
+
+  const toggleTempProblem = (problemId: number) => {
+    setTempSelectedProblems((prev) =>
+      prev.includes(problemId) ? prev.filter((id) => id !== problemId) : [...prev, problemId],
+    );
+  };
+
+  const confirmSelectedProblems = () => {
+    setSelectedProblems(tempSelectedProblems);
+    setShowProblemTable(false);
   };
 
   const handleSubmit = async () => {
@@ -170,20 +185,29 @@ const CreateContestModal = ({ isOpen, onClose, onCreate }: CreateContestModalPro
           {/** Dòng: Select Problems */}
           <div className="grid grid-cols-3 items-start">
             <label className="pr-4 pt-2 text-right">Select Problems</label>
-            <div className="col-span-2 grid max-h-64 grid-cols-2 gap-2 overflow-y-auto">
-              {problems.map((p, index) => {
-                const letter = String.fromCharCode(65 + index);
-                return (
-                  <label key={p.problem_id} className="flex items-center gap-2 rounded border p-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedProblems.includes(p.problem_id)}
-                      onChange={() => toggleProblem(p.problem_id)}
-                    />
-                    {letter}. {p.problem_name}
-                  </label>
-                );
-              })}
+            <div className="col-span-2 space-y-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setTempSelectedProblems(selectedProblems);
+                  setShowProblemTable(true);
+                }}
+                className="rounded bg-blue-500 px-3 py-1 text-white"
+              >
+                Browse Problems
+              </button>
+              <div className="grid max-h-64 grid-cols-2 gap-2 overflow-y-auto">
+                {selectedProblems.map((id, index) => {
+                  const p = problems.find((prob) => prob.problem_id === id);
+                  if (!p) return null;
+                  const letter = String.fromCharCode(65 + index);
+                  return (
+                    <div key={p.problem_id} className="rounded border p-2">
+                      {letter}. {p.problem_name}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -197,6 +221,16 @@ const CreateContestModal = ({ isOpen, onClose, onCreate }: CreateContestModalPro
             Confirm
           </button>
         </div>
+
+        {showProblemTable && (
+          <ProblemSelectModal
+            problems={problems}
+            selected={tempSelectedProblems}
+            onToggle={toggleTempProblem}
+            onCancel={() => setShowProblemTable(false)}
+            onConfirm={confirmSelectedProblems}
+          />
+        )}
       </div>
     </div>
   );
