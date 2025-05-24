@@ -6,9 +6,6 @@ const { models } = require("../models");
 exports.getAllSubmission = async (req, res) => {
   try {
     const submissions = await Submission.findAll({
-      // where: {
-      //   contest_id: null,
-      // },
       attributes: [
         "submission_id",
         "user_id",
@@ -40,6 +37,37 @@ exports.getAllSubmission = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       message: "Server error while fetching submissions",
+      details: err.message || err,
+    });
+  }
+};
+
+exports.GetSubmissonWithId = async (req, res) => {
+  const user_id = req.user.user_id;
+  const submission_id = req.params.id;
+
+  try {
+    const submission = await Submission.findByPk(submission_id);
+
+    if (!submission) {
+      return res.status(404).json({
+        message: "Submission not found",
+      });
+    }
+
+    if (submission.user_id !== user_id) {
+      return res.status(403).json({
+        message: "You do not have permission to view this submission",
+      });
+    }
+
+    res.status(200).json({
+      message: "Submission fetched successfully",
+      data: submission,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Server error while fetching submission",
       details: err.message || err,
     });
   }

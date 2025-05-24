@@ -42,12 +42,15 @@ export interface Problem {
 export interface Submission {
   submission_id: number;
   user_id: number;
+  problem_id: number;
+  contest_id: number;
   language: string;
+  code: string;
   status: string;
-  total_test: number;
-  passed_test: number;
   time_ms: number;
   memory_kb: number;
+  total_test: number;
+  passed_test: number;
   submit_time: string;
   User: User;
   Problem: Problem;
