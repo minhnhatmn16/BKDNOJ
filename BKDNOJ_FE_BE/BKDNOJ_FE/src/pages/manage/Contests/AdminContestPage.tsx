@@ -11,6 +11,16 @@ const AdminContestPage = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedContest, setSelectedContest] = useState<Contest | null>(null);
 
+  const handleEditClick = async (contestId: number) => {
+    try {
+      const res = await api.get(`/admin/contest/${contestId}`);
+      setSelectedContest(res.data.data);
+      setEditModalOpen(true);
+    } catch (err) {
+      console.error("Failed to fetch contest details", err);
+    }
+  };
+
   useEffect(() => {
     const fetchContests = async () => {
       try {
@@ -73,10 +83,7 @@ const AdminContestPage = () => {
                     <td className="border p-3 text-center">{contest.format}</td>
                     <td className="space-x-2 border p-3 text-center">
                       <button
-                        onClick={() => {
-                          setSelectedContest(contest);
-                          setEditModalOpen(true);
-                        }}
+                        onClick={() => handleEditClick(contest.contest_id)}
                         className="text-blue-600 underline"
                       >
                         Edit
@@ -89,19 +96,11 @@ const AdminContestPage = () => {
           </table>
         </div>
       </div>
-      <CreateContestModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        onCreate={() => {
-          api.get("/admin/contests").then((res) => setContests(res.data.data));
-        }}
-      />
+      <CreateContestModal isOpen={showModal} onClose={() => setShowModal(false)} />
+
       <UpdateContestModal
         isOpen={editModalOpen}
         onClose={() => setEditModalOpen(false)}
-        onUpdate={() => {
-          api.put("/admin/contest").then((res) => setContests(res.data.data));
-        }}
         contest={selectedContest}
       />
     </div>

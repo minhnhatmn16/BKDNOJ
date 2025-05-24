@@ -77,11 +77,7 @@ const AdminProblemPage = () => {
         </div>
       </div>
 
-      <CreateProblemModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        onCreate={fetchProblems}
-      />
+      <CreateProblemModal isOpen={showModal} onClose={() => setShowModal(false)} />
 
       <UpdateProblemModal
         isOpen={editModalOpen}

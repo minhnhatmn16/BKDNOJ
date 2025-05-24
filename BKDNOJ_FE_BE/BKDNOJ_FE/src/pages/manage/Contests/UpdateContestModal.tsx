@@ -3,27 +3,28 @@ import { Problem, Contest } from "../../types";
 import api from "../../../api";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
+import ProblemSelectModal from "./ProblemSelectModal";
+import PasswordInput from "../../../components/utils/PasswordInput";
+
 interface UpdateContestModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpdate: () => void;
   contest: Contest | null;
 }
 
-const UpdateContestModal = ({ isOpen, onClose, onUpdate, contest }: UpdateContestModalProps) => {
-  const [title, setTitle] = useState(contest?.contest_name || "");
-  const [startTime, setStartTime] = useState<Date | null>(
-    contest ? new Date(contest.start_time) : null,
-  );
-  const [duration, setDuration] = useState(contest?.duration.toString() || "");
-  const [rankRule, setRankRule] = useState<"ICPC" | "IOI">(
-    contest?.format === "IOI" ? "IOI" : "ICPC",
-  );
+const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProps) => {
+  const [title, setTitle] = useState("");
+  const [startTime, setStartTime] = useState<Date | null>(new Date());
+  const [duration, setDuration] = useState("");
+  const [rankRule, setRankRule] = useState<"ICPC" | "IOI">("ICPC");
+  const [isPublic, setIsPublic] = useState(true);
+  const [password, setPassword] = useState("");
+  const [problems, setProblems] = useState<Problem[]>([]);
+  const [selectedProblems, setSelectedProblems] = useState<number[]>([]);
 
-  const [isPublic, setIsPublic] = useState(contest?.is_public ?? true);
-  const [password, setPassword] = useState(contest?.password || "");
-  //   const [selectedProblems, setSelectedProblems] = useState<number[]>(contest?.problem_ids || []);
+  const [showProblemTable, setShowProblemTable] = useState(false);
+  const [tempSelectedProblems, setTempSelectedProblems] = useState<number[]>([]);
 
   useEffect(() => {
     if (contest) {
@@ -35,9 +36,33 @@ const UpdateContestModal = ({ isOpen, onClose, onUpdate, contest }: UpdateContes
       }
       setIsPublic(contest.is_public);
       setPassword(contest.password || "");
-      //   setSelectedProblems(contest.problem_ids || []);
+      const ids = contest.Contest_Problems?.map((cp) => cp.problem_id) || [];
+      setSelectedProblems(ids);
     }
   }, [contest]);
+
+  useEffect(() => {
+    const fetchProblems = async () => {
+      try {
+        const res = await api.get("/admin/problem");
+        setProblems(res.data.data);
+      } catch (err) {
+        console.error("Failed to load problems", err);
+      }
+    };
+    if (showProblemTable) fetchProblems();
+  }, [showProblemTable]);
+
+  const toggleTempProblem = (problemId: number) => {
+    setTempSelectedProblems((prev) =>
+      prev.includes(problemId) ? prev.filter((id) => id !== problemId) : [...prev, problemId],
+    );
+  };
+
+  const confirmSelectedProblems = () => {
+    setSelectedProblems(tempSelectedProblems);
+    setShowProblemTable(false);
+  };
 
   const handleSubmit = async () => {
     if (!title.trim()) {
@@ -63,9 +88,8 @@ const UpdateContestModal = ({ isOpen, onClose, onUpdate, contest }: UpdateContes
         rank_rule: rankRule,
         is_public: isPublic,
         password: isPublic ? null : password,
-        // problem_ids: selectedProblems,
+        problem_ids: selectedProblems,
       });
-      onUpdate();
       onClose();
     } catch (err) {
       console.error("Update failed", err);
@@ -75,10 +99,11 @@ const UpdateContestModal = ({ isOpen, onClose, onUpdate, contest }: UpdateContes
   if (!isOpen || !contest) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-40">
       <div className="w-full max-w-3xl rounded-md bg-white p-6 shadow-lg">
         <h2 className="mb-4 text-center text-xl font-bold">Update Contest</h2>
         <div className="space-y-4">
+          {/* Name */}
           <div className="grid grid-cols-3 items-center">
             <label className="pr-4 text-right">Name</label>
             <input
@@ -89,6 +114,7 @@ const UpdateContestModal = ({ isOpen, onClose, onUpdate, contest }: UpdateContes
             />
           </div>
 
+          {/* Begin Time */}
           <div className="grid grid-cols-3 items-center">
             <label className="pr-4 text-right">Begin Time (UTC+7)</label>
             <DatePicker
@@ -102,6 +128,7 @@ const UpdateContestModal = ({ isOpen, onClose, onUpdate, contest }: UpdateContes
             />
           </div>
 
+          {/* Duration */}
           <div className="grid grid-cols-3 items-center">
             <label className="pr-4 text-right">Duration (minutes)</label>
             <input
@@ -112,15 +139,14 @@ const UpdateContestModal = ({ isOpen, onClose, onUpdate, contest }: UpdateContes
             />
           </div>
 
+          {/* Rank Rule */}
           <div className="grid grid-cols-3 items-center">
             <label className="pr-4 text-right">Rank Rule</label>
             <div className="col-span-2 flex gap-4">
-              {["ICPC", "IOI"].map((rule) => (
+              {["IOI", "ICPC"].map((rule) => (
                 <button
                   key={rule}
-                  className={`rounded border px-3 py-1 ${
-                    rankRule === rule ? "bg-blue-500 text-white" : ""
-                  }`}
+                  className={`rounded border px-3 py-1 ${rankRule === rule ? "bg-blue-500 text-white" : ""}`}
                   onClick={() => setRankRule(rule as "ICPC" | "IOI")}
                 >
                   {rule}
@@ -129,6 +155,7 @@ const UpdateContestModal = ({ isOpen, onClose, onUpdate, contest }: UpdateContes
             </div>
           </div>
 
+          {/* Visibility */}
           <div className="grid grid-cols-3 items-center">
             <label className="pr-4 text-right">Visibility</label>
             <div className="col-span-2 flex gap-4">
@@ -149,39 +176,91 @@ const UpdateContestModal = ({ isOpen, onClose, onUpdate, contest }: UpdateContes
             </div>
           </div>
 
-          {!isPublic && (
-            <div className="grid grid-cols-3 items-center">
-              <label className="pr-4 text-right">Password</label>
-              <input
-                type="text"
+          {/** Dòng: Password (cho phép nhập khi là Private) */}
+          <div className="grid grid-cols-3 items-center">
+            <label className="pr-4 text-right">Password</label>
+            <div className="col-span-2">
+              <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="col-span-2 w-full rounded border p-2"
+                placeholder="Enter contest password"
+                disabled={isPublic}
               />
             </div>
-          )}
+          </div>
 
-          {/* <div className="grid grid-cols-3 items-start">
+          {/* Problems */}
+          <div className="grid grid-cols-3 items-start">
             <label className="pr-4 pt-2 text-right">Select Problems</label>
-            <div className="col-span-2 grid max-h-64 grid-cols-2 gap-2 overflow-y-auto">
-              {problems.map((p, index) => {
-                const letter = String.fromCharCode(65 + index);
-                return (
-                  <label key={p.problem_id} className="flex items-center gap-2 rounded border p-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedProblems.includes(p.problem_id)}
-                      onChange={() => toggleProblem(p.problem_id)}
-                    />
-                    {letter}. {p.problem_name}
-                  </label>
-                );
-              })}
+            <div className="col-span-2 space-y-2">
+              <button
+                className="mb-2 rounded border bg-blue-500 px-3 py-1 text-white"
+                onClick={() => {
+                  setTempSelectedProblems(selectedProblems);
+                  setShowProblemTable(true);
+                }}
+              >
+                Edit Problems
+              </button>
+
+              <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
+                {selectedProblems.map((id, index) => {
+                  const problem = problems.find((p) => p.problem_id === id);
+                  const letter = String.fromCharCode(65 + index);
+
+                  const moveUp = () => {
+                    if (index === 0) return;
+                    const newList = [...selectedProblems];
+                    [newList[index - 1], newList[index]] = [newList[index], newList[index - 1]];
+                    setSelectedProblems(newList);
+                  };
+
+                  const moveDown = () => {
+                    if (index === selectedProblems.length - 1) return;
+                    const newList = [...selectedProblems];
+                    [newList[index], newList[index + 1]] = [newList[index + 1], newList[index]];
+                    setSelectedProblems(newList);
+                  };
+
+                  const remove = () => {
+                    setSelectedProblems(selectedProblems.filter((pid) => pid !== id));
+                  };
+
+                  return (
+                    <div key={id} className="flex items-center justify-between rounded border p-2">
+                      <div>
+                        <span className="font-medium">{letter}. </span>
+                        <span>{problem?.problem_name || "Unknown Problem"}</span>
+                      </div>
+                      <div className="flex gap-1">
+                        <button
+                          onClick={moveUp}
+                          className="rounded bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                        >
+                          ↑
+                        </button>
+                        <button
+                          onClick={moveDown}
+                          className="rounded bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                        >
+                          ↓
+                        </button>
+                        <button
+                          onClick={remove}
+                          className="rounded bg-red-400 px-2 py-1 text-white hover:bg-red-500"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div> */}
+          </div>
         </div>
 
-        {/** Buttons */}
+        {/* Buttons */}
         <div className="mt-4 flex justify-end gap-2">
           <button onClick={onClose} className="rounded bg-gray-300 px-4 py-2">
             Cancel
@@ -190,8 +269,20 @@ const UpdateContestModal = ({ isOpen, onClose, onUpdate, contest }: UpdateContes
             Confirm
           </button>
         </div>
+
+        {/* Problem Selector Modal */}
+        {showProblemTable && (
+          <ProblemSelectModal
+            problems={problems}
+            selected={tempSelectedProblems}
+            onToggle={toggleTempProblem}
+            onCancel={() => setShowProblemTable(false)}
+            onConfirm={confirmSelectedProblems}
+          />
+        )}
       </div>
     </div>
   );
 };
+
 export default UpdateContestModal;

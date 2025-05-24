@@ -1,18 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../../../api";
 
 interface CreateProblemModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreate: () => void;
 }
 
-const CreateProblemModal = ({ isOpen, onClose, onCreate }: CreateProblemModalProps) => {
+const CreateProblemModal = ({ isOpen, onClose }: CreateProblemModalProps) => {
   const [problemName, setProblemName] = useState("");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [isPublic, setIsPublic] = useState(true);
-  const [timeLimit, setTimeLimit] = useState("");
-  const [memoryLimit, setMemoryLimit] = useState("");
+  const [timeLimit, setTimeLimit] = useState<number>(1);
+  const [memoryLimit, setMemoryLimit] = useState<number>(256);
+
+  useEffect(() => {
+    if (isOpen) {
+      setProblemName("");
+      setPdfFile(null);
+      setIsPublic(false);
+      setTimeLimit(1);
+      setMemoryLimit(256);
+    }
+  }, [isOpen]);
 
   const handleSubmit = async () => {
     if (!problemName.trim()) {
@@ -37,14 +46,13 @@ const CreateProblemModal = ({ isOpen, onClose, onCreate }: CreateProblemModalPro
         formData.append("pdf", pdfFile);
       }
       formData.append("is_public", String(isPublic));
-      formData.append("time_limit_ms", timeLimit);
-      formData.append("memory_limit_kb", memoryLimit);
+      formData.append("time_limit_ms", String(timeLimit));
+      formData.append("memory_limit_kb", String(memoryLimit));
 
       await api.post("/admin/problem", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      onCreate();
       onClose();
     } catch (err) {
       console.error("Create problem failed", err);
@@ -91,7 +99,7 @@ const CreateProblemModal = ({ isOpen, onClose, onCreate }: CreateProblemModalPro
               type="number"
               min={1}
               value={timeLimit}
-              onChange={(e) => setTimeLimit(e.target.value)}
+              onChange={(e) => setTimeLimit(Number(e.target.value))}
               className="col-span-2 w-full rounded border p-2"
             />
           </div>
@@ -102,7 +110,7 @@ const CreateProblemModal = ({ isOpen, onClose, onCreate }: CreateProblemModalPro
               type="number"
               min={1}
               value={memoryLimit}
-              onChange={(e) => setMemoryLimit(e.target.value)}
+              onChange={(e) => setMemoryLimit(Number(e.target.value))}
               className="col-span-2 w-full rounded border p-2"
             />
           </div>

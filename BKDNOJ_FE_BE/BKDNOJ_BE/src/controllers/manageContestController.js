@@ -2,6 +2,7 @@ const Contest = require("../models/contest");
 const ContestProblem = require("../models/contest_problem");
 const bcrypt = require("bcrypt");
 const { literal } = require("sequelize");
+const { models } = require("../models");
 
 // Lấy tất cả các contest
 exports.GetAllContest = async (req, res) => {
@@ -168,7 +169,32 @@ exports.UpdateContest = async (req, res) => {
 exports.GetContestById = async (req, res) => {
   const { id } = req.params;
   try {
-    const contest = await Contest.findByPk(id);
+    const contest = await Contest.findByPk(id, {
+      attributes: [
+        "contest_id",
+        "contest_name",
+        "start_time",
+        "duration",
+        "is_public",
+        "password",
+        "penalty",
+        "created_by",
+        "format",
+      ],
+      include: [
+        {
+          model: models.ContestProblem,
+          attributes: ["order", "point", "problem_id"],
+          include: [
+            {
+              model: models.Problem,
+              attributes: ["problem_name", "problem_id"],
+            },
+          ],
+        },
+      ],
+      order: [[models.ContestProblem, "order", "ASC"]],
+    });
 
     if (!contest) {
       return res.status(404).json({ error: "Contest not found" });

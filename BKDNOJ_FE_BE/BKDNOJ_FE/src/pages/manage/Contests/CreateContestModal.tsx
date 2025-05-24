@@ -5,25 +5,40 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
 import ProblemSelectModal from "./ProblemSelectModal";
+import PasswordInput from "../../../components/utils/PasswordInput";
 
 interface CreateContestModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreate: () => void;
 }
 
-const CreateContestModal = ({ isOpen, onClose, onCreate }: CreateContestModalProps) => {
+const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
   const [title, setTitle] = useState("");
   const [startTime, setStartTime] = useState<Date | null>(new Date());
   const [duration, setDuration] = useState("");
   const [rankRule, setRankRule] = useState<"ICPC" | "IOI">("ICPC");
-  const [isPublic, setIsPublic] = useState(true);
+  const [penalty, setPenalty] = useState<number>(20);
+  const [isPublic, setIsPublic] = useState(false);
   const [password, setPassword] = useState("");
   const [problems, setProblems] = useState<Problem[]>([]);
   const [selectedProblems, setSelectedProblems] = useState<number[]>([]);
 
   const [showProblemTable, setShowProblemTable] = useState(false);
   const [tempSelectedProblems, setTempSelectedProblems] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTitle("");
+      setStartTime(new Date());
+      setDuration("");
+      setRankRule("ICPC");
+      setPenalty(20);
+      setIsPublic(false);
+      setPassword("");
+      setSelectedProblems([]);
+      setTempSelectedProblems([]);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     const fetchProblems = async () => {
@@ -34,14 +49,8 @@ const CreateContestModal = ({ isOpen, onClose, onCreate }: CreateContestModalPro
         console.error("Failed to load problems", err);
       }
     };
-    if (isOpen) fetchProblems();
-  }, [isOpen]);
-
-  const toggleProblem = (problemId: number) => {
-    setSelectedProblems((prev) =>
-      prev.includes(problemId) ? prev.filter((id) => id !== problemId) : [...prev, problemId],
-    );
-  };
+    if (showProblemTable) fetchProblems();
+  }, [showProblemTable]);
 
   const toggleTempProblem = (problemId: number) => {
     setTempSelectedProblems((prev) =>
@@ -65,8 +74,20 @@ const CreateContestModal = ({ isOpen, onClose, onCreate }: CreateContestModalPro
       return;
     }
 
-    if (isPublic && !password.trim()) {
-      alert("Password is required.");
+    if (!isPublic) {
+      if (!password.trim()) {
+        alert("Password is required.");
+        return;
+      }
+      const isValid = /^[a-zA-Z0-9]*$/.test(password);
+      if (!isValid) {
+        alert("Password can only contain letters and numbers (a-z, A-Z, 0-9).");
+        return;
+      }
+    }
+
+    if (rankRule === "ICPC" && Number(penalty) < 0) {
+      alert("Penalty must be 0 or greater.");
       return;
     }
 
@@ -77,10 +98,10 @@ const CreateContestModal = ({ isOpen, onClose, onCreate }: CreateContestModalPro
         duration: Number(duration),
         rank_rule: rankRule,
         is_public: isPublic,
+        penalty: penalty,
         password: isPublic ? null : password,
         problem_ids: selectedProblems,
       });
-      onCreate();
       onClose();
     } catch (err) {
       console.error("Create failed", err);
@@ -134,7 +155,7 @@ const CreateContestModal = ({ isOpen, onClose, onCreate }: CreateContestModalPro
           <div className="grid grid-cols-3 items-center">
             <label className="pr-4 text-right">Rank Rule</label>
             <div className="col-span-2 flex gap-4">
-              {["ICPC", "IOI"].map((rule) => (
+              {["IOI", "ICPC"].map((rule) => (
                 <button
                   key={rule}
                   className={`rounded border px-3 py-1 ${
@@ -146,6 +167,20 @@ const CreateContestModal = ({ isOpen, onClose, onCreate }: CreateContestModalPro
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="grid grid-cols-3 items-center">
+            <label className="pr-4 text-right">Penalty (minutes)</label>
+            <input
+              type="number"
+              min="0"
+              value={penalty}
+              onChange={(e) => setPenalty(Number(e.target.value))}
+              disabled={rankRule !== "ICPC"}
+              className={`col-span-2 w-full rounded border p-2 ${
+                rankRule !== "ICPC" ? "cursor-not-allowed bg-gray-100" : ""
+              }`}
+            />
           </div>
 
           {/** Dòng: Visibility */}
@@ -169,18 +204,18 @@ const CreateContestModal = ({ isOpen, onClose, onCreate }: CreateContestModalPro
             </div>
           </div>
 
-          {/** Dòng: Password (chỉ hiện nếu Private) */}
-          {!isPublic && (
-            <div className="grid grid-cols-3 items-center">
-              <label className="pr-4 text-right">Password</label>
-              <input
-                type="text"
+          {/** Dòng: Password (cho phép nhập khi là Private) */}
+          <div className="grid grid-cols-3 items-center">
+            <label className="pr-4 text-right">Password</label>
+            <div className="col-span-2">
+              <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="col-span-2 w-full rounded border p-2"
+                placeholder="Enter contest password"
+                disabled={isPublic}
               />
             </div>
-          )}
+          </div>
 
           {/** Dòng: Select Problems */}
           <div className="grid grid-cols-3 items-start">
