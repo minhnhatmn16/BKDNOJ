@@ -3,12 +3,23 @@ import { Problem } from "../../types";
 import api from "../../../api";
 import CreateProblemModal from "./CreateProblemModal";
 import UpdateProblemModal from "./UpdateProblemModal";
+import { Link, useNavigate } from "react-router-dom";
 
 const AdminProblemPage = () => {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
+
+  const handleEditClick = async (problemId: number) => {
+    try {
+      const res = await api.get(`/admin/problem/${problemId}`);
+      setSelectedProblem(res.data.data);
+      setEditModalOpen(true);
+    } catch (err) {
+      console.error("Failed to fetch problem details", err);
+    }
+  };
 
   const fetchProblems = async () => {
     try {
@@ -53,7 +64,14 @@ const AdminProblemPage = () => {
               {problems.map((problem) => (
                 <tr key={problem.problem_id} className="border-t">
                   <td className="border p-3 text-center">{problem.problem_id}</td>
-                  <td className="border p-3 text-center">{problem.problem_name}</td>
+                  <td className="border p-3 text-center">
+                    <Link
+                      to={`/problem/${problem.problem_id}`}
+                      className="text-blue-600 hover:underline"
+                    >
+                      {problem.problem_name}
+                    </Link>
+                  </td>
                   <td className="border p-3 text-center">{problem.timelimit_ms}</td>
                   <td className="border p-3 text-center">{problem.memorylimit_kb}</td>
                   <td className="border p-3 text-center">
@@ -61,11 +79,8 @@ const AdminProblemPage = () => {
                   </td>
                   <td className="border p-3 text-center">
                     <button
+                      onClick={() => handleEditClick(problem.problem_id)}
                       className="text-blue-600 underline"
-                      onClick={() => {
-                        setSelectedProblem(problem);
-                        setEditModalOpen(true);
-                      }}
                     >
                       Edit
                     </button>

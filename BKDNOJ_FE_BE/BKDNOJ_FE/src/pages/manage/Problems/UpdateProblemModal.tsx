@@ -14,7 +14,7 @@ const UpdateProblemModal = ({ isOpen, onClose, onUpdate, problem }: UpdateProble
   const [timeLimit, setTimeLimit] = useState(problem?.timelimit_ms?.toString() || "");
   const [memoryLimit, setMemoryLimit] = useState(problem?.memorylimit_kb?.toString() || "");
   const [isPublic, setIsPublic] = useState(problem?.is_public ?? true);
-
+  
   useEffect(() => {
     if (problem) {
       setProblemName(problem.problem_name);

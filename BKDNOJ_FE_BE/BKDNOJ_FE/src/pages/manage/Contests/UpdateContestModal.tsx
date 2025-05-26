@@ -18,13 +18,42 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
   const [startTime, setStartTime] = useState<Date | null>(new Date());
   const [duration, setDuration] = useState("");
   const [rankRule, setRankRule] = useState<"ICPC" | "IOI">("ICPC");
-  const [isPublic, setIsPublic] = useState(true);
+  const [penalty, setPenalty] = useState<number>(20);
+  const [isPublic, setIsPublic] = useState(false);
   const [password, setPassword] = useState("");
   const [problems, setProblems] = useState<Problem[]>([]);
   const [selectedProblems, setSelectedProblems] = useState<number[]>([]);
+  const [problemScores, setProblemScores] = useState<Record<number, number>>({});
 
   const [showProblemTable, setShowProblemTable] = useState(false);
   const [tempSelectedProblems, setTempSelectedProblems] = useState<number[]>([]);
+
+  const fetchProblems = async () => {
+    try {
+      const res = await api.get("/admin/problem");
+      setProblems(res.data.data);
+    } catch (err) {
+      console.error("Failed to load problems", err);
+    }
+  };
+
+  const toggleTempProblem = (problemId: number) => {
+    setTempSelectedProblems((prev) =>
+      prev.includes(problemId) ? prev.filter((id) => id !== problemId) : [...prev, problemId],
+    );
+  };
+
+  const confirmSelectedProblems = () => {
+    setSelectedProblems(tempSelectedProblems);
+    if (rankRule === "IOI") {
+      const newScores: Record<number, number> = {};
+      tempSelectedProblems.forEach((pid) => {
+        newScores[pid] = problemScores[pid] ?? 100;
+      });
+      setProblemScores(newScores);
+    }
+    setShowProblemTable(false);
+  };
 
   useEffect(() => {
     if (contest) {
@@ -38,31 +67,13 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
       setPassword(contest.password || "");
       const ids = contest.Contest_Problems?.map((cp) => cp.problem_id) || [];
       setSelectedProblems(ids);
+      fetchProblems();
     }
   }, [contest]);
 
   useEffect(() => {
-    const fetchProblems = async () => {
-      try {
-        const res = await api.get("/admin/problem");
-        setProblems(res.data.data);
-      } catch (err) {
-        console.error("Failed to load problems", err);
-      }
-    };
     if (showProblemTable) fetchProblems();
   }, [showProblemTable]);
-
-  const toggleTempProblem = (problemId: number) => {
-    setTempSelectedProblems((prev) =>
-      prev.includes(problemId) ? prev.filter((id) => id !== problemId) : [...prev, problemId],
-    );
-  };
-
-  const confirmSelectedProblems = () => {
-    setSelectedProblems(tempSelectedProblems);
-    setShowProblemTable(false);
-  };
 
   const handleSubmit = async () => {
     if (!title.trim()) {
@@ -75,9 +86,31 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
       return;
     }
 
-    if (isPublic && !password.trim()) {
-      alert("Password is required.");
+    if (!isPublic) {
+      if (!password.trim()) {
+        alert("Password is required.");
+        return;
+      }
+      const isValid = /^[a-zA-Z0-9]*$/.test(password);
+      if (!isValid) {
+        alert("Password can only contain letters and numbers (a-z, A-Z, 0-9).");
+        return;
+      }
+    }
+
+    if (rankRule === "ICPC" && Number(penalty) < 0) {
+      alert("Penalty must be 0 or greater.");
       return;
+    }
+
+    if (rankRule === "IOI") {
+      for (const id of selectedProblems) {
+        const score = problemScores[id];
+        if (typeof score !== "number" || score < 10) {
+          alert(`Each problem in IOI mode must be greater than 0.`);
+          return;
+        }
+      }
     }
 
     try {
@@ -213,6 +246,12 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
                     const newList = [...selectedProblems];
                     [newList[index - 1], newList[index]] = [newList[index], newList[index - 1]];
                     setSelectedProblems(newList);
+
+                    const newScores = { ...problemScores };
+                    const temp = newScores[newList[index]];
+                    newScores[newList[index]] = newScores[newList[index - 1]];
+                    newScores[newList[index - 1]] = temp;
+                    setProblemScores(newScores);
                   };
 
                   const moveDown = () => {
@@ -220,6 +259,12 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
                     const newList = [...selectedProblems];
                     [newList[index], newList[index + 1]] = [newList[index + 1], newList[index]];
                     setSelectedProblems(newList);
+
+                    const newScores = { ...problemScores };
+                    const temp = newScores[newList[index]];
+                    newScores[newList[index]] = newScores[newList[index + 1]];
+                    newScores[newList[index + 1]] = temp;
+                    setProblemScores(newScores);
                   };
 
                   const remove = () => {
@@ -231,6 +276,20 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
                       <div>
                         <span className="font-medium">{letter}. </span>
                         <span>{problem?.problem_name || "Unknown Problem"}</span>
+                        {rankRule === "IOI" && (
+                          <div className="mt-1 text-sm text-gray-700">
+                            <label className="mr-2">Score:</label>
+                            <input
+                              type="number"
+                              min={1}
+                              className="w-20 rounded border px-1 py-0.5"
+                              value={problemScores[id] ?? 1}
+                              onChange={(e) =>
+                                setProblemScores({ ...problemScores, [id]: Number(e.target.value) })
+                              }
+                            />
+                          </div>
+                        )}
                       </div>
                       <div className="flex gap-1">
                         <button

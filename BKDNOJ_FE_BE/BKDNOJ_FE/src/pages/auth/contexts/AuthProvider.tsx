@@ -18,7 +18,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const token = localStorage.getItem("token");
       if (token) {
         try {
-          const decoded: DecodedToken = jwtDecode(token);
+          // const decoded: DecodedToken = jwtDecode(token);
+          const decoded: DecodedToken & { exp: number } = jwtDecode(token);
+
+          const currentTime = Math.floor(Date.now() / 1000);
+          if (decoded.exp < currentTime) {
+            console.warn("Token expired");
+            localStorage.removeItem("token");
+            setUser(null);
+            return;
+          }
           const res = await api.get(`auth/profile/${decoded.user_name}`);
           setUser({
             user_name: res.data.data.profile.user_name,
