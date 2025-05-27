@@ -3,13 +3,20 @@ import { Problem } from "../../types";
 import api from "../../../api";
 import CreateProblemModal from "./CreateProblemModal";
 import UpdateProblemModal from "./UpdateProblemModal";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import Pagination from "../../../components/pagination/Pagination";
 
 const AdminProblemPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [problems, setProblems] = useState<Problem[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const handleEditClick = async (problemId: number) => {
     try {
@@ -21,18 +28,24 @@ const AdminProblemPage = () => {
     }
   };
 
-  const fetchProblems = async () => {
+  const fetchProblems = async (page: number) => {
     try {
-      const res = await api.get("/admin/problem");
+      const res = await api.get(`/admin/problem?page=${page}`);
       setProblems(res.data.data.problems);
+      setTotalPages(res.data.data.pagination.totalPages);
     } catch (err) {
       console.error("Error fetching problems:", err);
     }
   };
 
   useEffect(() => {
-    fetchProblems();
-  }, []);
+    fetchProblems(currentPage);
+  }, [currentPage]);
+
+  const onPageChange = (page: number) => {
+    setCurrentPage(page);
+    navigate(`/admin/problem?page=${page}`);
+  };
 
   return (
     <div className="one-column-element mb-6">
@@ -90,6 +103,8 @@ const AdminProblemPage = () => {
             </tbody>
           </table>
         </div>
+        {/* Pagination */}
+        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
       </div>
 
       <CreateProblemModal isOpen={showModal} onClose={() => setShowModal(false)} />
@@ -97,7 +112,6 @@ const AdminProblemPage = () => {
       <UpdateProblemModal
         isOpen={editModalOpen}
         onClose={() => setEditModalOpen(false)}
-        onUpdate={fetchProblems}
         problem={selectedProblem}
       />
     </div>

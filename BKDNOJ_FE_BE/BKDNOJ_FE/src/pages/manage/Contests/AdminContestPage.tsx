@@ -1,15 +1,22 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../../../api";
 import { Contest } from "../../types";
 import CreateContestModal from "./CreateContestModal";
 import UpdateContestModal from "./UpdateContestModal";
+import Pagination from "../../../components/pagination/Pagination";
 
 const AdminContestPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [contests, setContests] = useState<Contest[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedContest, setSelectedContest] = useState<Contest | null>(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const handleEditClick = async (contestId: number) => {
     try {
@@ -21,17 +28,24 @@ const AdminContestPage = () => {
     }
   };
 
+  const fetchContests = async (page: number) => {
+    try {
+      const res = await api.get(`/admin/contest?page=${page}`);
+      setContests(res.data.data.contests);
+      setTotalPages(res.data.data.pagination.totalPages);
+    } catch (err) {
+      console.error("Failed to fetch contests", err);
+    }
+  };
+
   useEffect(() => {
-    const fetchContests = async () => {
-      try {
-        const res = await api.get("/admin/contest");
-        setContests(res.data.data.contests);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchContests();
-  }, []);
+    fetchContests(currentPage);
+  }, [currentPage]);
+
+  const onPageChange = (page: number) => {
+    setCurrentPage(page);
+    navigate(`/admin/contest?page=${page}`);
+  };
 
   return (
     <div className="one-column-element mb-6">
@@ -102,6 +116,8 @@ const AdminContestPage = () => {
             </tbody>
           </table>
         </div>
+        {/* Pagination */}
+        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
       </div>
       <CreateContestModal isOpen={showModal} onClose={() => setShowModal(false)} />
 

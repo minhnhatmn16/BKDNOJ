@@ -10,11 +10,12 @@ export const ListProblemsPage = () => {
 
   const queryParams = new URLSearchParams(location.search);
   const initialSearch = queryParams.get("search") || "";
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
+
+  const [listProblem, setListProblem] = useState<Problem[]>([]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [listProblem, setListProblem] = useState<Problem[]>([]);
   const [totalPages, setTotalPages] = useState(1);
-  const [searchTerm, setSearchTerm] = useState(initialSearch);
 
   const fetchProblems = async (page: number, query = "") => {
     try {
@@ -24,7 +25,7 @@ export const ListProblemsPage = () => {
 
       const res = await api.get(url);
       setListProblem(res.data.data.problems);
-      setTotalPages(res.data.totalPages);
+      setTotalPages(res.data.data.pagination.totalPages);
     } catch (error) {
       console.error("Failed to fetch problems:", error);
     }
@@ -32,7 +33,9 @@ export const ListProblemsPage = () => {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const search = queryParams.get("search") || "";
+    const page = parseInt(queryParams.get("page") || "1", 10);
     setSearchTerm(search);
+    setCurrentPage(page);
   }, [location.search]);
 
   useEffect(() => {
@@ -41,6 +44,7 @@ export const ListProblemsPage = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+    navigate(`/problems?page=${page}&search=${encodeURIComponent(searchTerm)}`);
   };
   const handleSearch = (term: string) => {
     setSearchTerm(term);

@@ -1,12 +1,22 @@
 import { Submission } from "../types";
 import { Link } from "react-router-dom";
+import Pagination from "../../components/pagination/Pagination";
 
 interface SubmissionTableProps {
   title: string;
   submissions: Submission[];
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
-const SubmissionTable = ({ title, submissions }: SubmissionTableProps) => {
+const SubmissionTable = ({
+  title,
+  submissions,
+  currentPage,
+  totalPages,
+  onPageChange,
+}: SubmissionTableProps) => {
   return (
     <div className="one-column-element mb-6">
       <div className="overflow-hidden rounded-md border border-gray-300">
@@ -123,6 +133,8 @@ const SubmissionTable = ({ title, submissions }: SubmissionTableProps) => {
             </tbody>
           </table>
         </div>
+        {/* Pagination */}
+        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
       </div>
     </div>
   );

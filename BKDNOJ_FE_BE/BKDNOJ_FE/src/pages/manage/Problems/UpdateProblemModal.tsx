@@ -5,11 +5,10 @@ import api from "../../../api";
 interface UpdateProblemModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpdate: () => void;
   problem: Problem | null;
 }
 
-const UpdateProblemModal = ({ isOpen, onClose, onUpdate, problem }: UpdateProblemModalProps) => {
+const UpdateProblemModal = ({ isOpen, onClose, problem }: UpdateProblemModalProps) => {
   const [problemName, setProblemName] = useState(problem?.problem_name || "");
   const [timeLimit, setTimeLimit] = useState(problem?.timelimit_ms?.toString() || "");
   const [memoryLimit, setMemoryLimit] = useState(problem?.memorylimit_kb?.toString() || "");
@@ -47,7 +46,6 @@ const UpdateProblemModal = ({ isOpen, onClose, onUpdate, problem }: UpdateProble
         memory_limit_kb: Number(memoryLimit),
         is_public: isPublic,
       });
-      onUpdate();
       onClose();
       window.location.reload();
     } catch (err) {

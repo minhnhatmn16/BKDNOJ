@@ -15,8 +15,7 @@ interface DetailContestProps {
 }
 
 const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 10;
+  const navigate = useNavigate();
 
   const [mysubmissions, setMySubmissions] = useState<Submission[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -29,7 +28,8 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
     standing: false,
   });
 
-  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const handleTabChange = (tab: string) => {
     navigate(`/contest/${detail_contest.contest_id}/${tab}`);
@@ -115,10 +115,22 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
         />
       )}
       {activeTab === "mysubmissions" && (
-        <SubmissionTable title="My contest submissions" submissions={mysubmissions} />
+        <SubmissionTable
+          title="My contest submissions"
+          submissions={mysubmissions}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       )}
       {activeTab === "status" && (
-        <SubmissionTable title="Contest status" submissions={submissions} />
+        <SubmissionTable
+          title="Contest status"
+          submissions={submissions}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       )}
       {activeTab === "standing" && (
         <StandingTable
