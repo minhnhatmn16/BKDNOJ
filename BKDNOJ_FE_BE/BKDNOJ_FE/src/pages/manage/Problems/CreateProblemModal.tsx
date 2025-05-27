@@ -52,8 +52,8 @@ const CreateProblemModal = ({ isOpen, onClose }: CreateProblemModalProps) => {
       await api.post("/admin/problem", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
       onClose();
+      window.location.reload();
     } catch (err) {
       console.error("Create problem failed", err);
     }

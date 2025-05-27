@@ -124,6 +124,7 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
         problem_ids: selectedProblems,
       });
       onClose();
+      window.location.reload();
     } catch (err) {
       console.error("Update failed", err);
     }
@@ -137,18 +138,18 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
         <h2 className="mb-4 text-center text-xl font-bold">Update Contest</h2>
         <div className="space-y-4">
           {/* Name */}
-          <div className="grid grid-cols-3 items-center">
+          <div className="grid grid-cols-4 items-center">
             <label className="pr-4 text-right">Name</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="col-span-2 w-full rounded border p-2"
+              className="col-span-3 w-full rounded border p-2"
             />
           </div>
 
           {/* Begin Time */}
-          <div className="grid grid-cols-3 items-center">
+          <div className="grid grid-cols-4 items-center">
             <label className="pr-4 text-right">Begin Time (UTC+7)</label>
             <DatePicker
               selected={startTime}
@@ -157,25 +158,25 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
               timeFormat="HH:mm"
               timeIntervals={5}
               dateFormat="dd-MM-yyyy HH:mm:ss"
-              className="col-span-2 w-full rounded border p-2"
+              className="col-span-3 w-full rounded border p-2"
             />
           </div>
 
           {/* Duration */}
-          <div className="grid grid-cols-3 items-center">
+          <div className="grid grid-cols-4 items-center">
             <label className="pr-4 text-right">Duration (minutes)</label>
             <input
               type="number"
               value={duration}
               onChange={(e) => setDuration(e.target.value)}
-              className="col-span-2 w-full rounded border p-2"
+              className="col-span-3 w-full rounded border p-2"
             />
           </div>
 
           {/* Rank Rule */}
-          <div className="grid grid-cols-3 items-center">
+          <div className="grid grid-cols-4 items-center">
             <label className="pr-4 text-right">Rank Rule</label>
-            <div className="col-span-2 flex gap-4">
+            <div className="col-span-3 flex gap-4">
               {["IOI", "ICPC"].map((rule) => (
                 <button
                   key={rule}
@@ -189,9 +190,9 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
           </div>
 
           {/* Visibility */}
-          <div className="grid grid-cols-3 items-center">
+          <div className="grid grid-cols-4 items-center">
             <label className="pr-4 text-right">Visibility</label>
-            <div className="col-span-2 flex gap-4">
+            <div className="col-span-3 flex gap-4">
               {["Public", "Private"].map((v) => {
                 const selected = v === "Public" ? isPublic : !isPublic;
                 return (
@@ -210,9 +211,9 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
           </div>
 
           {/** Dòng: Password (cho phép nhập khi là Private) */}
-          <div className="grid grid-cols-3 items-center">
+          <div className="grid grid-cols-4 items-center">
             <label className="pr-4 text-right">Password</label>
-            <div className="col-span-2">
+            <div className="col-span-3">
               <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -223,9 +224,9 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
           </div>
 
           {/* Problems */}
-          <div className="grid grid-cols-3 items-start">
+          <div className="grid grid-cols-4 items-start">
             <label className="pr-4 pt-2 text-right">Select Problems</label>
-            <div className="col-span-2 space-y-2">
+            <div className="col-span-3 space-y-2">
               <button
                 className="mb-2 rounded border bg-blue-500 px-3 py-1 text-white"
                 onClick={() => {
@@ -246,12 +247,6 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
                     const newList = [...selectedProblems];
                     [newList[index - 1], newList[index]] = [newList[index], newList[index - 1]];
                     setSelectedProblems(newList);
-
-                    const newScores = { ...problemScores };
-                    const temp = newScores[newList[index]];
-                    newScores[newList[index]] = newScores[newList[index - 1]];
-                    newScores[newList[index - 1]] = temp;
-                    setProblemScores(newScores);
                   };
 
                   const moveDown = () => {
@@ -259,12 +254,6 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
                     const newList = [...selectedProblems];
                     [newList[index], newList[index + 1]] = [newList[index + 1], newList[index]];
                     setSelectedProblems(newList);
-
-                    const newScores = { ...problemScores };
-                    const temp = newScores[newList[index]];
-                    newScores[newList[index]] = newScores[newList[index + 1]];
-                    newScores[newList[index + 1]] = temp;
-                    setProblemScores(newScores);
                   };
 
                   const remove = () => {
@@ -283,7 +272,7 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
                               type="number"
                               min={1}
                               className="w-20 rounded border px-1 py-0.5"
-                              value={problemScores[id] ?? 1}
+                              value={problemScores[id] ?? 100}
                               onChange={(e) =>
                                 setProblemScores({ ...problemScores, [id]: Number(e.target.value) })
                               }

@@ -73,7 +73,14 @@ const AdminContestPage = () => {
 
                 return (
                   <tr key={contest.contest_id} className="border-t">
-                    <td className="border p-3 text-center">{contest.contest_name}</td>
+                    <td className="border p-3 text-center">
+                      <Link
+                        to={`/contest/${contest.contest_id}`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        {contest.contest_name}
+                      </Link>
+                    </td>
                     <td className="border p-3 text-center">{start.toLocaleString()}</td>
                     <td className="border p-3 text-center">{contest.duration} minutes</td>
                     <td className="border p-3 text-center">{status}</td>

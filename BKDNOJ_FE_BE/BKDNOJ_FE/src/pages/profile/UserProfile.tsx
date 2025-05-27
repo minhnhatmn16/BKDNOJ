@@ -1,4 +1,5 @@
 import { Profile, HeatmapDay } from "../types";
+import { useState } from "react";
 
 interface UserProfileProps {
   title: string;
@@ -74,17 +75,71 @@ const UserProfilePage = ({ title, profile, sumissionsInYear }: UserProfileProps)
 
   const monthLabels = getMonthLabels();
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const validExtensions = ["jpg", "jpeg", "png"];
+      const fileName = file.name.toLowerCase();
+      const fileExtension = fileName.split(".").pop();
+
+      if (!fileExtension || !validExtensions.includes(fileExtension)) {
+        alert("Please select a valid image file (jpg, jpeg, png).");
+        return;
+      }
+
+      setSelectedFile(file);
+    }
+  };
+
+  const handleUpload = () => {
+    if (!selectedFile) return;
+    console.log("Uploading:", selectedFile);
+    window.location.reload();
+  };
   return (
     <div className="one-column-element mb-6">
       {/* User Info */}
       <div className="mb-4 overflow-hidden rounded-md border border-gray-300">
         <div className="flex flex-col p-4">
           <h1 className="ml-4 text-2xl font-bold">{profile.user_name}</h1>
-          <img
-            src={profile.avatar}
-            alt="Profile"
-            className="ml-4 h-[300px] w-[300px] rounded-md border border-gray-300 object-cover"
-          />
+          <div className="ml-4 w-fit rounded-md border border-gray-300 p-4">
+            <img
+              src={profile.avatar}
+              alt="Profile"
+              className="h-[300px] w-[300px] rounded-md border border-gray-300 object-cover"
+            />
+
+            <div className="mt-2 text-sm text-blue-600">
+              <button
+                onClick={() => document.getElementById("fileInput")?.click()}
+                className="hover:underline"
+              >
+                Change photo
+              </button>
+              {selectedFile && <span className="ml-2 text-gray-700">({selectedFile.name})</span>}
+            </div>
+
+            {selectedFile && (
+              <div className="mt-2">
+                <button
+                  onClick={handleUpload}
+                  className="rounded bg-gray-500 px-3 py-1 text-white hover:bg-gray-600"
+                >
+                  Upload
+                </button>
+              </div>
+            )}
+
+            <input
+              id="fileInput"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+          </div>
         </div>
       </div>
 
@@ -95,9 +150,9 @@ const UserProfilePage = ({ title, profile, sumissionsInYear }: UserProfileProps)
 
           <div className="flex items-start">
             {/* Cột ngày */}
-            <div className="mr-2 flex h-[112px] flex-col justify-between">
+            <div className="mr-5 mt-3 flex h-[112px] flex-col justify-between">
               {daysOfWeek.map((day) => (
-                <div key={day} className="h-4 text-sm text-gray-500">
+                <div key={day} className="w-4 text-center text-xs text-gray-500">
                   {day}
                 </div>
               ))}
