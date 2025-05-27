@@ -4,6 +4,11 @@ const { models } = require("../models");
 
 // Lấy tất cả các submission
 exports.getAllSubmission = async (req, res) => {
+  const { page = 1 } = req.query;
+  const maxitem = 100;
+  const pageInt = parseInt(page);
+  const offset = (pageInt - 1) * maxitem;
+
   try {
     const submissions = await Submission.findAll({
       attributes: [
@@ -28,11 +33,23 @@ exports.getAllSubmission = async (req, res) => {
         },
       ],
       order: [["submission_id", "DESC"]],
+      limit: maxitem,
+      offset: offset,
     });
+
+    const totalCount = await Submission.count();
 
     res.status(200).json({
       message: "Submissions fetched successfully",
-      data: submissions,
+      data: {
+        submissions,
+        pagination: {
+          total: totalCount,
+          page: pageInt,
+          maxitem: maxitem,
+          totalPages: Math.ceil(totalCount / maxitem),
+        },
+      },
     });
   } catch (err) {
     res.status(500).json({

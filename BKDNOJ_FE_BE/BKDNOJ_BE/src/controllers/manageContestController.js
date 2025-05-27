@@ -1,13 +1,23 @@
 const Contest = require("../models/contest");
 const ContestProblem = require("../models/contest_problem");
 const bcrypt = require("bcrypt");
-const { literal } = require("sequelize");
+const { Op, literal } = require("sequelize");
 const { models } = require("../models");
 
 // Lấy tất cả các contest
 exports.GetAllContest = async (req, res) => {
+  const { search = "", page = 1 } = req.query;
+  const maxitem = 50;
+  const pageInt = parseInt(page);
+  const offset = (pageInt - 1) * maxitem;
+
   try {
-    const allContest = await Contest.findAll({
+    const contests = await Contest.findAll({
+      where: {
+        contest_name: {
+          [Op.like]: `%${search}%`,
+        },
+      },
       order: [["contest_id", "DESC"]],
       attributes: [
         "contest_id",
@@ -23,11 +33,29 @@ exports.GetAllContest = async (req, res) => {
           "participantCount",
         ],
       ],
+      limit: maxitem,
+      offset: offset,
+    });
+
+    const totalCount = await Contest.count({
+      where: {
+        contest_name: {
+          [Op.like]: `%${search}%`,
+        },
+      },
     });
 
     res.status(200).json({
       message: "Contest list fetched successfully",
-      data: allContest,
+      data: {
+        contests,
+        pagination: {
+          total: totalCount,
+          page: pageInt,
+          maxitem: maxitem,
+          totalPages: Math.ceil(totalCount / maxitem),
+        },
+      },
     });
   } catch (err) {
     res.status(500).json({

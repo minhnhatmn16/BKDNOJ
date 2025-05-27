@@ -107,7 +107,13 @@ exports.addSubmit = async (req, res) => {
 
 // Lấy tất cả các submission tương ứng với bài
 exports.getAllSubmission = async (req, res) => {
+  const { page = 1 } = req.query;
+  const maxitem = 100;
+  const pageInt = parseInt(page);
+  const offset = (pageInt - 1) * maxitem;
+
   const { id } = req.params;
+
   try {
     const submissions = await Submission.findAll({
       where: {
@@ -136,11 +142,28 @@ exports.getAllSubmission = async (req, res) => {
         },
       ],
       order: [["submit_time", "DESC"]],
+      limit: maxitem,
+      offset: offset,
+    });
+
+    const totalCount = await Submission.count({
+      where: {
+        problem_id: id,
+        contest_id: null,
+      },
     });
 
     res.status(200).json({
       message: "Submissions fetched successfully",
-      data: submissions,
+      data: {
+        submissions,
+        pagination: {
+          total: totalCount,
+          page: pageInt,
+          maxitem: maxitem,
+          totalPages: Math.ceil(totalCount / maxitem),
+        },
+      },
     });
   } catch (err) {
     res.status(500).json({
@@ -154,6 +177,11 @@ exports.getAllSubmission = async (req, res) => {
 exports.getMySubmission = async (req, res) => {
   const user_id = req.user.user_id;
   const { id } = req.params;
+
+  const { page = 1 } = req.query;
+  const maxitem = 100;
+  const pageInt = parseInt(page);
+  const offset = (pageInt - 1) * maxitem;
 
   try {
     const mysubmissions = await Submission.findAll({
@@ -184,11 +212,29 @@ exports.getMySubmission = async (req, res) => {
         },
       ],
       order: [["submit_time", "DESC"]],
+      limit: maxitem,
+      offset: offset,
+    });
+
+    const totalCount = await Submission.count({
+      where: {
+        user_id,
+        problem_id: id,
+        contest_id: null,
+      },
     });
 
     res.status(200).json({
       message: "User's submissions fetched successfully",
-      data: mysubmissions,
+      data: {
+        mysubmissions,
+        pagination: {
+          total: totalCount,
+          page: pageInt,
+          maxitem: maxitem,
+          totalPages: Math.ceil(totalCount / maxitem),
+        },
+      },
     });
   } catch (err) {
     res.status(500).json({

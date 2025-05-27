@@ -323,6 +323,12 @@ exports.getRanking = async (req, res) => {
 // Lấy tất cả các submission tương ứng với contest
 exports.getAllSubmission = async (req, res) => {
   const { id } = req.params;
+
+  const { page = 1 } = req.query;
+  const maxitem = 100;
+  const pageInt = parseInt(page);
+  const offset = (pageInt - 1) * maxitem;
+
   try {
     const contest = await Contest.findByPk(id);
     if (!contest) {
@@ -355,10 +361,28 @@ exports.getAllSubmission = async (req, res) => {
         },
       ],
       order: [["submit_time", "DESC"]],
+      limit: maxitem,
+      offset: offset,
     });
-    res
-      .status(200)
-      .json({ message: "Submissions fetched successfully", data: submissions });
+
+    const totalCount = await Submission.count({
+      where: {
+        contest_id: id,
+      },
+    });
+
+    res.status(200).json({
+      message: "Submissions fetched successfully",
+      data: {
+        submissions,
+        pagination: {
+          total: totalCount,
+          page: pageInt,
+          maxitem: maxitem,
+          totalPages: Math.ceil(totalCount / maxitem),
+        },
+      },
+    });
   } catch (err) {
     res.status(500).json({ error: "Server error", details: err });
   }
@@ -368,6 +392,11 @@ exports.getAllSubmission = async (req, res) => {
 exports.getMySubmissions = async (req, res) => {
   const { id } = req.params;
   const user_id = req.user.user_id;
+
+  const { page = 1 } = req.query;
+  const maxitem = 100;
+  const pageInt = parseInt(page);
+  const offset = (pageInt - 1) * maxitem;
 
   try {
     const mysubmissions = await Submission.findAll({
@@ -397,10 +426,28 @@ exports.getMySubmissions = async (req, res) => {
         },
       ],
       order: [["submit_time", "DESC"]],
+      limit: maxitem,
+      offset: offset,
     });
+
+    const totalCount = await Submission.count({
+      where: {
+        user_id: user_id,
+        contest_id: id,
+      },
+    });
+
     res.status(200).json({
       message: "Your submissions fetched successfully",
-      data: mysubmissions,
+      data: {
+        mysubmissions,
+        pagination: {
+          total: totalCount,
+          page: pageInt,
+          maxitem: maxitem,
+          totalPages: Math.ceil(totalCount / maxitem),
+        },
+      },
     });
   } catch (err) {
     res.status(500).json({ error: "Server error", details: err });

@@ -4,7 +4,11 @@ const { Op, literal } = require("sequelize");
 
 // Lấy tất cả các problem
 exports.GetAllProblem = async (req, res) => {
-  const { search = "" } = req.query;
+  const { search = "", page = 1 } = req.query;
+  const maxitem = 50;
+  const pageInt = parseInt(page);
+  const offset = (pageInt - 1) * maxitem;
+
   try {
     const problems = await Problem.findAll({
       where: {
@@ -31,11 +35,30 @@ exports.GetAllProblem = async (req, res) => {
           "acceptedUserCount",
         ],
       ],
+      limit: maxitem,
+      offset: offset,
+    });
+
+    const totalCount = await Problem.count({
+      where: {
+        is_public: true,
+        problem_name: {
+          [Op.like]: `%${search}%`,
+        },
+      },
     });
 
     res.status(200).json({
       message: "Public problems fetched successfully",
-      data: problems,
+      data: {
+        problems,
+        pagination: {
+          total: totalCount,
+          page: pageInt,
+          maxitem: maxitem,
+          totalPages: Math.ceil(totalCount / maxitem),
+        },
+      },
     });
   } catch (err) {
     res.status(500).json({

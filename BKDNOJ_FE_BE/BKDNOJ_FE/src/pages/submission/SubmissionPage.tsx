@@ -9,7 +9,7 @@ export const SubmissionsPage = () => {
   const fetchSubmissions = async () => {
     try {
       const res = await api.get("/submissions");
-      setSubmissions(res.data.data);
+      setSubmissions(res.data.data.submissions);
     } catch (error) {
       console.error("Failed to fetch submissions", error);
     }

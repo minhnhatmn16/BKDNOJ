@@ -25,7 +25,7 @@ const AdminContestPage = () => {
     const fetchContests = async () => {
       try {
         const res = await api.get("/admin/contest");
-        setContests(res.data.data);
+        setContests(res.data.data.contests);
       } catch (err) {
         console.error(err);
       }

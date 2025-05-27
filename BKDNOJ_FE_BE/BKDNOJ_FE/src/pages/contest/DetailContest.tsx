@@ -49,12 +49,12 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
       try {
         if (activeTab === "mysubmissions" && !hasLoaded.mysubmissions) {
           const res = await api.get(`/contest/${detail_contest.contest_id}/mysubmissions`);
-          setMySubmissions(res.data.data);
+          setMySubmissions(res.data.data.mysubmissions);
           setHasLoaded((prev) => ({ ...prev, mysubmissions: true }));
         }
         if (activeTab === "status" && !hasLoaded.status) {
           const res = await api.get(`/contest/${detail_contest.contest_id}/submissions`);
-          setSubmissions(res.data.data);
+          setSubmissions(res.data.data.submissions);
           setHasLoaded((prev) => ({ ...prev, status: true }));
         }
         if (activeTab === "standing" && !hasLoaded.standing) {

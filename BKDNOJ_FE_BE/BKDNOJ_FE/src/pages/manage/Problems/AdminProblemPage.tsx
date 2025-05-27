@@ -24,7 +24,7 @@ const AdminProblemPage = () => {
   const fetchProblems = async () => {
     try {
       const res = await api.get("/admin/problem");
-      setProblems(res.data.data);
+      setProblems(res.data.data.problems);
     } catch (err) {
       console.error("Error fetching problems:", err);
     }

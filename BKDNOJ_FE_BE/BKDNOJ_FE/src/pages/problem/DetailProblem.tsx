@@ -56,11 +56,11 @@ const DetailProblem = ({ title, detail_problem, activeTab }: DetailProblemProps)
           setHasLoaded((prev) => ({ ...prev, submit: true }));
         } else if (activeTab === "mysubmissions" && !hasLoaded.mysubmissions) {
           const res = await api.get(`/problem/${detail_problem.problem_id}/mysubmissions`);
-          setMySubmissions(res.data.data);
+          setMySubmissions(res.data.data.mysubmissions);
           setHasLoaded((prev) => ({ ...prev, mysubmissions: true }));
         } else if (activeTab === "status" && !hasLoaded.status) {
           const res = await api.get(`/problem/${detail_problem.problem_id}/submissions`);
-          setSubmissions(res.data.data);
+          setSubmissions(res.data.data.submissions);
           setHasLoaded((prev) => ({ ...prev, status: true }));
         }
       } catch (err) {
