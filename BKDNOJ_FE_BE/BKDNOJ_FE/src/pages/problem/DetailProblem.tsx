@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Problem, Submission } from "../types";
 import api from "../../api";
 import SubmissionTable from "../submission/SubmissionTable";
 import SubmitPage from "../submit/SubmitPage";
 import PdfViewer from "./PdfViewer";
+import { useLocation, useNavigate } from "react-router-dom";
+import Pagination from "../../components/pagination/Pagination";
 
 interface DetailProblemProps {
   title: string;
@@ -16,8 +17,8 @@ const getDirectDriveLink = (link: string): string => {
   return match ? `https://drive.google.com/file/d/${match[1]}/preview` : link;
 };
 const DetailProblem = ({ title, detail_problem, activeTab }: DetailProblemProps) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 10;
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const [mysubmissions, setMySubmissions] = useState<Submission[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -28,7 +29,8 @@ const DetailProblem = ({ title, detail_problem, activeTab }: DetailProblemProps)
     status: false,
   });
 
-  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const handleTabChange = (tab: string) => {
     if (tab === "problem") {
@@ -112,9 +114,23 @@ const DetailProblem = ({ title, detail_problem, activeTab }: DetailProblemProps)
       )}
       {activeTab === "submit" && <SubmitPage problem={detail_problem} />}
       {activeTab === "mysubmissions" && (
-        <SubmissionTable title="My submissions" submissions={mysubmissions} />
+        <SubmissionTable
+          title="My submissions"
+          submissions={mysubmissions}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       )}
-      {activeTab === "status" && <SubmissionTable title="Status" submissions={submissions} />}
+      {activeTab === "status" && (
+        <SubmissionTable
+          title="Status"
+          submissions={submissions}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      )}
     </div>
   );
 };

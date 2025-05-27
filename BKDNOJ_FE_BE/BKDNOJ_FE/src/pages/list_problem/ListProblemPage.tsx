@@ -49,7 +49,8 @@ export const ListProblemsPage = () => {
   const handleSearch = (term: string) => {
     setSearchTerm(term);
     setCurrentPage(1);
-    navigate(`/problems?search=${encodeURIComponent(term)}`);
+    if (term.length === 0) navigate(`/problems`);
+    else navigate(`/problems?search=${encodeURIComponent(term)}`);
   };
   return (
     <div className="one-column-wrapper">
