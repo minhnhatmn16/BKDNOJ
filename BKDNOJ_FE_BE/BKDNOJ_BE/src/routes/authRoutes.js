@@ -3,6 +3,7 @@ const router = express.Router();
 const authController = require("../controllers/authController");
 const authenticateToken = require("../middleware/authenticateToken");
 const addPermission = require("../middleware/addPermission");
+const upload = require("../middleware/multer");
 
 // Đăng ký và đăng nhập
 router.post("/register", authController.register); // Đăng kí
@@ -15,5 +16,6 @@ router.put(
   addPermission,
   authController.changePermission
 );
+router.put("/profile", upload.single("avatar"), authController.updateProfile);
 
 module.exports = router;

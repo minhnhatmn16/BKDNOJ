@@ -43,11 +43,11 @@ const CreateProblemModal = ({ isOpen, onClose }: CreateProblemModalProps) => {
       const formData = new FormData();
       formData.append("problem_name", problemName);
       if (pdfFile) {
-        formData.append("pdf", pdfFile);
+        formData.append("link", pdfFile);
       }
       formData.append("is_public", String(isPublic));
-      formData.append("time_limit_ms", String(timeLimit));
-      formData.append("memory_limit_kb", String(memoryLimit));
+      formData.append("timelimit_ms", String(timeLimit));
+      formData.append("memorylimit_kb", String(memoryLimit));
 
       await api.post("/admin/problem", formData, {
         headers: { "Content-Type": "multipart/form-data" },

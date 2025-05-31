@@ -1,6 +1,7 @@
 const Problem = require("../models/problem");
 const bcrypt = require("bcrypt");
 const { Op, literal } = require("sequelize");
+const uploadToCloudinary = require("../utils/cloudinaryUpload");
 
 // Lấy tất cả các problem
 exports.GetAllProblem = async (req, res) => {
@@ -70,13 +71,17 @@ exports.GetAllProblem = async (req, res) => {
 
 // Tạo problem
 exports.CreateProblem = async (req, res) => {
-  const { problem_name, link, is_public, timelimit_ms, memorylimit_kb } =
-    req.body;
-
   try {
+    const { problem_name, is_public, timelimit_ms, memorylimit_kb } = req.body;
+
+    let link = null;
+    if (req.file) {
+      link = await uploadToCloudinary(req.file.path, "bkdnoj/problems", "raw");
+    }
+
     const newProblem = await Problem.create({
       problem_name,
-      link,
+      ...(link && { link: link }),
       is_public,
       timelimit_ms,
       memorylimit_kb,

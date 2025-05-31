@@ -12,6 +12,8 @@ interface ListProblemsTableProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   onSearch: (searchTerm: string) => void;
+  onToggleHideSolved: (hide: boolean) => void;
+  hideSolved: boolean;
 }
 
 const ProblemsTable = ({
@@ -21,6 +23,8 @@ const ProblemsTable = ({
   totalPages,
   onPageChange,
   onSearch,
+  onToggleHideSolved,
+  hideSolved,
 }: ListProblemsTableProps) => {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
@@ -74,7 +78,9 @@ const ProblemsTable = ({
                           ""
                         )}
                       </td>
-                      <td className="border border-gray-300 p-3 text-center">{index + 1}</td>
+                      <td className="border border-gray-300 p-3 text-center">
+                        {problem.problem_id}
+                      </td>
 
                       <td className="border border-gray-300 p-3">
                         <Link
@@ -133,7 +139,12 @@ const ProblemsTable = ({
           />
           <div className="flex flex-col space-y-1">
             <label>
-              <input type="checkbox" /> Hide solved problems
+              <input
+                type="checkbox"
+                checked={hideSolved}
+                onChange={(e) => onToggleHideSolved(e.target.checked)}
+              />{" "}
+              Hide solved problems
             </label>
           </div>
           <div className="mt-4 flex justify-center">

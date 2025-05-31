@@ -11,18 +11,16 @@ export const ListProblemsPage = () => {
   const queryParams = new URLSearchParams(location.search);
   const initialSearch = queryParams.get("search") || "";
   const [searchTerm, setSearchTerm] = useState(initialSearch);
+  const [hideSolved, setHideSolved] = useState(false);
 
   const [listProblem, setListProblem] = useState<Problem[]>([]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const fetchProblems = async (page: number, query = "") => {
+  const fetchProblems = async (page: number, query = "", hideSolved = false) => {
     try {
-      const url = query
-        ? `/problems?page=${page}&search=${encodeURIComponent(query)}`
-        : `/problems?page=${page}`;
-
+      const url = `/problems?page=${page}&search=${encodeURIComponent(query)}&hide_solved=${hideSolved}`;
       const res = await api.get(url);
       setListProblem(res.data.data.problems);
       setTotalPages(res.data.data.pagination.totalPages);
@@ -30,6 +28,7 @@ export const ListProblemsPage = () => {
       console.error("Failed to fetch problems:", error);
     }
   };
+
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const search = queryParams.get("search") || "";
@@ -39,8 +38,8 @@ export const ListProblemsPage = () => {
   }, [location.search]);
 
   useEffect(() => {
-    fetchProblems(currentPage, searchTerm);
-  }, [currentPage, searchTerm]);
+    fetchProblems(currentPage, searchTerm, hideSolved);
+  }, [currentPage, searchTerm, hideSolved]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -61,6 +60,8 @@ export const ListProblemsPage = () => {
         totalPages={totalPages}
         onPageChange={handlePageChange}
         onSearch={handleSearch}
+        onToggleHideSolved={setHideSolved}
+        hideSolved={hideSolved}
       />
     </div>
   );

@@ -5,6 +5,7 @@ const Submission = require("../models/submission");
 const { literal, Op, fn } = require("sequelize");
 const { models } = require("../models");
 const moment = require("moment");
+const uploadToCloudinary = require("../utils/cloudinaryUpload");
 
 // Đăng kí
 exports.register = async (req, res) => {
@@ -163,6 +164,54 @@ exports.changePermission = async (req, res) => {
     });
   } catch (err) {
     console.error("Change permission error:", err);
+    res.status(500).json({ message: "Server error", details: err.message });
+  }
+};
+
+// Update avatar
+exports.updateProfile = async (req, res) => {
+  const { user_name } = req.body;
+
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "No token provided" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "your_jwt_secret"
+    );
+
+    const user = await User.findByPk(decoded.user_id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    let avatarUrl = user.avatar;
+    if (req.file) {
+      avatarUrl = await uploadToCloudinary(
+        req.file.path,
+        "bkdnoj/avatars",
+        "image"
+      );
+    }
+
+    user.avatar = avatarUrl;
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      data: {
+        user_id: user.user_id,
+        user_name: user.user_name,
+        email: user.email,
+        avatar: user.avatar,
+      },
+    });
+  } catch (err) {
+    console.error("Update profile error:", err);
     res.status(500).json({ message: "Server error", details: err.message });
   }
 };
