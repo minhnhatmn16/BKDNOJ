@@ -32,6 +32,7 @@ router.put(
   "/:id",
   authenticateToken,
   checkAdmin,
+  upload.single("file"),
   manageProblemController.UpdateProblem
 );
 

@@ -1,5 +1,6 @@
 import { Profile, HeatmapDay } from "../types";
 import { useState } from "react";
+import api from "../../api";
 
 interface UserProfileProps {
   title: string;
@@ -93,10 +94,21 @@ const UserProfilePage = ({ title, profile, sumissionsInYear }: UserProfileProps)
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!selectedFile) return;
     console.log("Uploading:", selectedFile);
-    window.location.reload();
+    try {
+      const formData = new FormData();
+      if (selectedFile) {
+        formData.append("avatar", selectedFile);
+      }
+      await api.put("/auth/profile/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      window.location.reload();
+    } catch (err) {
+      console.error("Update problem failed", err);
+    }
   };
   return (
     <div className="one-column-element mb-6">

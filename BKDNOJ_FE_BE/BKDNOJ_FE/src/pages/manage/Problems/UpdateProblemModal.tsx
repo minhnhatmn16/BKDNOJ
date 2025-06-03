@@ -10,6 +10,7 @@ interface UpdateProblemModalProps {
 
 const UpdateProblemModal = ({ isOpen, onClose, problem }: UpdateProblemModalProps) => {
   const [problemName, setProblemName] = useState(problem?.problem_name || "");
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [timeLimit, setTimeLimit] = useState(problem?.timelimit_ms?.toString() || "");
   const [memoryLimit, setMemoryLimit] = useState(problem?.memorylimit_kb?.toString() || "");
   const [isPublic, setIsPublic] = useState(problem?.is_public ?? true);
@@ -40,11 +41,17 @@ const UpdateProblemModal = ({ isOpen, onClose, problem }: UpdateProblemModalProp
     }
 
     try {
-      await api.put(`/admin/problem/${problem?.problem_id}`, {
-        problem_name: problemName,
-        time_limit_ms: Number(timeLimit),
-        memory_limit_kb: Number(memoryLimit),
-        is_public: isPublic,
+      const formData = new FormData();
+      formData.append("problem_name", problemName);
+      if (pdfFile) {
+        formData.append("file", pdfFile);
+      }
+      formData.append("is_public", String(isPublic));
+      formData.append("timelimit_ms", String(timeLimit));
+      formData.append("memorylimit_kb", String(memoryLimit));
+
+      await api.put(`/admin/problem/${problem?.problem_id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
       onClose();
       window.location.reload();
@@ -67,6 +74,23 @@ const UpdateProblemModal = ({ isOpen, onClose, problem }: UpdateProblemModalProp
               value={problemName}
               onChange={(e) => setProblemName(e.target.value)}
               className="col-span-2 w-full rounded border p-2"
+            />
+          </div>
+
+          <div className="grid grid-cols-3 items-center">
+            <label className="pr-4 text-right">PDF File</label>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file && file.type === "application/pdf") {
+                  setPdfFile(file);
+                } else {
+                  alert("Please select a valid PDF file.");
+                }
+              }}
+              className="col-span-2 w-full"
             />
           </div>
 

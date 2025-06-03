@@ -1,7 +1,17 @@
 const Problem = require("../models/problem");
 const bcrypt = require("bcrypt");
 const { Op, literal } = require("sequelize");
-const uploadToCloudinary = require("../utils/cloudinaryUpload");
+const { uploadPDFToDrive } = require("../utils/uploadToDrive");
+const fs = require("fs");
+const { google } = require("googleapis");
+
+const KEYFILEPATH = "srcsecurity\bkdnoj-461512-668e7fc6c984.json";
+const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
+
+const auth = new google.auth.GoogleAuth({
+  keyFile: KEYFILEPATH,
+  scopes: SCOPES,
+});
 
 // Lấy tất cả các problem
 exports.GetAllProblem = async (req, res) => {
@@ -74,18 +84,24 @@ exports.CreateProblem = async (req, res) => {
   try {
     const { problem_name, is_public, timelimit_ms, memorylimit_kb } = req.body;
 
-    let link = null;
-    if (req.file) {
-      link = await uploadToCloudinary(req.file.path, "bkdnoj/problems", "raw");
-    }
-
     const newProblem = await Problem.create({
       problem_name,
-      ...(link && { link: link }),
       is_public,
       timelimit_ms,
       memorylimit_kb,
     });
+
+    let link = null;
+    if (req.file) {
+      const newFileName = `${newProblem.problem_id}.pdf`;
+      link = await uploadPDFToDrive(req.file.path, newFileName);
+
+      await Problem.update(
+        { link: link },
+        { where: { problem_id: newProblem.problem_id } }
+      );
+      newProblem.link = link;
+    }
 
     res.status(201).json({
       message: "Problem created successfully",
@@ -102,19 +118,26 @@ exports.CreateProblem = async (req, res) => {
 // Cập nhật problem
 exports.UpdateProblem = async (req, res) => {
   const problem_id = req.params.id;
-  const { problem_name, link, is_public, timelimit_ms, memorylimit_kb } =
-    req.body;
 
   try {
+    const { problem_name, is_public, timelimit_ms, memorylimit_kb } = req.body;
+
     const updateProblem = await Problem.findByPk(problem_id);
     if (!updateProblem)
       return res.status(404).json({ message: "Problem not found" });
 
-    if (problem_name) updateProblem.problem_name = problem_name;
-    if (link) updateProblem.link = link;
+    if (problem_name !== undefined) updateProblem.problem_name = problem_name;
     if (is_public !== undefined) updateProblem.is_public = is_public;
-    if (timelimit_ms) updateProblem.timelimit_ms = timelimit_ms;
-    if (memorylimit_kb) updateProblem.memorylimit_kb = memorylimit_kb;
+    if (timelimit_ms !== undefined) updateProblem.timelimit_ms = timelimit_ms;
+    if (memorylimit_kb !== undefined)
+      updateProblem.memorylimit_kb = memorylimit_kb;
+
+    let link = null;
+    if (req.file) {
+      const newFileName = `${updateProblem.problem_id}.pdf`;
+      link = await uploadPDFToDrive(req.file.path, newFileName);
+      updateProblem.link = link;
+    }
 
     await updateProblem.save();
 

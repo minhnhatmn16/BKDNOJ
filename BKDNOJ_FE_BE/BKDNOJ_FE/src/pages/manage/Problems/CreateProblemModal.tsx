@@ -43,7 +43,7 @@ const CreateProblemModal = ({ isOpen, onClose }: CreateProblemModalProps) => {
       const formData = new FormData();
       formData.append("problem_name", problemName);
       if (pdfFile) {
-        formData.append("link", pdfFile);
+        formData.append("file", pdfFile);
       }
       formData.append("is_public", String(isPublic));
       formData.append("timelimit_ms", String(timeLimit));
