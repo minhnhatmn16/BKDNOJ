@@ -15,8 +15,8 @@ class JudgeProcessor:
             executable += '.exe'
         
         if os.path.exists(executable):
-            source_mtime = os.path.getmtime(source_file)  # Thời gian sửa file nguồn
-            exec_mtime = os.path.getmtime(executable)     # Thời gian sửa file thực thi
+            source_mtime = os.path.getmtime(source_file)  
+            exec_mtime = os.path.getmtime(executable)     
             if exec_mtime >= source_mtime:
                 return executable
         
@@ -30,15 +30,11 @@ class JudgeProcessor:
             )
             
             if compile_process.returncode != 0:
-                # error_msg = compile_process.stderr
-                # raise RuntimeError(f"Compilation failed: {error_msg}")
                 raise RuntimeError(f"Compilation failed")
             
             return executable
         except Exception as e:
-            # raise RuntimeError(f"Compilation error: {str(e)}")
             raise RuntimeError(f"Compilation error")
-
 
     def get_command(self, source_file, language):
         if language == 'python':
@@ -52,66 +48,53 @@ class JudgeProcessor:
         else:
             raise ValueError(f"Không hỗ trợ: {language}")
         
-    def process_submission(self, submission_id, problem_id, source_path, language):
+    def process_submission(self, submission_id, problem_id, source_path, language, timelimit_ms, memorylimit_kb):
         try:
-
             try:
                 command = self.get_command(source_path, language)
             except Exception as e:
-                # result["Code"] = "CE"  # Compilation Error
-                # result["Error"] = str(e)
-                # return result
                 return {
-                    # "status": "CE",  # Compilation Error
-                    "status": "CE",
                     "submission_id" : submission_id,
-                    "problem_id": problem_id,
-                    "results" : [],
-                    "summary": {
-                        "passed": 0,
-                        "total": 0,
-                        "score": f"{0}/{0}"
-                    }
+                    "status": "CE",  # Compilation Error
+                    "passed": 0,
+                    "total": 0,
                 }
 
-            input_dir = os.path.join("problems", f"#{problem_id}")
-            output_dir = os.path.join("problems", f"#{problem_id}")
-            # input_dir = os.path.join("problems", f"#{problem_id}", "input")
-            # output_dir = os.path.join("problems", f"#{problem_id}", "output")
-            # input_files = [f for f in os.listdir(input_dir) if (f.startswith('Test_') and f.endswith('.txt')) or (f.endswith('.in'))]
+            input_dir = os.path.join("problems", f"{problem_id}")
+            output_dir = os.path.join("problems", f"{problem_id}")
+
             input_files = [f for f in os.listdir(input_dir) if (f.endswith('.in'))]
             input_files.sort(key=lambda x: int(x.split('.')[0]))
             
             count_testcase = 0
             count_testpassed = 0
             results = []
+            firstStatus = ""
+            isFirstStatus = False
             for input_file in input_files:
-                print("Đang chấm test " ,count_testcase)
+                print("Testcase " ,count_testcase)
 
                 input_path = os.path.join(input_dir, input_file)
                 output_path = os.path.join(output_dir, input_file.split(".")[0]+".out")
-                print(input_path)
-                print(output_path)
 
-                temp = MonoProcessMonitor(100, 1, 1.2, 200, source_path, input_path, output_path, language)
+                temp = MonoProcessMonitor(100, timelimit_ms, timelimit_ms * 3, 2, source_path, input_path, output_path, language)
                 result  = temp.run()
                 count_testcase += 1
                 
                 results.append(result)
 
-                if (result["Code"] == "AC"):
+                if (result["status"] == "AC"):
                     count_testpassed += 1
-          
+
+                if isFirstStatus == False:
+                    isFirstStatus  = True
+                    firstStatus = result["status"]
+
             return {
-                "status": "ok",
+                "status": firstStatus,
                 "submission_id" : submission_id,
-                "problem_id": problem_id,
-                "results" : results,
-                "summary": {
-                    "passed": count_testpassed,
-                    "total": count_testcase,
-                    "score": f"{count_testpassed}/{count_testcase}"
-                }
+                "passed": count_testpassed,
+                "total": count_testcase,
             }
         except Exception as e:
             return {"status": "error tai checker_mono", "message": str(e)}

@@ -1,12 +1,15 @@
 import sys
 import math
+import time
 
 EPSILON = 1e-6  
 def is_float_equal(a, b, epsilon=EPSILON):
     try:
-        return abs(float(a) - float(b)) < epsilon
+        af = float(a)
+        bf = float(b)
+        return abs(af - bf) < epsilon
     except ValueError:
-        return False 
+        return False
 
 def compare_lines(expected, output):
     expected = expected.strip()
@@ -29,14 +32,10 @@ def compare_lines(expected, output):
 
 def check(expected_file, output_lines):
     with open(expected_file, 'r') as f:
-        expected_lines = f.readlines()
-    # with open(output_file, 'r') as f:
-    #     output_lines = f.readlines()
-    
-    if len(expected_lines) != len(output_lines):
-        return "WA"
-    
-    for expected, output in zip(expected_lines, output_lines):
-        if not compare_lines(expected, output):
+        for i, (expected_line, output_line) in enumerate(zip(f, output_lines)):
+            if not compare_lines(expected_line.rstrip('\n'), output_line.rstrip('\n')):
+                return "WA"
+        
+        if sum(1 for _ in f) + i + 1 != len(output_lines):
             return "WA"
     return "AC"    

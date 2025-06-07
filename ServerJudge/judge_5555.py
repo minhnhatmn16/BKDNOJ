@@ -16,9 +16,6 @@ class JudgeServer:
         self.max_connections = 1
 
     def start(self):
-        # p = psutil.Process(os.getpid())
-        # p.cpu_affinity([self.core_id])
-
         self.server_socket.bind((self.host, self.port))
         self.server_socket.listen(5)
         print(f"Judge Server listening on {self.host}:{self.port}")
@@ -52,7 +49,9 @@ class JudgeServer:
                 request['submission_id'],
                 request['problem_id'],
                 request['source_path'],
-                request['language']
+                request['language'],
+                request['timelimit_ms'],
+                request['memorylimit_kb'],
             )
 
             client_socket.send(json.dumps(response).encode())
