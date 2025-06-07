@@ -3,6 +3,7 @@ const Problem = require("../models/problem");
 const Submission = require("../models/submission");
 const User = require("../models/user");
 const { models } = require("../models");
+const axios = require("axios");
 
 // Thêm problem
 exports.createProblem = async (req, res) => {
@@ -85,7 +86,8 @@ exports.addSubmit = async (req, res) => {
   const user_id = req.user.user_id;
   const problem_id = req.params.id;
   const { language, code } = req.body;
-
+  const timelimit_ms = 1000;
+  const memorylimit_kb = 256;
   try {
     const newSubmission = await Submission.create({
       user_id,
@@ -93,6 +95,16 @@ exports.addSubmit = async (req, res) => {
       language,
       code,
     });
+
+    await axios.post("http://localhost:5000/submit", {
+      submission_id: newSubmission.submission_id,
+      problem_id,
+      language,
+      code,
+      timelimit_ms,
+      memorylimit_kb,
+    });
+
     res.status(201).json({
       message: "Submission added successfully",
       data: newSubmission.submission_id,

@@ -8,7 +8,7 @@ interface SubmitPageProps {
 }
 
 const SubmitPage = ({ problem }: SubmitPageProps) => {
-  const [language, setLanguage] = useState("C++17");
+  const [language, setLanguage] = useState("cpp");
   const [code, setCode] = useState("// Write your code here");
   const [submitting, setSubmitting] = useState(false);
 
@@ -57,8 +57,8 @@ const SubmitPage = ({ problem }: SubmitPageProps) => {
               onChange={(e) => setLanguage(e.target.value)}
               className="rounded border border-gray-300 px-2 py-1"
             >
-              <option value="C++">C++</option>
-              <option value="Python">Python</option>
+              <option value="cpp">C++</option>
+              <option value="py">Python</option>
             </select>
           </div>
 
