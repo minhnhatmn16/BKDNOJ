@@ -48,7 +48,7 @@ const UpdateProblemModal = ({ isOpen, onClose, problem }: UpdateProblemModalProp
         formData.append("file", pdfFile);
       }
       if (zipFile) {
-        formData.append("zip_file", zipFile);
+        formData.append("zip_testcase", zipFile);
       }
       formData.append("is_public", String(isPublic));
       formData.append("timelimit_ms", String(timeLimit));

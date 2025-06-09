@@ -5,6 +5,7 @@ const { uploadPDFToDrive } = require("../utils/uploadToDrive");
 const fs = require("fs");
 const { google } = require("googleapis");
 const axios = require("axios");
+const FormData = require("form-data");
 
 const KEYFILEPATH = "srcsecurity\bkdnoj-461512-668e7fc6c984.json";
 const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
@@ -83,32 +84,39 @@ exports.CreateProblem = async (req, res) => {
       memorylimit_kb,
     });
 
-    let link = null;
-    if (req.file) {
+    if (req.files && req.files.file && req.files.file.length > 0) {
+      const pdfFile = req.files.file[0];
       const newFileName = `${newProblem.problem_id}.pdf`;
-      link = await uploadPDFToDrive(req.file.path, newFileName);
+      const link = await uploadPDFToDrive(pdfFile.path, newFileName);
 
       await Problem.update(
         { link: link },
         { where: { problem_id: newProblem.problem_id } }
       );
       newProblem.link = link;
+      fs.unlink(pdfFile.path, (err) => {
+        if (err) console.error("Failed to delete PDF file:", err);
+      });
     }
 
-    // if (
-    //   req.files &&
-    //   req.files.zip_testcase &&
-    //   req.files.zip_testcase.length > 0
-    // ) {
-    //   const zipFile = req.files.zip_testcase[0];
-    //   const formData = new FormData();
-    //   formData.append("zip_file", fs.createReadStream(zipFile.path));
-    //   formData.append("problem_id", newProblem.problem_id);
+    if (
+      req.files &&
+      req.files.zip_testcase &&
+      req.files.zip_testcase.length > 0
+    ) {
+      const zipFile = req.files.zip_testcase[0];
+      const formData = new FormData();
+      formData.append("zip_file", fs.createReadStream(zipFile.path));
+      formData.append("problem_id", newProblem.problem_id);
 
-    //   await axios.post("http://localhost:5000/uploadTestcase", formData, {
-    //     headers: formData.getHeaders(),
-    //   });
-    // }
+      await axios.post("http://localhost:5000/uploadTestcase", formData, {
+        headers: formData.getHeaders(),
+      });
+
+      fs.unlink(zipFile.path, (err) => {
+        if (err) console.error("Failed to delete zip testcase file:", err);
+      });
+    }
 
     res.status(201).json({
       message: "Problem created successfully",
@@ -139,11 +147,39 @@ exports.UpdateProblem = async (req, res) => {
     if (memorylimit_kb !== undefined)
       updateProblem.memorylimit_kb = memorylimit_kb;
 
-    let link = null;
-    if (req.file) {
+    if (req.files && req.files.file && req.files.file.length > 0) {
+      const pdfFile = req.files.file[0];
       const newFileName = `${updateProblem.problem_id}.pdf`;
-      link = await uploadPDFToDrive(req.file.path, newFileName);
+      const link = await uploadPDFToDrive(pdfFile.path, newFileName);
+
+      await Problem.update(
+        { link: link },
+        { where: { problem_id: updateProblem.problem_id } }
+      );
       updateProblem.link = link;
+      fs.unlink(pdfFile.path, (err) => {
+        if (err) console.error("Failed to delete PDF file:", err);
+      });
+    }
+
+    if (
+      req.files &&
+      req.files.zip_testcase &&
+      req.files.zip_testcase.length > 0
+    ) {
+      updateProblem.has_testcase = false;
+      const zipFile = req.files.zip_testcase[0];
+      const formData = new FormData();
+      formData.append("zip_file", fs.createReadStream(zipFile.path));
+      formData.append("problem_id", updateProblem.problem_id);
+
+      await axios.post("http://localhost:5000/uploadTestcase", formData, {
+        headers: formData.getHeaders(),
+      });
+
+      fs.unlink(zipFile.path, (err) => {
+        if (err) console.error("Failed to delete zip testcase file:", err);
+      });
     }
 
     await updateProblem.save();

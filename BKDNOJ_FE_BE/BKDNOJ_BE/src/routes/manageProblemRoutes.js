@@ -17,7 +17,11 @@ router.post(
   "/",
   authenticateToken,
   checkAdmin,
-  upload.single("file"),
+  // upload.single("file"),
+  upload.fields([
+    { name: "file", maxCount: 1 }, // file PDF giới thiệu problem
+    { name: "zip_testcase", maxCount: 1 }, // file zip testcase
+  ]),
   manageProblemController.CreateProblem
 );
 
@@ -32,7 +36,11 @@ router.put(
   "/:id",
   authenticateToken,
   checkAdmin,
-  upload.single("file"),
+  // upload.single("file"),
+  upload.fields([
+    { name: "file", maxCount: 1 }, // file PDF giới thiệu problem
+    { name: "zip_testcase", maxCount: 1 }, // file zip testcase
+  ]),
   manageProblemController.UpdateProblem
 );
 
