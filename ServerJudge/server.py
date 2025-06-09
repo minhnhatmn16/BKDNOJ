@@ -36,7 +36,7 @@ class JudgeClient:
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
-    def update_submission(self, submission_id, status, passed, total, time_ms, memory_kb):
+    def update_submission(self, submission_id, status, passed, total, time_ms, memory_kb, contest_id):
         try:
             conn = pymysql.connect(
                 host="127.0.0.1",
@@ -56,15 +56,16 @@ class JudgeClient:
                         passed_test = %s,
                         total_test = %s,
                         time_ms = %s,
-                        memory_kb = %s
+                        memory_kb = %s,
+                        contest_id = %s
                     WHERE submission_id = %s
                     """
-                    cursor.execute(sql, (status, passed, total, time_ms, memory_kb, submission_id))
+                    cursor.execute(sql, (status, passed, total, time_ms, memory_kb, contest_id, submission_id))
                 conn.commit()
         except Exception as e:
             print(f"[DB ERROR] Cannot update submission {submission_id}: {e}")
 
-    def submit_to_judge(self, problem_id, source_path, language, submission_id, timelimit_ms, memorylimit_kb):
+    def submit_to_judge(self, problem_id, source_path, language, submission_id, timelimit_ms, memorylimit_kb, contest_id):
         # _judge_id = 0
         # for i in range(len(JUDGE_SERVER)):
         #     if (JUDGE_SERVER[i]['active'] == False):
@@ -97,7 +98,8 @@ class JudgeClient:
                 passed=result.get("passed", 0),
                 total=result.get("total", 0),
                 time_ms=result.get("time_ms", 0),
-                memory_kb=result.get("memory_kb", 0)
+                memory_kb=result.get("memory_kb", 0),
+                contest_id = contest_id
             )
 
             return result
@@ -148,13 +150,13 @@ def submit_code():
         language = data['language']
         timelimit_ms = data['timelimit_ms']
         memorylimit_kb = data['memorylimit_kb']
+        contest_id = data.get('contest_id')
 
         # Tạo file tạm để lưu code
         filename = f"code{submission_id}.{language}"
         source_path = os.path.join(UPLOAD_FOLDER, filename)
         with open(source_path, 'w', encoding='utf-8') as f:
             f.write(code)
-
 
         job = {
             'problem_id': problem_id,
@@ -163,6 +165,7 @@ def submit_code():
             'language': language,
             'timelimit_ms': timelimit_ms,
             'memorylimit_kb': memorylimit_kb,
+            'contest_id': contest_id,
         }
 
         submission_queue.put(job)
@@ -179,5 +182,34 @@ def submit_code():
     except Exception as e:
         return jsonify({"error": f"Submission error: {str(e)}"}), 500
 
+
+@app.route('/uploadTestcase', methods=['POST'])
+def upload_testcase():
+    try:
+        if 'zip_file' not in request.files:
+            return jsonify({"error": "No file part with name 'zip_file'"}), 400
+        
+        zip_file = request.files['zip_file']
+        problem_id = request.form.get('problem_id')
+
+        if not problem_id:
+            return jsonify({"error": "Missing problem_id"}), 400
+
+        if zip_file.filename == '':
+            return jsonify({"error": "No selected file"}), 400
+
+        # Tên file an toàn
+        filename = secure_filename(zip_file.filename)
+        # Bạn có thể lưu với tên liên quan đến problem_id để dễ quản lý
+        save_path = os.path.join(PROBLEMS_FOLDER, f"{problem_id}.zip")
+        zip_file.save(save_path)
+
+        # TODO: nếu muốn, bạn có thể thêm job xử lý testcase vào 1 queue riêng ở đây
+        # hoặc gọi xử lý unzip/testcase etc.
+
+        return jsonify({"status": "success", "message": f"Testcase for problem {problem_id} uploaded."})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

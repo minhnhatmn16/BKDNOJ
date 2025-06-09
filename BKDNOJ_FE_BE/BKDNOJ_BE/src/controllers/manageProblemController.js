@@ -4,6 +4,7 @@ const { Op, literal } = require("sequelize");
 const { uploadPDFToDrive } = require("../utils/uploadToDrive");
 const fs = require("fs");
 const { google } = require("googleapis");
+const axios = require("axios");
 
 const KEYFILEPATH = "srcsecurity\bkdnoj-461512-668e7fc6c984.json";
 const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
@@ -36,6 +37,7 @@ exports.GetAllProblem = async (req, res) => {
         "is_public",
         "timelimit_ms",
         "memorylimit_kb",
+        "has_testcase",
         [
           literal(`(
               SELECT COUNT(DISTINCT user_id)
@@ -102,6 +104,21 @@ exports.CreateProblem = async (req, res) => {
       );
       newProblem.link = link;
     }
+
+    // if (
+    //   req.files &&
+    //   req.files.zip_testcase &&
+    //   req.files.zip_testcase.length > 0
+    // ) {
+    //   const zipFile = req.files.zip_testcase[0];
+    //   const formData = new FormData();
+    //   formData.append("zip_file", fs.createReadStream(zipFile.path));
+    //   formData.append("problem_id", newProblem.problem_id);
+
+    //   await axios.post("http://localhost:5000/uploadTestcase", formData, {
+    //     headers: formData.getHeaders(),
+    //   });
+    // }
 
     res.status(201).json({
       message: "Problem created successfully",

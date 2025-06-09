@@ -33,7 +33,7 @@ function calculateICPCRanking(
     if (status === "AC") {
       record.foundAC = true;
       record.firstACTime = subTime;
-    } else {
+    } else if (status !== "Pending") {
       record.wrongAttempts += 1;
     }
   }
@@ -60,13 +60,16 @@ function calculateICPCRanking(
 
       if (rec.foundAC) {
         solved += 1;
-        penalty += rec.firstACTime + rec.wrongAttempts * penaltyPerWrong;
+        penalty +=
+          Math.floor(rec.firstACTime / 60000) +
+          rec.wrongAttempts * penaltyPerWrong;
       }
       listProblem.push({
         problem_id: pid,
         order: problemIdToOrder[pid] || null,
         wrongAttempts: rec.wrongAttempts,
-        firstACTime: rec.firstACTime,
+        firstACTime:
+          rec.firstACTime !== null ? Math.floor(rec.firstACTime / 60000) : null,
       });
     }
 
@@ -144,13 +147,19 @@ function calculateIOIRanking(
         firstTimeScoreMax: null,
       };
       score += rec.score;
-      total_time += rec.firstTimeScoreMax;
+      total_time +=
+        rec.firstTimeScoreMax !== null
+          ? Math.floor(rec.firstTimeScoreMax / 60000)
+          : 0;
 
       listProblem.push({
         problem_id: pid,
         order: problemIdToOrder[pid].order || null,
         score: rec.score,
-        firstTimeScoreMax: rec.firstTimeScoreMax,
+        firstTimeScoreMax:
+          rec.firstTimeScoreMax !== null
+            ? Math.floor(rec.firstTimeScoreMax / 60000)
+            : null,
       });
     }
 

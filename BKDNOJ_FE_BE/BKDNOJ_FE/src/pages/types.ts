@@ -38,6 +38,7 @@ export interface Problem {
   memorylimit_kb: string;
   link?: string;
   is_public: boolean;
+  has_testcase: boolean;
 }
 
 export interface Submission {

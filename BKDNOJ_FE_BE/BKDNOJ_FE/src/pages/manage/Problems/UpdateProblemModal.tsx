@@ -12,6 +12,7 @@ const UpdateProblemModal = ({ isOpen, onClose, problem }: UpdateProblemModalProp
   const [problemName, setProblemName] = useState(problem?.problem_name || "");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [timeLimit, setTimeLimit] = useState(problem?.timelimit_ms?.toString() || "");
+  const [zipFile, setZipFile] = useState<File | null>(null);
   const [memoryLimit, setMemoryLimit] = useState(problem?.memorylimit_kb?.toString() || "");
   const [isPublic, setIsPublic] = useState(problem?.is_public ?? true);
 
@@ -45,6 +46,9 @@ const UpdateProblemModal = ({ isOpen, onClose, problem }: UpdateProblemModalProp
       formData.append("problem_name", problemName);
       if (pdfFile) {
         formData.append("file", pdfFile);
+      }
+      if (zipFile) {
+        formData.append("zip_file", zipFile);
       }
       formData.append("is_public", String(isPublic));
       formData.append("timelimit_ms", String(timeLimit));
@@ -88,6 +92,25 @@ const UpdateProblemModal = ({ isOpen, onClose, problem }: UpdateProblemModalProp
                   setPdfFile(file);
                 } else {
                   alert("Please select a valid PDF file.");
+                }
+              }}
+              className="col-span-2 w-full"
+            />
+          </div>
+
+          <div className="grid grid-cols-3 items-center">
+            <label className="pr-4 text-right">Test case</label>
+            <input
+              type="file"
+              accept=".zip,application/zip,application/x-zip-compressed"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file && file.name.toLowerCase().endsWith(".zip")) {
+                  setZipFile(file);
+                } else {
+                  alert("Please select a valid ZIP file.");
+                  e.target.value = ""; // reset input
+                  setZipFile(null);
                 }
               }}
               className="col-span-2 w-full"

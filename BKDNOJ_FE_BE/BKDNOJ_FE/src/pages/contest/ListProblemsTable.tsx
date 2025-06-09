@@ -31,6 +31,7 @@ const ProblemsTable = ({
     try {
       const res = await api.post(`/contest/${contest_id}/${problem_id}`, { language, code });
       navigate(`/contest/${contest_id}/mysubmissions`);
+      window.location.reload();
     } catch (err: any) {
       if (err.response?.data?.message) {
         setError(err.response.data.message);

@@ -70,6 +70,7 @@ const AdminProblemPage = () => {
                 <th className="border p-3 text-center">Time Limit (ms)</th>
                 <th className="border p-3 text-center">Memory Limit (KB)</th>
                 <th className="border p-3 text-center">Visibility</th>
+                <th className="border p-3 text-center">Testcase</th>
                 <th className="border p-3 text-center">Actions</th>
               </tr>
             </thead>
@@ -89,6 +90,9 @@ const AdminProblemPage = () => {
                   <td className="border p-3 text-center">{problem.memorylimit_kb}</td>
                   <td className="border p-3 text-center">
                     {problem.is_public ? "Public" : "Private"}
+                  </td>
+                  <td className="border p-3 text-center">
+                    {problem.has_testcase ? <span className="text-green-500">&#10004;</span> : ""}
                   </td>
                   <td className="border p-3 text-center">
                     <button

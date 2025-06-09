@@ -272,7 +272,7 @@ exports.getRanking = async (req, res) => {
         "passed_test",
         "submit_time",
       ],
-      order: [["submit_time", "DESC"]],
+      order: [["submit_time", "ASC"]],
     });
 
     const problems = await ContestProblem.findAll({

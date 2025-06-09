@@ -9,6 +9,7 @@ interface CreateProblemModalProps {
 const CreateProblemModal = ({ isOpen, onClose }: CreateProblemModalProps) => {
   const [problemName, setProblemName] = useState("");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [zipFile, setZipFile] = useState<File | null>(null);
   const [isPublic, setIsPublic] = useState(true);
   const [timeLimit, setTimeLimit] = useState<number>(1);
   const [memoryLimit, setMemoryLimit] = useState<number>(256);
@@ -17,6 +18,7 @@ const CreateProblemModal = ({ isOpen, onClose }: CreateProblemModalProps) => {
     if (isOpen) {
       setProblemName("");
       setPdfFile(null);
+      setZipFile(null);
       setIsPublic(false);
       setTimeLimit(1);
       setMemoryLimit(256);
@@ -44,6 +46,9 @@ const CreateProblemModal = ({ isOpen, onClose }: CreateProblemModalProps) => {
       formData.append("problem_name", problemName);
       if (pdfFile) {
         formData.append("file", pdfFile);
+      }
+      if (zipFile) {
+        formData.append("zip_file", zipFile);
       }
       formData.append("is_public", String(isPublic));
       formData.append("timelimit_ms", String(timeLimit));
@@ -87,6 +92,25 @@ const CreateProblemModal = ({ isOpen, onClose }: CreateProblemModalProps) => {
                   setPdfFile(file);
                 } else {
                   alert("Please select a valid PDF file.");
+                }
+              }}
+              className="col-span-2 w-full"
+            />
+          </div>
+
+          <div className="grid grid-cols-3 items-center">
+            <label className="pr-4 text-right">Test case</label>
+            <input
+              type="file"
+              accept=".zip,application/zip,application/x-zip-compressed"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file && file.name.toLowerCase().endsWith(".zip")) {
+                  setZipFile(file);
+                } else {
+                  alert("Please select a valid ZIP file.");
+                  e.target.value = ""; // reset input
+                  setZipFile(null);
                 }
               }}
               className="col-span-2 w-full"

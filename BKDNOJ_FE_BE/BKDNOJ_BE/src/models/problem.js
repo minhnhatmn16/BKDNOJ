@@ -30,6 +30,11 @@ const Problem = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    has_testcase: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     tableName: "problems",
