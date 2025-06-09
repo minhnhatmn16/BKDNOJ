@@ -101,13 +101,13 @@ exports.CreateContest = async (req, res) => {
       format,
       created_by: user_id,
     });
-    
-    if (problems && Array.isArray(problems)) {
-      const contestProblems = problems.map((problem) => ({
+
+    if (Array.isArray(problems) && problems.length > 0) {
+      const contestProblems = problems.map((p, index) => ({
         contest_id: newContest.contest_id,
-        problem_id: problem.problem_id,
-        order: problem.order,
-        point: problem.point || 1.0,
+        problem_id: p.problem_id,
+        order: index + 1,
+        point: p.point ?? 1.0,
       }));
 
       await ContestProblem.bulkCreate(contestProblems);
@@ -174,13 +174,12 @@ exports.UpdateContest = async (req, res) => {
         where: { contest_id: contest.contest_id },
       });
 
-      const contestProblems = problems.map((problem) => ({
+      const contestProblems = problems.map((p, index) => ({
         contest_id: contest.contest_id,
-        problem_id: problem.problem_id,
-        order: problem.order,
-        point: problem.point || 1.0,
+        problem_id: p.problem_id,
+        order: index + 1,
+        point: p.point ?? 1.0,
       }));
-
       await ContestProblem.bulkCreate(contestProblems);
     }
 
@@ -204,7 +203,6 @@ exports.GetContestById = async (req, res) => {
         "start_time",
         "duration",
         "is_public",
-        "password",
         "penalty",
         "created_by",
         "format",

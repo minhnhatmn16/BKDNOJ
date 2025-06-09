@@ -78,7 +78,8 @@ const ProblemsTable = ({
                       <td className="border border-gray-300 p-3 text-center">{index + 1}</td>
                       <td className="border border-gray-300 p-3">
                         <Link
-                          to={`/problem/${contestProblem.problem_id}`}
+                          // to={`/problem/${contestProblem.problem_id}`}
+                          to={`/contest/${contest_id}/${contestProblem.problem_id}`}
                           className="text-blue-600 hover:underline"
                         >
                           {contestProblem.Problem.problem_name}

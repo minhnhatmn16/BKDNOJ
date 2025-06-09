@@ -12,6 +12,10 @@ interface UpdateContestModalProps {
   onClose: () => void;
   contest: Contest | null;
 }
+interface SelectedProblem {
+  problem_id: number;
+  score?: number;
+}
 
 const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProps) => {
   const [title, setTitle] = useState("");
@@ -22,7 +26,7 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
   const [isPublic, setIsPublic] = useState(false);
   const [password, setPassword] = useState("");
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [selectedProblems, setSelectedProblems] = useState<number[]>([]);
+  const [selectedProblems, setSelectedProblems] = useState<SelectedProblem[]>([]);
   const [problemScores, setProblemScores] = useState<Record<number, number>>({});
 
   const [showProblemTable, setShowProblemTable] = useState(false);
@@ -31,7 +35,7 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
   const fetchProblems = async () => {
     try {
       const res = await api.get("/admin/problem");
-      setProblems(res.data.data);
+      setProblems(res.data.data.problems);
     } catch (err) {
       console.error("Failed to load problems", err);
     }
@@ -44,13 +48,18 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
   };
 
   const confirmSelectedProblems = () => {
-    setSelectedProblems(tempSelectedProblems);
     if (rankRule === "IOI") {
-      const newScores: Record<number, number> = {};
-      tempSelectedProblems.forEach((pid) => {
-        newScores[pid] = problemScores[pid] ?? 100;
-      });
-      setProblemScores(newScores);
+      const newSelected = tempSelectedProblems.map((pid) => ({
+        problem_id: pid,
+        point: problemScores[pid] ?? 100,
+      }));
+      setSelectedProblems(newSelected);
+    } else {
+      const newSelected = tempSelectedProblems.map((pid) => ({
+        problem_id: pid,
+        point: 1,
+      }));
+      setSelectedProblems(newSelected);
     }
     setShowProblemTable(false);
   };
@@ -65,8 +74,13 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
       }
       setIsPublic(contest.is_public);
       setPassword(contest.password || "");
-      const ids = contest.Contest_Problems?.map((cp) => cp.problem_id) || [];
-      setSelectedProblems(ids);
+
+      const selected =
+        contest.Contest_Problems?.map((cp) => ({
+          problem_id: cp.problem_id,
+          score: cp.point ?? 100,
+        })) || [];
+      setSelectedProblems(selected);
       fetchProblems();
     }
   }, [contest]);
@@ -104,8 +118,8 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
     }
 
     if (rankRule === "IOI") {
-      for (const id of selectedProblems) {
-        const score = problemScores[id];
+      for (const selectedProblem of selectedProblems) {
+        const score = problemScores[selectedProblem.problem_id];
         if (typeof score !== "number" || score < 10) {
           alert(`Each problem in IOI mode must be greater than 0.`);
           return;
@@ -121,7 +135,7 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
         rank_rule: rankRule,
         is_public: isPublic,
         password: isPublic ? null : password,
-        problem_ids: selectedProblems,
+        problems: selectedProblems,
       });
       onClose();
       window.location.reload();
@@ -230,7 +244,7 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
               <button
                 className="mb-2 rounded border bg-blue-500 px-3 py-1 text-white"
                 onClick={() => {
-                  setTempSelectedProblems(selectedProblems);
+                  setTempSelectedProblems(selectedProblems.map((p) => p.problem_id));
                   setShowProblemTable(true);
                 }}
               >
@@ -238,8 +252,8 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
               </button>
 
               <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
-                {selectedProblems.map((id, index) => {
-                  const problem = problems.find((p) => p.problem_id === id);
+                {selectedProblems.map((p, index) => {
+                  const problem = problems.find((prob) => prob.problem_id === p.problem_id);
                   const letter = String.fromCharCode(65 + index);
 
                   const moveUp = () => {
@@ -257,11 +271,16 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
                   };
 
                   const remove = () => {
-                    setSelectedProblems(selectedProblems.filter((pid) => pid !== id));
+                    setSelectedProblems(
+                      selectedProblems.filter((item) => item.problem_id !== p.problem_id),
+                    );
                   };
 
                   return (
-                    <div key={id} className="flex items-center justify-between rounded border p-2">
+                    <div
+                      key={p.problem_id}
+                      className="flex items-center justify-between rounded border p-2"
+                    >
                       <div>
                         <span className="font-medium">{letter}. </span>
                         <span>{problem?.problem_name || "Unknown Problem"}</span>
@@ -270,11 +289,17 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
                             <label className="mr-2">Score:</label>
                             <input
                               type="number"
-                              min={1}
+                              min={10}
                               className="w-20 rounded border px-1 py-0.5"
-                              value={problemScores[id] ?? 100}
+                              value={p.score ?? 100}
                               onChange={(e) =>
-                                setProblemScores({ ...problemScores, [id]: Number(e.target.value) })
+                                setSelectedProblems((prev) =>
+                                  prev.map((item) =>
+                                    item.problem_id === p.problem_id
+                                      ? { ...item, score: Number(e.target.value) }
+                                      : item,
+                                  ),
+                                )
                               }
                             />
                           </div>

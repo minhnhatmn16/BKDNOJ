@@ -20,6 +20,7 @@ export interface User {
   role: string;
   can_create_contest: boolean;
 }
+
 export interface ContestProblem {
   order: string;
   point: number;

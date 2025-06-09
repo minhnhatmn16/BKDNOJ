@@ -12,6 +12,11 @@ interface CreateContestModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+interface SelectedProblem {
+  problem_id: number;
+  point: number;
+}
+
 const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
   const [title, setTitle] = useState("");
   const [startTime, setStartTime] = useState<Date | null>(new Date());
@@ -21,7 +26,7 @@ const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
   const [isPublic, setIsPublic] = useState(false);
   const [password, setPassword] = useState("");
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [selectedProblems, setSelectedProblems] = useState<number[]>([]);
+  const [selectedProblems, setSelectedProblems] = useState<SelectedProblem[]>([]);
   const [problemScores, setProblemScores] = useState<Record<number, number>>({});
 
   const navigate = useNavigate();
@@ -36,13 +41,18 @@ const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
   };
 
   const confirmSelectedProblems = () => {
-    setSelectedProblems(tempSelectedProblems);
     if (rankRule === "IOI") {
-      const newScores: Record<number, number> = {};
-      tempSelectedProblems.forEach((pid) => {
-        newScores[pid] = problemScores[pid] ?? 100;
-      });
-      setProblemScores(newScores);
+      const newSelected = tempSelectedProblems.map((pid) => ({
+        problem_id: pid,
+        point: problemScores[pid] ?? 100,
+      }));
+      setSelectedProblems(newSelected);
+    } else {
+      const newSelected = tempSelectedProblems.map((pid) => ({
+        problem_id: pid,
+        point: 1,
+      }));
+      setSelectedProblems(newSelected);
     }
     setShowProblemTable(false);
   };
@@ -103,8 +113,8 @@ const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
     }
 
     if (rankRule === "IOI") {
-      for (const id of selectedProblems) {
-        const score = problemScores[id];
+      for (const selectedProblem of selectedProblems) {
+        const score = problemScores[selectedProblem.problem_id];
         if (typeof score !== "number" || score < 10) {
           alert(`Each problem in IOI mode must be greater than 0.`);
           return;
@@ -247,7 +257,7 @@ const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
               <button
                 className="mb-2 rounded border bg-blue-500 px-3 py-1 text-white"
                 onClick={() => {
-                  setTempSelectedProblems(selectedProblems);
+                  setTempSelectedProblems(selectedProblems.map((p) => p.problem_id));
                   setShowProblemTable(true);
                 }}
               >
@@ -255,9 +265,15 @@ const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
               </button>
 
               <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
-                {selectedProblems.map((id, index) => {
-                  const problem = problems.find((p) => p.problem_id === id);
+                {selectedProblems.map(({ problem_id, point }, index) => {
+                  const problem = problems.find((p) => p.problem_id === problem_id);
                   const letter = String.fromCharCode(65 + index);
+
+                  const onChangePoint = (value: number) => {
+                    setSelectedProblems((prev) =>
+                      prev.map((p) => (p.problem_id === problem_id ? { ...p, point: value } : p)),
+                    );
+                  };
 
                   const moveUp = () => {
                     if (index === 0) return;
@@ -274,12 +290,14 @@ const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
                   };
 
                   const remove = () => {
-                    const newList = selectedProblems.filter((pid) => pid !== id);
-                    setSelectedProblems(newList);
+                    setSelectedProblems((prev) => prev.filter((p) => p.problem_id !== problem_id));
                   };
 
                   return (
-                    <div key={id} className="flex items-center justify-between rounded border p-2">
+                    <div
+                      key={problem_id}
+                      className="flex items-center justify-between rounded border p-2"
+                    >
                       <div>
                         <span className="font-medium">{letter}. </span>
                         <span>{problem?.problem_name || "Unknown Problem"}</span>
@@ -288,12 +306,10 @@ const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
                             <label className="mr-2">Score:</label>
                             <input
                               type="number"
-                              min={1}
+                              min={10}
                               className="w-20 rounded border px-1 py-0.5"
-                              value={problemScores[id] ?? 100}
-                              onChange={(e) =>
-                                setProblemScores({ ...problemScores, [id]: Number(e.target.value) })
-                              }
+                              value={point}
+                              onChange={(e) => onChangePoint(Number(e.target.value))}
                             />
                           </div>
                         )}

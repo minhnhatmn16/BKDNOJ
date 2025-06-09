@@ -5,6 +5,7 @@ const ContestProblem = require("../models/contest_problem");
 const { models } = require("../models");
 const { Op, fn, col } = require("sequelize");
 const bcrypt = require("bcrypt");
+const axios = require("axios");
 
 const {
   calculateICPCRanking,
@@ -546,6 +547,8 @@ exports.addSubmit = async (req, res) => {
   const user_id = req.user.user_id;
   const { problem_id, contest_id } = req.params;
   const { language, code } = req.body;
+  const timelimit_ms = 1000;
+  const memorylimit_kb = 256;
 
   try {
     const problemInContest = await ContestProblem.findOne({
@@ -575,6 +578,15 @@ exports.addSubmit = async (req, res) => {
       contest_id,
       language,
       code,
+    });
+    await axios.post("http://localhost:5000/submit", {
+      submission_id: newSubmission.submission_id,
+      problem_id,
+      language,
+      code,
+      contest_id,
+      timelimit_ms,
+      memorylimit_kb,
     });
 
     res.status(201).json({
