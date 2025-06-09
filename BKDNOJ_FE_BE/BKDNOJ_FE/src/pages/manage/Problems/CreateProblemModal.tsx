@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../../../api";
+import { notifyError, notifySuccess } from "../../../components/utils/ApiNotifier";
 
 interface CreateProblemModalProps {
   isOpen: boolean;
@@ -57,10 +58,11 @@ const CreateProblemModal = ({ isOpen, onClose }: CreateProblemModalProps) => {
       await api.post("/admin/problem", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+      notifySuccess("Problem created successfully!");
       onClose();
       window.location.reload();
-    } catch (err) {
-      console.error("Create problem failed", err);
+    } catch (err: any) {
+      notifyError(err.response?.data?.message || "Failed to create problem");
     }
   };
 

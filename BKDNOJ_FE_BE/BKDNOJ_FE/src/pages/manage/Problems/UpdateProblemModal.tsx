@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Problem } from "../../types";
 import api from "../../../api";
+import { notifyError, notifySuccess } from "../../../components/utils/ApiNotifier";
 
 interface UpdateProblemModalProps {
   isOpen: boolean;
@@ -57,10 +58,11 @@ const UpdateProblemModal = ({ isOpen, onClose, problem }: UpdateProblemModalProp
       await api.put(`/admin/problem/${problem?.problem_id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+      notifySuccess("Problem updated successfully!");
       onClose();
       window.location.reload();
-    } catch (err) {
-      console.error("Update problem failed", err);
+    } catch (err: any) {
+      notifyError(err.response?.data?.message || "Failed to update problem");
     }
   };
 

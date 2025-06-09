@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { format, parse } from "date-fns";
 import ProblemSelectModal from "./ProblemSelectModal";
 import PasswordInput from "../../../components/utils/PasswordInput";
+import { notifyError, notifySuccess } from "../../../components/utils/ApiNotifier";
 
 interface UpdateContestModalProps {
   isOpen: boolean;
@@ -137,10 +138,11 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
         password: isPublic ? null : password,
         problems: selectedProblems,
       });
+      notifySuccess("Contest updated successfully!");
       onClose();
       window.location.reload();
-    } catch (err) {
-      console.error("Update failed", err);
+    } catch (err: any) {
+      notifyError(err.response?.data?.message || "Failed to update contest");
     }
   };
 

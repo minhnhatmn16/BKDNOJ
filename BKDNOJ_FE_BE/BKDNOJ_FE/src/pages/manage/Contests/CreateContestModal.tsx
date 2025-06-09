@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import ProblemSelectModal from "./ProblemSelectModal";
 import PasswordInput from "../../../components/utils/PasswordInput";
 import { Link, useNavigate } from "react-router-dom";
+import { notifyError, notifySuccess } from "../../../components/utils/ApiNotifier";
 
 interface CreateContestModalProps {
   isOpen: boolean;
@@ -134,10 +135,11 @@ const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
         format: rankRule,
         problems: selectedProblems,
       });
+      notifySuccess("Contest created successfully!");
       onClose();
       window.location.reload();
-    } catch (err) {
-      console.error("Create failed", err);
+    } catch (err: any) {
+      notifyError(err.response?.data?.message || "Failed to create contest");
     }
   };
 
