@@ -183,6 +183,55 @@ def submit_code():
         return jsonify({"error": f"Submission error: {str(e)}"}), 500
 
 
+import zipfile
+testcase_queue = Queue()
+def update_problem_has_testcase(problem_id):
+    try:
+        conn = pymysql.connect(
+            host="127.0.0.1",
+            port=4306,
+            user="root",
+            password="",
+            database="bkdnoj",
+            charset="utf8mb4",
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        with conn:
+            with conn.cursor() as cursor:
+                sql = "UPDATE problems SET has_testcase = %s WHERE problem_id = %s"
+                cursor.execute(sql, (True, problem_id))
+            conn.commit()
+        print(f"[DB] Updated problem {problem_id} has_testcase = True")
+    except Exception as e:
+        print(f"[DB ERROR] Update problem {problem_id} failed: {e}")
+
+def testcase_worker():
+    while True:
+        job = testcase_queue.get()
+        if job is None:
+            break
+        problem_id = job['problem_id']
+        zip_path = job['zip_path']
+
+        extract_dir = os.path.join(PROBLEMS_FOLDER, f"{problem_id}")
+
+        try:
+            os.makedirs(extract_dir, exist_ok=True)
+
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                zip_ref.extractall(extract_dir)
+
+            print(f"[Testcase Worker] Extracted testcases to {extract_dir}")
+            update_problem_has_testcase(problem_id)
+            if os.path.exists(zip_path):
+                os.remove(zip_path)
+
+        except Exception as e:
+            print(f"[Testcase Worker] Error processing {problem_id}: {e}")
+        testcase_queue.task_done()
+
+threading.Thread(target=testcase_worker, daemon=True).start()
+
 @app.route('/uploadTestcase', methods=['POST'])
 def upload_testcase():
     try:
@@ -198,14 +247,13 @@ def upload_testcase():
         if zip_file.filename == '':
             return jsonify({"error": "No selected file"}), 400
 
-        # Tên file an toàn
-        filename = secure_filename(zip_file.filename)
-        # Bạn có thể lưu với tên liên quan đến problem_id để dễ quản lý
         save_path = os.path.join(PROBLEMS_FOLDER, f"{problem_id}.zip")
         zip_file.save(save_path)
 
-        # TODO: nếu muốn, bạn có thể thêm job xử lý testcase vào 1 queue riêng ở đây
-        # hoặc gọi xử lý unzip/testcase etc.
+        testcase_queue.put({
+                    'problem_id': int(problem_id),
+                    'zip_path': save_path
+                })
 
         return jsonify({"status": "success", "message": f"Testcase for problem {problem_id} uploaded."})
     except Exception as e:

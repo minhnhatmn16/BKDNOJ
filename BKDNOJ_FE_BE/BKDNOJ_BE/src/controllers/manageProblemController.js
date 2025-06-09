@@ -24,7 +24,6 @@ exports.GetAllProblem = async (req, res) => {
   try {
     const problems = await Problem.findAll({
       where: {
-        is_public: true,
         problem_name: {
           [Op.like]: `%${search}%`,
         },
@@ -38,15 +37,6 @@ exports.GetAllProblem = async (req, res) => {
         "timelimit_ms",
         "memorylimit_kb",
         "has_testcase",
-        [
-          literal(`(
-              SELECT COUNT(DISTINCT user_id)
-              FROM submissions
-              WHERE submissions.problem_id = problem.problem_id
-                AND submissions.status = 'AC'
-            )`),
-          "acceptedUserCount",
-        ],
       ],
       limit: maxitem,
       offset: offset,
