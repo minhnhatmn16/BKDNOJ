@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Problem } from "../../types";
 import api from "../../../api";
 import { notifyError, notifySuccess } from "../../../components/utils/ApiNotifier";
+import LoadingOverlay from "../../../components/utils/LoadingOverlay";
 
 interface UpdateProblemModalProps {
   isOpen: boolean;
@@ -16,6 +17,8 @@ const UpdateProblemModal = ({ isOpen, onClose, problem }: UpdateProblemModalProp
   const [zipFile, setZipFile] = useState<File | null>(null);
   const [memoryLimit, setMemoryLimit] = useState(problem?.memorylimit_kb?.toString() || "");
   const [isPublic, setIsPublic] = useState(problem?.is_public ?? true);
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (problem) {
@@ -42,6 +45,7 @@ const UpdateProblemModal = ({ isOpen, onClose, problem }: UpdateProblemModalProp
       return;
     }
 
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("problem_name", problemName);
@@ -169,6 +173,7 @@ const UpdateProblemModal = ({ isOpen, onClose, problem }: UpdateProblemModalProp
           </button>
         </div>
       </div>
+      {loading && <LoadingOverlay message="Updating problem..." />}
     </div>
   );
 };

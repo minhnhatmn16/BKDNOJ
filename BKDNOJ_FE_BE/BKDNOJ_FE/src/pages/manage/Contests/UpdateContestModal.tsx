@@ -7,6 +7,7 @@ import { format, parse } from "date-fns";
 import ProblemSelectModal from "./ProblemSelectModal";
 import PasswordInput from "../../../components/utils/PasswordInput";
 import { notifyError, notifySuccess } from "../../../components/utils/ApiNotifier";
+import LoadingOverlay from "../../../components/utils/LoadingOverlay";
 
 interface UpdateContestModalProps {
   isOpen: boolean;
@@ -32,6 +33,8 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
 
   const [showProblemTable, setShowProblemTable] = useState(false);
   const [tempSelectedProblems, setTempSelectedProblems] = useState<number[]>([]);
+
+  const [loading, setLoading] = useState(false);
 
   const fetchProblems = async () => {
     try {
@@ -128,6 +131,7 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
       }
     }
 
+    setLoading(true);
     try {
       await api.put(`/admin/contest/${contest?.contest_id}`, {
         contest_name: title,
@@ -356,6 +360,7 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
           />
         )}
       </div>
+      {loading && <LoadingOverlay message="Updating contest..." />}
     </div>
   );
 };

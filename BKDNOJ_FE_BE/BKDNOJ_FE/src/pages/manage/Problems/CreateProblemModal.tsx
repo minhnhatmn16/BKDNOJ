@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../../../api";
 import { notifyError, notifySuccess } from "../../../components/utils/ApiNotifier";
+import LoadingOverlay from "../../../components/utils/LoadingOverlay";
 
 interface CreateProblemModalProps {
   isOpen: boolean;
@@ -14,6 +15,8 @@ const CreateProblemModal = ({ isOpen, onClose }: CreateProblemModalProps) => {
   const [isPublic, setIsPublic] = useState(true);
   const [timeLimit, setTimeLimit] = useState<number>(1);
   const [memoryLimit, setMemoryLimit] = useState<number>(256);
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -42,6 +45,7 @@ const CreateProblemModal = ({ isOpen, onClose }: CreateProblemModalProps) => {
       return;
     }
 
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("problem_name", problemName);
@@ -171,6 +175,7 @@ const CreateProblemModal = ({ isOpen, onClose }: CreateProblemModalProps) => {
           </button>
         </div>
       </div>
+      {loading && <LoadingOverlay message="Creating problem..." />}
     </div>
   );
 };

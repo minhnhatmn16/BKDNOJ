@@ -8,6 +8,7 @@ import ProblemSelectModal from "./ProblemSelectModal";
 import PasswordInput from "../../../components/utils/PasswordInput";
 import { Link, useNavigate } from "react-router-dom";
 import { notifyError, notifySuccess } from "../../../components/utils/ApiNotifier";
+import LoadingOverlay from "../../../components/utils/LoadingOverlay";
 
 interface CreateContestModalProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [selectedProblems, setSelectedProblems] = useState<SelectedProblem[]>([]);
   const [problemScores, setProblemScores] = useState<Record<number, number>>({});
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -123,6 +125,7 @@ const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
       }
     }
 
+    setLoading(true);
     try {
       await api.post("/admin/contest", {
         contest_name: title,
@@ -367,6 +370,7 @@ const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
           />
         )}
       </div>
+      {loading && <LoadingOverlay message="Creating contest..." />}
     </div>
   );
 };
