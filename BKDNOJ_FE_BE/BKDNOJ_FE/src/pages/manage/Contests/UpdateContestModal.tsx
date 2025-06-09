@@ -146,6 +146,7 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
       onClose();
       window.location.reload();
     } catch (err: any) {
+      setLoading(false);
       notifyError(err.response?.data?.message || "Failed to update contest");
     }
   };

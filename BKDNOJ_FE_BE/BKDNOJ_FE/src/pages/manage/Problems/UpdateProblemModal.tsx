@@ -66,6 +66,7 @@ const UpdateProblemModal = ({ isOpen, onClose, problem }: UpdateProblemModalProp
       onClose();
       window.location.reload();
     } catch (err: any) {
+      setLoading(false);
       notifyError(err.response?.data?.message || "Failed to update problem");
     }
   };
