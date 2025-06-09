@@ -101,7 +101,7 @@ exports.CreateContest = async (req, res) => {
       format,
       created_by: user_id,
     });
-
+    
     if (problems && Array.isArray(problems)) {
       const contestProblems = problems.map((problem) => ({
         contest_id: newContest.contest_id,

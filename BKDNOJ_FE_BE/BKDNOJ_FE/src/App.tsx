@@ -22,6 +22,8 @@ import DetailProblemWrapper from "./pages/problem/DetailProblemWrapper";
 import { AuthProvider } from "./pages/auth/contexts/AuthProvider";
 import AdminContestPage from "./pages/manage/Contests/AdminContestPage";
 import AdminProblemPage from "./pages/manage/Problems/AdminProblemPage";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
@@ -73,6 +75,7 @@ function App() {
 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
+          <ToastContainer position="top-right" autoClose={3000} />
         </Layout>
       </Router>
     </AuthProvider>

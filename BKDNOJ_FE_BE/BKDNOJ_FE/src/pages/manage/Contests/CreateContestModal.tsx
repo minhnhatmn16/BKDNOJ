@@ -12,7 +12,6 @@ interface CreateContestModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
 const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
   const [title, setTitle] = useState("");
   const [startTime, setStartTime] = useState<Date | null>(new Date());
@@ -24,6 +23,7 @@ const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [selectedProblems, setSelectedProblems] = useState<number[]>([]);
   const [problemScores, setProblemScores] = useState<Record<number, number>>({});
+
   const navigate = useNavigate();
 
   const [showProblemTable, setShowProblemTable] = useState(false);
@@ -66,7 +66,7 @@ const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
     const fetchProblems = async () => {
       try {
         const res = await api.get("/admin/problem");
-        setProblems(res.data.data);
+        setProblems(res.data.data.problems);
       } catch (err) {
         console.error("Failed to load problems", err);
       }
@@ -121,7 +121,8 @@ const CreateContestModal = ({ isOpen, onClose }: CreateContestModalProps) => {
         is_public: isPublic,
         penalty: penalty,
         password: isPublic ? null : password,
-        problem_ids: selectedProblems,
+        format: rankRule,
+        problems: selectedProblems,
       });
       onClose();
       window.location.reload();

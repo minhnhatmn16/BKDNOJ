@@ -6,6 +6,7 @@ interface ListContestTableProps {
   title: string;
   list_contest: Contest[];
   showEmptyMessage?: boolean;
+  onClickRegister?: (contestId: number) => void;
 }
 
 const ListContestTable = ({
@@ -13,6 +14,7 @@ const ListContestTable = ({
   title,
   list_contest,
   showEmptyMessage = false,
+  onClickRegister,
 }: ListContestTableProps) => {
   return (
     <div className="one-column-element mb-6">
@@ -75,32 +77,25 @@ const ListContestTable = ({
                     </td>
 
                     <td className="border border-gray-300 p-3 text-center">
-                      <div className="flex flex-col items-center">
-                        <div className="flex items-center space-x-2">
+                      <div className="flex flex-col items-center text-sm">
+                        <div className="mb-1 flex items-center space-x-1">
                           <img src="user-register.png" alt="User Icon" className="h-4 w-4" />
-                          <span> x {contest.participantCount}</span>
+                          <span>x {contest.participantCount}</span>
                         </div>
-                        {isPast ? (
+                        {isPast || contest.isRegistered ? (
                           <Link
                             to={`/contest/${contest.contest_id}/standing`}
-                            className="ml-2 text-blue-600 hover:underline"
-                          >
-                            Standing &gt;&gt;
-                          </Link>
-                        ) : contest.isRegistered ? (
-                          <Link
-                            to={`/contest/${contest.contest_id}/standing`}
-                            className="ml-2 text-blue-600 hover:underline"
+                            className="text-blue-600 hover:underline"
                           >
                             Standing &gt;&gt;
                           </Link>
                         ) : (
-                          <Link
-                            to={`/contest/${contest.contest_id}/register`}
-                            className="ml-2 text-blue-600 hover:underline"
+                          <button
+                            onClick={() => onClickRegister?.(contest.contest_id)}
+                            className="text-blue-600 hover:underline"
                           >
                             Register &gt;&gt;
-                          </Link>
+                          </button>
                         )}
                       </div>
                     </td>
