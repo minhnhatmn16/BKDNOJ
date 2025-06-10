@@ -80,10 +80,12 @@ const DetailProblem = ({ title, detail_problem, activeTab }: DetailProblemProps)
       </h4>
       <div className="flex flex-col p-4 text-center">
         <h1 className="space-y-1 text-center text-sm text-gray-500">
-          Time Limit per test: {detail_problem.timelimit_ms}
+          <strong>Time limit:</strong> {(parseFloat(detail_problem.timelimit_ms) / 1000).toFixed(2)}{" "}
+          s
         </h1>
+
         <h1 className="space-y-1 text-center text-sm text-gray-500">
-          Memory Limit per test: {detail_problem.memorylimit_kb}
+          <strong>Memory limit:</strong> {detail_problem.memorylimit_kb} MB
         </h1>
       </div>
 

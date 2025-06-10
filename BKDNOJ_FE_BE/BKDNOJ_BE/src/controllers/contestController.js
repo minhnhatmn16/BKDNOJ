@@ -72,6 +72,7 @@ exports.getContestById = async (req, res) => {
         "start_time",
         "duration",
         "is_public",
+        "format",
       ],
       include: [
         {

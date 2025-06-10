@@ -21,13 +21,12 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [problems, setProblems] = useState<Problem[]>([]);
   const [standings, setStandings] = useState<Standing[]>([]);
-  const [format, setFormat] = useState("");
+  const [format, setFormat] = useState(detail_contest.format);
   const [hasLoaded, setHasLoaded] = useState({
     mysubmissions: false,
     status: false,
     standing: false,
   });
-
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -61,7 +60,6 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
           const res = await api.get(`/contest/${detail_contest.contest_id}/ranking`);
           setStandings(res.data.data.rankings);
           setProblems(res.data.data.problems);
-          setFormat(res.data.data.format);
           setHasLoaded((prev) => ({ ...prev, standing: true }));
         }
       } catch (err) {
@@ -77,7 +75,9 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
       <h4 className="p-3 text-center text-2xl font-bold text-primary">
         {detail_contest.contest_name}
       </h4>
-      <h4 className="space-y-1 text-center text-sm text-gray-500">Format: {format}</h4>
+      <h4 className="space-y-1 text-center text-sm text-gray-500">
+        <strong>Format:</strong> {format}
+      </h4>
 
       <ContestStatusTimer
         startTime={detail_contest.start_time}
