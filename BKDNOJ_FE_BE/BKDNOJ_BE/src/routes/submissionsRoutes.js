@@ -3,7 +3,7 @@ const router = express.Router();
 const submissionsController = require("../controllers/submissionsController");
 const authenticateToken = require("../middleware/authenticateToken");
 
-router.get("/", submissionsController.getAllSubmission); // Lấy thông tin contest
-router.get("/:id", authenticateToken, submissionsController.GetSubmissonWithId); // Lấy thông tin contest
+router.get("/", submissionsController.getAllSubmission); // Lấy tất cả các submission
+router.get("/:id", authenticateToken, submissionsController.GetSubmissonWithId); // Lấy submission tương ứng với submissions_id
 
 module.exports = router;

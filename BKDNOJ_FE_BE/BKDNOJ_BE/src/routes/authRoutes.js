@@ -17,5 +17,6 @@ router.put(
   authController.changePermission
 );
 router.put("/profile", upload.single("avatar"), authController.updateProfile);
+router.get("/profile", authenticateToken, authController.myProfile);
 
 module.exports = router;

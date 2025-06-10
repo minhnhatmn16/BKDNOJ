@@ -144,6 +144,33 @@ exports.profile = async (req, res) => {
   }
 };
 
+// My Profile
+exports.myProfile = async (req, res) => {
+  const user_id = req.user.user_id;
+
+  try {
+    const profile = await User.findByPk(user_id, {
+      attributes: ["user_id", "user_name", "avatar", "role"],
+    });
+
+    if (!profile) {
+      return res
+        .status(404)
+        .json({ message: `User not found with user_id: ${user_id}` });
+    }
+
+    res.status(200).json({
+      message: "User profile fetched successfully",
+      data: { profile },
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Server error",
+      details: err.message,
+    });
+  }
+};
+
 // Thay đổi quyền tạo contest
 exports.changePermission = async (req, res) => {
   const { user_id, can_create_contest } = req.body;

@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           }
           const res = await api.get(`auth/profile/${decoded.user_name}`);
           setUser({
+            user_id: res.data.data.profile.user_id,
             user_name: res.data.data.profile.user_name,
             avatar: res.data.data.profile.avatar || "/default-avatar.png",
             role: res.data.data.profile.role,

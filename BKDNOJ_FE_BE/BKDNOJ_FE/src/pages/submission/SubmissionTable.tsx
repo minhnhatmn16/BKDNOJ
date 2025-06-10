@@ -8,6 +8,8 @@ interface SubmissionTableProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  onSubmissionClick: (submissionId: number) => void;
+  currentUserId: number;
 }
 
 const SubmissionTable = ({
@@ -16,6 +18,8 @@ const SubmissionTable = ({
   currentPage,
   totalPages,
   onPageChange,
+  onSubmissionClick,
+  currentUserId,
 }: SubmissionTableProps) => {
   return (
     <div className="one-column-element mb-6">
@@ -37,8 +41,18 @@ const SubmissionTable = ({
               {submissions.map((sub, index) => (
                 <tr key={sub.submission_id} className={index % 2 === 0 ? "bg-gray-50" : ""}>
                   <td className="border border-gray-300 px-2 py-1 text-center">
-                    {sub.submission_id.toString().padStart(6, "0")}
+                    {sub.user_id === currentUserId ? (
+                      <button
+                        className="text-blue-600 hover:underline"
+                        onClick={() => onSubmissionClick(sub.submission_id)}
+                      >
+                        {sub.submission_id.toString().padStart(6, "0")}
+                      </button>
+                    ) : (
+                      <span>{sub.submission_id.toString().padStart(6, "0")}</span>
+                    )}
                   </td>
+
                   <td className="border border-gray-300 px-2 py-1 text-center">
                     {sub.status === "Pending" ? (
                       <div className="flex flex-col items-center justify-center">
