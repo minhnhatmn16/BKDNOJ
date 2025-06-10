@@ -5,6 +5,7 @@ import CreateProblemModal from "./CreateProblemModal";
 import UpdateProblemModal from "./UpdateProblemModal";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Pagination from "../../../components/pagination/Pagination";
+import { Pencil, RefreshCw } from "lucide-react";
 
 const AdminProblemPage = () => {
   const navigate = useNavigate();
@@ -98,8 +99,9 @@ const AdminProblemPage = () => {
                     <button
                       onClick={() => handleEditClick(problem.problem_id)}
                       className="text-blue-600 underline"
+                      title="Edit"
                     >
-                      Edit
+                      <Pencil className="inline h-5 w-5" />
                     </button>
                   </td>
                 </tr>

@@ -171,13 +171,6 @@ def submit_code():
         submission_queue.put(job)
 
         return jsonify({"status": "queued", "message": "Submission enqueued successfully."})
-        # client = JudgeClient()
-        # response = client.submit_to_judge(problem_id, source_path, language, submission_id, timelimit_ms, memorylimit_kb)
-        
-        # if os.path.exists(source_path):
-        #     os.remove(source_path)
-
-        # return jsonify(response)
 
     except Exception as e:
         return jsonify({"error": f"Submission error: {str(e)}"}), 500

@@ -39,15 +39,6 @@ const SubmissionTable = ({
                   <td className="border border-gray-300 px-2 py-1 text-center">
                     {sub.submission_id.toString().padStart(6, "0")}
                   </td>
-
-                  {/* <td className={`border border-gray-300 px-2 py-1 text-center ${sub.colorClass}`}> */}
-                  {/* <td className={`border border-gray-300 px-2 py-1 text-center`}>
-                    <div className="font-semibold">{sub.passed_test}</div>
-                    <div className="text-xs">
-                      {sub.status} | {sub.language}
-                    </div>
-                  </td>
-                   */}
                   <td className="border border-gray-300 px-2 py-1 text-center">
                     {sub.status === "Pending" ? (
                       <div className="flex flex-col items-center justify-center">
@@ -87,7 +78,7 @@ const SubmissionTable = ({
                       >
                         <div>{sub.passed_test}</div>
                         <div className="text-xs font-normal">
-                          {sub.status} | {sub.language}
+                          {sub.status} | {sub.language == "cpp" ? "C++" : "Python"}
                         </div>
                       </div>
                     )}

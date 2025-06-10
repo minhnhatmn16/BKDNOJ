@@ -1,10 +1,12 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../../../api";
-import { Contest } from "../../types";
+import { Contest, ContestProblem } from "../../types";
 import CreateContestModal from "./CreateContestModal";
 import UpdateContestModal from "./UpdateContestModal";
+import ProblemRejudgeModal from "./ProblemRejudgeModal";
 import Pagination from "../../../components/pagination/Pagination";
+import { Pencil, RefreshCw } from "lucide-react";
 
 const AdminContestPage = () => {
   const navigate = useNavigate();
@@ -12,12 +14,22 @@ const AdminContestPage = () => {
 
   const [contests, setContests] = useState<Contest[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedContest, setSelectedContest] = useState<Contest | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  const fetchContests = async (page: number) => {
+    try {
+      const res = await api.get(`/admin/contest?page=${page}`);
+      setContests(res.data.data.contests);
+      setTotalPages(res.data.data.pagination.totalPages);
+    } catch (err) {
+      console.error("Failed to fetch contests", err);
+    }
+  };
+
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const handleEditClick = async (contestId: number) => {
     try {
       const res = await api.get(`/admin/contest/${contestId}`);
@@ -28,13 +40,25 @@ const AdminContestPage = () => {
     }
   };
 
-  const fetchContests = async (page: number) => {
+  const [rejudgeModalOpen, setRejudgeModalOpen] = useState(false);
+  const [rejudgeProblems, setRejudgeProblems] = useState<ContestProblem[]>([]);
+  const openRejudgeModal = async (contestId: number) => {
     try {
-      const res = await api.get(`/admin/contest?page=${page}`);
-      setContests(res.data.data.contests);
-      setTotalPages(res.data.data.pagination.totalPages);
+      const res = await api.get(`/admin/contest/${contestId}`);
+      setRejudgeProblems(res.data.data.Contest_Problems);
+      setRejudgeModalOpen(true);
     } catch (err) {
-      console.error("Failed to fetch contests", err);
+      console.error("Failed to load problems for rejudge", err);
+    }
+  };
+
+  const handleRejudgeProblem = async (contestId: number) => {
+    try {
+      await api.post(`/admin/problem/${contestId}/rejudge`);
+      alert(`Rejudge for problem ${contestId} started.`);
+    } catch (err) {
+      console.error("Rejudge failed", err);
+      alert("Failed to rejudge.");
     }
   };
 
@@ -106,8 +130,16 @@ const AdminContestPage = () => {
                       <button
                         onClick={() => handleEditClick(contest.contest_id)}
                         className="text-blue-600 underline"
+                        title="Edit"
                       >
-                        Edit
+                        <Pencil className="inline h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={() => openRejudgeModal(contest.contest_id)}
+                        className="ml-2 text-red-600 hover:text-red-800"
+                        title="Rejudge submissions"
+                      >
+                        <RefreshCw className="inline h-5 w-5" />
                       </button>
                     </td>
                   </tr>
@@ -126,6 +158,13 @@ const AdminContestPage = () => {
         onClose={() => setEditModalOpen(false)}
         contest={selectedContest}
       />
+      {rejudgeModalOpen && (
+        <ProblemRejudgeModal
+          problems={rejudgeProblems}
+          onClose={() => setRejudgeModalOpen(false)}
+          onRejudge={handleRejudgeProblem}
+        />
+      )}
     </div>
   );
 };
