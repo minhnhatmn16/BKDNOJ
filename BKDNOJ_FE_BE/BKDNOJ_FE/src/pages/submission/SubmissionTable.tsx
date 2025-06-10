@@ -78,7 +78,6 @@ const SubmissionTable = ({
                             ></path>
                           </svg>
                         </div>
-                        <div className="text-xs font-normal">{sub.language}</div>
                       </div>
                     ) : (
                       <div
@@ -90,7 +89,9 @@ const SubmissionTable = ({
                               : "bg-gray-200 text-black"
                         }`}
                       >
-                        <div>{sub.passed_test}</div>
+                        <div>
+                          {sub.passed_test} / {sub.total_test}
+                        </div>
                         <div className="text-xs font-normal">
                           {sub.status} | {sub.language == "cpp" ? "C++" : "Python"}
                         </div>
