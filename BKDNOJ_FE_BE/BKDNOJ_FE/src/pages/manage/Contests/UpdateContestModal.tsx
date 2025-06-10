@@ -42,6 +42,7 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
       setProblems(res.data.data.problems);
     } catch (err) {
       console.error("Failed to load problems", err);
+      notifyError("Failed to load problem list.");
     }
   };
 
@@ -95,29 +96,29 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      alert("Title contest is required.");
+      notifyError("Contest title is required.");
       return;
     }
 
     if (Number(duration) <= 0) {
-      alert("Duration must be greater than 0.");
+      notifyError("Duration must be greater than 0.");
       return;
     }
 
     if (!isPublic) {
       if (!password.trim()) {
-        alert("Password is required.");
+        notifyError("Password is required for private contest.");
         return;
       }
       const isValid = /^[a-zA-Z0-9]*$/.test(password);
       if (!isValid) {
-        alert("Password can only contain letters and numbers (a-z, A-Z, 0-9).");
+        notifyError("Password can only contain letters and numbers (a-z, A-Z, 0-9).");
         return;
       }
     }
 
     if (rankRule === "ICPC" && Number(penalty) < 0) {
-      alert("Penalty must be 0 or greater.");
+      notifyError("Penalty must be 0 or greater.");
       return;
     }
 
@@ -125,7 +126,7 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
       for (const selectedProblem of selectedProblems) {
         const score = problemScores[selectedProblem.problem_id];
         if (typeof score !== "number" || score < 10) {
-          alert(`Each problem in IOI mode must be greater than 0.`);
+          notifyError("Each problem in IOI mode must have score ≥ 10.");
           return;
         }
       }

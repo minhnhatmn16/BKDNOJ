@@ -31,17 +31,17 @@ const CreateProblemModal = ({ isOpen, onClose }: CreateProblemModalProps) => {
 
   const handleSubmit = async () => {
     if (!problemName.trim()) {
-      alert("Problem name is required.");
+      notifyError("Problem name is required.");
       return;
     }
 
     if (Number(timeLimit) <= 0) {
-      alert("Time limit must be greater than 0.");
+      notifyError("Time limit must be greater than 0.");
       return;
     }
 
     if (Number(memoryLimit) <= 0) {
-      alert("Memory limit must be greater than 0.");
+      notifyError("Memory limit must be greater than 0.");
       return;
     }
 
