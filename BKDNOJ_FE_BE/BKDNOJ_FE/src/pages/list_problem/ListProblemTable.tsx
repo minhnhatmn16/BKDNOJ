@@ -4,6 +4,7 @@ import Pagination from "../../components/pagination/Pagination";
 import SubmitModal from "../submit/SubmitModal";
 import { useState } from "react";
 import api from "../../api";
+import { notifyError, notifySuccess } from "../../components/utils/ApiNotifier";
 
 interface ListProblemsTableProps {
   title: string;
@@ -35,12 +36,14 @@ const ProblemsTable = ({
   const handleSubmit = async (problem_id: number, language: string, code: string) => {
     try {
       const res = await api.post(`/problem/${problem_id}/submit`, { language, code });
+      notifySuccess("Submitted successfully!");
       navigate("/submissions");
-    } catch (err: any) {
-      if (err.response?.data?.message) {
-        setError(err.response.data.message);
+    } catch (error: any) {
+      console.error("Submission failed:", error);
+      if (error.response?.status === 503) {
+        notifyError("Saved, but judge server is offline.");
       } else {
-        setError("Login failed. Please try again.");
+        notifyError("Submission failed.");
       }
     }
   };

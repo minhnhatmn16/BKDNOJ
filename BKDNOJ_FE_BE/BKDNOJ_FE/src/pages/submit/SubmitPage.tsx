@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Problem } from "../types";
 import api from "../../api";
+import { notifyError, notifySuccess } from "../../components/utils/ApiNotifier";
 
 interface SubmitPageProps {
   problem: Problem;
@@ -15,7 +16,7 @@ const SubmitPage = ({ problem }: SubmitPageProps) => {
   const navigate = useNavigate();
   const handleSubmit = async () => {
     if (!problem?.problem_id) {
-      console.error("Missing problem_id");
+      notifyError("Missing problem_id");
       return;
     }
 
@@ -25,11 +26,15 @@ const SubmitPage = ({ problem }: SubmitPageProps) => {
         language,
         code,
       });
+      notifySuccess("Submitted successfully!");
       navigate("/submissions");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Submission failed:", error);
-    } finally {
-      setSubmitting(false);
+      if (error.response?.status === 503) {
+        notifyError("Saved, but judge server is offline.");
+      } else {
+        notifyError("Submission failed.");
+      }
     }
   };
 

@@ -580,15 +580,23 @@ exports.addSubmit = async (req, res) => {
       language,
       code,
     });
-    await axios.post("http://localhost:5000/submit", {
-      submission_id: newSubmission.submission_id,
-      problem_id,
-      language,
-      contest_id,
-      timelimit_ms,
-      memorylimit_kb,
-    });
 
+    try {
+      await axios.post("http://localhost:5000/submit", {
+        submission_id: newSubmission.submission_id,
+        problem_id,
+        language,
+        contest_id,
+        timelimit_ms,
+        memorylimit_kb,
+      });
+    } catch (judgeError) {
+      console.error("Judge server unreachable:", judgeError.message);
+      return res.status(503).json({
+        message: "Judge server is not available",
+        submission_id: newSubmission.submission_id,
+      });
+    }
     res.status(201).json({
       message: "Submission added successfully",
       data: newSubmission.submission_id,
