@@ -157,7 +157,8 @@ def judge_worker():
         submission_queue.task_done()
 
 # Tạo thread chạy nền
-threading.Thread(target=judge_worker, daemon=True).start()
+for _ in range(len(JUDGE_SERVER)):
+    threading.Thread(target=judge_worker, daemon=True).start()
 
 
 @app.route('/submit', methods=['POST'])
