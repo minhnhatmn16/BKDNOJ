@@ -88,7 +88,7 @@ exports.addSubmit = async (req, res) => {
   const { language, code } = req.body;
   const timelimit_ms = 1000;
   const memorylimit_kb = 256;
-  
+
   try {
     const newSubmission = await Submission.create({
       user_id,
@@ -101,7 +101,6 @@ exports.addSubmit = async (req, res) => {
       submission_id: newSubmission.submission_id,
       problem_id,
       language,
-      code,
       timelimit_ms,
       memorylimit_kb,
     });
