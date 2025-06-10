@@ -65,18 +65,43 @@ class JudgeClient:
         except Exception as e:
             print(f"[DB ERROR] Cannot update submission {submission_id}: {e}")
 
-    def submit_to_judge(self, problem_id, source_path, language, submission_id, timelimit_ms, memorylimit_kb, contest_id):
-        # _judge_id = 0
-        # for i in range(len(JUDGE_SERVER)):
-        #     if (JUDGE_SERVER[i]['active'] == False):
-        #         _judge_id  = i
-        #         JUDGE_SERVER[_judge_id]['active'] = True
-        #         break
-
+    def fetch_code_from_db(self, submission_id):
+        try:
+            conn = pymysql.connect(
+                host="127.0.0.1",
+                port=4306,
+                user="root",
+                password="",
+                database="bkdnoj",
+                charset="utf8mb4",
+                cursorclass=pymysql.cursors.DictCursor
+            )
+            with conn:
+                with conn.cursor() as cursor:
+                    sql = "SELECT code FROM submissions WHERE submission_id = %s"
+                    cursor.execute(sql, (submission_id,))
+                    result = cursor.fetchone()
+                    return result['code'] if result else None
+        except Exception as e:
+            print(f"[DB ERROR] Cannot fetch code for submission {submission_id}: {e}")
+            return None
+        
+    def submit_to_judge(self, problem_id, language, submission_id, timelimit_ms, memorylimit_kb, contest_id):
         _judge_id = judge_queue.get()
+        source_path = None
 
         try:
-            print("Nhận được dữ liệu từ postman " , time.time())
+            code = self.fetch_code_from_db(submission_id)
+            if not code:
+                raise Exception("Code not found in database")
+
+            filename = f"code{submission_id}.{language}"
+            source_path = os.path.join(UPLOAD_FOLDER, filename)
+            with open(source_path, 'w', encoding='utf-8') as f:
+                f.write(code)
+
+            print(f"[Judge] Đang xử lý submission {submission_id}...")
+
             self.socket.connect((JUDGE_SERVER[_judge_id]['host'], JUDGE_SERVER[_judge_id]['port']))
             request = {
                 'problem_id': problem_id,
@@ -103,8 +128,6 @@ class JudgeClient:
             )
 
             return result
-        
-            # return json.loads(response)
         except Exception as e:
             return {"status": "error", "message": str(e)}
         finally:
@@ -139,29 +162,19 @@ threading.Thread(target=judge_worker, daemon=True).start()
 
 @app.route('/submit', methods=['POST'])
 def submit_code():
-    global submission_counter
-
     try:
         data = request.get_json()
 
         problem_id = data['problem_id']
         submission_id = data['submission_id']
-        code = data['code']
         language = data['language']
         timelimit_ms = data['timelimit_ms']
         memorylimit_kb = data['memorylimit_kb']
         contest_id = data.get('contest_id')
 
-        # Tạo file tạm để lưu code
-        filename = f"code{submission_id}.{language}"
-        source_path = os.path.join(UPLOAD_FOLDER, filename)
-        with open(source_path, 'w', encoding='utf-8') as f:
-            f.write(code)
-
         job = {
             'problem_id': problem_id,
             'submission_id': submission_id,
-            'source_path': source_path,
             'language': language,
             'timelimit_ms': timelimit_ms,
             'memorylimit_kb': memorylimit_kb,

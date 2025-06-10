@@ -583,7 +583,6 @@ exports.addSubmit = async (req, res) => {
       submission_id: newSubmission.submission_id,
       problem_id,
       language,
-      code,
       contest_id,
       timelimit_ms,
       memorylimit_kb,
