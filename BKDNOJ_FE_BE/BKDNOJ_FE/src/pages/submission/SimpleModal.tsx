@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface SimpleModalProps {
   open: boolean;
@@ -7,6 +7,8 @@ interface SimpleModalProps {
 }
 
 const SimpleModal = ({ open, onClose, children }: SimpleModalProps) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -17,12 +19,25 @@ const SimpleModal = ({ open, onClose, children }: SimpleModalProps) => {
 
   if (!open) return null;
 
+  const handleClickOutside = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === modalRef.current) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="relative w-full max-w-3xl rounded-lg bg-white p-6 shadow-lg">
+    <div
+      ref={modalRef}
+      onClick={handleClickOutside}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+    >
+      <div
+        className="relative w-full max-w-3xl rounded-lg bg-white p-6 shadow-lg"
+        onClick={(e) => e.stopPropagation()} 
+      >
         <button
           onClick={onClose}
-          className="absolute right-3 top-3 text-xl text-gray-500 hover:text-gray-700"
+          className="absolute right-1 top-1 text-4xl text-gray-500 hover:text-gray-700"
         >
           &times;
         </button>

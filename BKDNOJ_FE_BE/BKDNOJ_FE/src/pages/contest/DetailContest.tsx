@@ -7,6 +7,7 @@ import ListProblemsTable from "./ListProblemsTable";
 import SubmissionTable from "../submission/SubmissionTable";
 import StandingTable from "../standings/StandingTable";
 import ContestStatusTimer from "../../components/layout/ContestStatusTimer";
+import SubmissionCodeModal from "../submission/SubmissionCodeModal";
 
 interface DetailContestProps {
   title: string;
@@ -30,6 +31,9 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  const [user_id, setUserId] = useState<number>();
+  const [viewingId, setViewingId] = useState<number | null>(null);
+
   const handleTabChange = (tab: string) => {
     navigate(`/contest/${detail_contest.contest_id}/${tab}`);
   };
@@ -43,15 +47,26 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
     return now.toLocaleString("en-GB", { hour12: false });
   };
 
+  const fetchMyProfile = async () => {
+    try {
+      const res = await api.get(`/auth/profile`);
+      setUserId(res.data.data.profile.user_id);
+    } catch (error) {
+      console.error("Failed to fetch profile", error);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (activeTab === "mysubmissions" && !hasLoaded.mysubmissions) {
+          fetchMyProfile();
           const res = await api.get(`/contest/${detail_contest.contest_id}/mysubmissions`);
           setMySubmissions(res.data.data.mysubmissions);
           setHasLoaded((prev) => ({ ...prev, mysubmissions: true }));
         }
         if (activeTab === "status" && !hasLoaded.status) {
+          fetchMyProfile();
           const res = await api.get(`/contest/${detail_contest.contest_id}/submissions`);
           setSubmissions(res.data.data.submissions);
           setHasLoaded((prev) => ({ ...prev, status: true }));
@@ -121,6 +136,8 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange}
+          onSubmissionClick={(id) => setViewingId(id)}
+          currentUserId={user_id || -1}
         />
       )}
       {activeTab === "status" && (
@@ -130,6 +147,8 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange}
+          onSubmissionClick={(id) => setViewingId(id)}
+          currentUserId={user_id || -1}
         />
       )}
       {activeTab === "standing" && (
@@ -140,6 +159,11 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
           format={format}
         />
       )}
+      <SubmissionCodeModal
+        open={viewingId !== null}
+        submissionId={viewingId}
+        onClose={() => setViewingId(null)}
+      />
     </div>
   );
 };

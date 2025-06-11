@@ -1,5 +1,8 @@
 const { where } = require("sequelize");
 const Submission = require("../models/submission");
+const Problem = require("../models/problem");
+const User = require("../models/user");
+
 const { models } = require("../models");
 
 // Lấy tất cả các submission
@@ -64,7 +67,18 @@ exports.GetSubmissonWithId = async (req, res) => {
   const submission_id = req.params.id;
 
   try {
-    const submission = await Submission.findByPk(submission_id);
+    const submission = await Submission.findByPk(submission_id, {
+      include: [
+        {
+          model: Problem,
+          attributes: ["problem_name"],
+        },
+        {
+          model: User,
+          attributes: ["user_name"],
+        },
+      ],
+    });
 
     if (!submission) {
       return res.status(404).json({
