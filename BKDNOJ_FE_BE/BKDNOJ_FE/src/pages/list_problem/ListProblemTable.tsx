@@ -152,7 +152,7 @@ const ProblemsTable = ({
           </div>
           <div className="mt-4 flex justify-center">
             <button
-              className="rounded bg-blue-500 px-4 py-2 text-white"
+              className="rounded bg-primary px-4 py-2 text-white hover:bg-blue-700"
               onClick={() => {
                 onSearch(searchText);
               }}

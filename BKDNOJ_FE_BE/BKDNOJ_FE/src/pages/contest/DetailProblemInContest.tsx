@@ -40,6 +40,7 @@ const DetailProblem = ({ title, detail_problem, contest_id }: DetailProblemProps
     <div className="one-column-element mb-6">
       <div className="overflow-hidden rounded-md border border-gray-300">
         <h4 className="p-3 text-center text-2xl font-bold text-primary">
+          {String.fromCharCode(64 + parseInt(detail_problem.order))}.{" "}
           {detail_problem.Problem.problem_name}
         </h4>
 
@@ -56,7 +57,7 @@ const DetailProblem = ({ title, detail_problem, contest_id }: DetailProblemProps
         <div className="mb-4 flex justify-end pr-6">
           <button
             onClick={() => setShowModal((prev) => !prev)}
-            className="flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+            className="flex items-center gap-2 rounded bg-primary px-4 py-2 text-white hover:bg-blue-700"
           >
             <img src="/submit.png" alt="Submit" className="h-5 w-5" />
             {"Submit"}

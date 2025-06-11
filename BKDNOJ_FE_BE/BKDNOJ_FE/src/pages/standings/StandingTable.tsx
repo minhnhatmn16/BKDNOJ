@@ -98,24 +98,6 @@ const StandingTable = ({ title, problems, standings, format, contest_id }: Stand
                             )}
                           </>
                         )}
-                        {/* {standing.listProblem[idx].firstACTime !== null ? (
-                          <>
-                            <div className="font-medium text-green-600">
-                              +
-                              {standing.listProblem[idx].wrongAttempts > 0 &&
-                                ` ${standing.listProblem[idx].wrongAttempts}`}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              {standing.listProblem[idx].firstACTime}
-                            </div>
-                          </>
-                        ) : standing.listProblem[idx].wrongAttempts > 0 ? (
-                          <div className="font-medium text-red-600">
-                            - {standing.listProblem[idx].wrongAttempts}
-                          </div>
-                        ) : (
-                          ""
-                        )} */}
                       </td>
                     );
                   })}

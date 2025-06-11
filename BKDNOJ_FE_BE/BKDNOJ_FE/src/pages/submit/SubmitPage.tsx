@@ -41,20 +41,7 @@ const SubmitPage = ({ problem }: SubmitPageProps) => {
   return (
     <div className="flex justify-center p-6">
       <div className="w-full max-w-3xl rounded-md border border-gray-200 bg-white shadow-lg">
-        {/* <div className="flex items-center justify-between border-b bg-gray-100 px-4 py-2">
-          <h2 className="text-lg font-semibold">Submit Solution</h2>
-          <button onClick={() => navigate(-1)} className="text-sm text-blue-600 hover:underline">
-            &larr; Go Back
-          </button>
-        </div> */}
         <div className="p-4">
-          {/* {problem && (
-            <div className="mb-4 flex items-center gap-2">
-              <label className="mb-1 block font-medium text-gray-700">Problem:</label>
-              <div className="mb-1 block font-semibold text-gray-800">{problem.problem_name}</div>
-            </div>
-          )} */}
-
           <div className="mb-4">
             <label className="mb-1 block font-medium">Language:</label>
             <select
@@ -76,15 +63,6 @@ const SubmitPage = ({ problem }: SubmitPageProps) => {
               onChange={(e) => setCode(e.target.value)}
             />
           </div>
-
-          {/* <div className="mb-4">
-            <label className="mb-1 block font-medium">Attach File (Optional):</label>
-            <input
-              type="file"
-              onChange={handleFileChange}
-              className="w-full rounded border border-gray-300 px-2 py-1"
-            />
-          </div> */}
 
           <div className="flex justify-end space-x-3">
             <button
