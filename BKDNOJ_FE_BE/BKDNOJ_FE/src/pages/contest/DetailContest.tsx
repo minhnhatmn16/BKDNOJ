@@ -86,18 +86,27 @@ const DetailContest = ({
           setProblems(res.data.data.problems);
           setHasLoaded((prev) => ({ ...prev, standing: true }));
         }
-        if (activeTab === "detailproblem" && !hasLoaded.detailproblem) {
-          const res = await api.get(`/problem/${selectedProblemId}`);
-          setDetailProblem(res.data.data);
-          setHasLoaded((prev) => ({ ...prev, detailproblem: true }));
-        }
       } catch (err) {
         console.error("Failed to fetch data:", err);
       }
     };
 
     fetchData();
-  }, [activeTab, detail_contest.contest_id, hasLoaded, selectedProblemId]);
+  }, [activeTab, detail_contest.contest_id, hasLoaded]);
+
+  useEffect(() => {
+    const fetchDetailProblem = async () => {
+      if (activeTab === "detailproblem" && selectedProblemId) {
+        try {
+          const res = await api.get(`/problem/${selectedProblemId}`);
+          setDetailProblem(res.data.data);
+        } catch (err) {
+          console.error("Failed to fetch detail problem:", err);
+        }
+      }
+    };
+    fetchDetailProblem();
+  }, [activeTab, selectedProblemId]);
 
   return (
     <div className="one-column-element mb-6">

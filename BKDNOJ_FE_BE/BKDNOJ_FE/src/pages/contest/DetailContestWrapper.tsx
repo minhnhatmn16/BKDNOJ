@@ -27,7 +27,7 @@ const DetailContestWrapper = () => {
     if (!(contest_id && problem_id) && !validTabs.includes(rawTab || "")) {
       navigate(`/contest/${contest_id}/problems`, { replace: true });
     }
-  }, [rawTab, contest_id, navigate]);
+  }, [rawTab, contest_id, navigate, problem_id]);
 
   const tab = problem_id
     ? "detailproblem"
