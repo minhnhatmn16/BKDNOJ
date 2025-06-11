@@ -584,11 +584,6 @@ exports.addSubmit = async (req, res) => {
     try {
       await axios.post("http://localhost:5000/submit", {
         submission_id: newSubmission.submission_id,
-        problem_id,
-        language,
-        contest_id,
-        timelimit_ms,
-        memorylimit_kb,
       });
     } catch (judgeError) {
       console.error("Judge server unreachable:", judgeError.message);

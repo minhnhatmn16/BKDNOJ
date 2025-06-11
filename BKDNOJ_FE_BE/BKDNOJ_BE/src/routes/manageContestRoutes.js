@@ -8,5 +8,10 @@ router.get("/", authenticateToken, manageContestController.GetAllContest);
 router.post("/", authenticateToken, manageContestController.CreateContest);
 router.get("/:id", authenticateToken, manageContestController.GetContestById);
 router.put("/:id", authenticateToken, manageContestController.UpdateContest);
+router.post(
+  "/rejudge",
+  authenticateToken,
+  manageContestController.RejudgeSubmission
+);
 
 module.exports = router;

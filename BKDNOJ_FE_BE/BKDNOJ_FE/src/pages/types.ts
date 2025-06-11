@@ -22,6 +22,7 @@ export interface User {
 }
 
 export interface ContestProblem {
+  contest_problem_id: number;
   order: string;
   point: number;
   problem_id: number;

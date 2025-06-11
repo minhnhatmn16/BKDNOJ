@@ -4,7 +4,7 @@ import { RefreshCw, X } from "lucide-react";
 interface ProblemRejudgeModalProps {
   problems: ContestProblem[];
   onClose: () => void;
-  onRejudge: (problemId: number) => void;
+  onRejudge: (contestProblemId: number) => void;
 }
 
 const ProblemRejudgeModal = ({ problems, onClose, onRejudge }: ProblemRejudgeModalProps) => {
@@ -32,7 +32,7 @@ const ProblemRejudgeModal = ({ problems, onClose, onRejudge }: ProblemRejudgeMod
                   <td className="border px-4 py-2">{p.Problem.problem_name}</td>
                   <td className="border px-4 py-2 text-center">
                     <button
-                      onClick={() => onRejudge(p.problem_id)}
+                      onClick={() => onRejudge(p.contest_problem_id)}
                       title="Rejudge this problem"
                       className="text-blue-600 hover:text-blue-800"
                     >

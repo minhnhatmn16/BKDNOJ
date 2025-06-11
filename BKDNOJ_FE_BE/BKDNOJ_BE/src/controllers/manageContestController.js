@@ -1,8 +1,10 @@
 const Contest = require("../models/contest");
 const ContestProblem = require("../models/contest_problem");
+const Submission = require("../models/submission");
 const bcrypt = require("bcrypt");
 const { Op, literal } = require("sequelize");
 const { models } = require("../models");
+const axios = require("axios");
 
 // Lấy tất cả các contest
 exports.GetAllContest = async (req, res) => {
@@ -210,7 +212,7 @@ exports.GetContestById = async (req, res) => {
       include: [
         {
           model: models.ContestProblem,
-          attributes: ["order", "point", "problem_id"],
+          attributes: ["order", "point", "problem_id", "contest_problem_id"],
           include: [
             {
               model: models.Problem,
@@ -233,6 +235,50 @@ exports.GetContestById = async (req, res) => {
     } else {
       res.status(404).json({ error: "Contest not found" });
     }
+  } catch (err) {
+    res.status(500).json({ error: "Server error", details: err });
+  }
+};
+
+// Chấm lại submission
+exports.RejudgeSubmission = async (req, res) => {
+  const { contest_problem_id } = req.body;
+  try {
+    const contestProblem = await ContestProblem.findByPk(contest_problem_id);
+
+    if (!contestProblem) {
+      return res.status(404).json({ error: "Contest not found" });
+    }
+
+    const { contest_id, problem_id } = contestProblem;
+
+    const submissions = await Submission.findAll({
+      where: {
+        contest_id,
+        problem_id,
+      },
+    });
+
+    if (!submissions.length) {
+      return res.status(200).json({ message: "No submissions to rejudge" });
+    }
+
+    const submissionIds = [];
+    for (const sub of submissions) submissionIds.push(sub.submission_id);
+
+    try {
+      await axios.post("http://localhost:5000/rejudge", {
+        submission_ids: submissionIds,
+      });
+    } catch (judgeError) {
+      console.error("Judge server unreachable:", judgeError.message);
+      return res.status(503).json({
+        message: "Judge server is not available",
+        submission_id: newSubmission.submission_id,
+      });
+    }
+
+    res.status(201).json({ message: "Submission rejudged successfully." });
   } catch (err) {
     res.status(500).json({ error: "Server error", details: err });
   }

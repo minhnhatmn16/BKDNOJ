@@ -65,7 +65,7 @@ class JudgeClient:
         except Exception as e:
             print(f"[DB ERROR] Cannot update submission {submission_id}: {e}")
 
-    def fetch_code_from_db(self, submission_id):
+    def fetch_submission_info_from_db(self, submission_id):
         try:
             conn = pymysql.connect(
                 host="127.0.0.1",
@@ -78,20 +78,39 @@ class JudgeClient:
             )
             with conn:
                 with conn.cursor() as cursor:
-                    sql = "SELECT code FROM submissions WHERE submission_id = %s"
+                    sql = """
+                    SELECT 
+                        submission_id,
+                        problem_id,
+                        language,
+                        code,
+                        contest_id
+                    FROM submissions
+                    WHERE submission_id = %s
+                """
                     cursor.execute(sql, (submission_id,))
                     result = cursor.fetchone()
-                    return result['code'] if result else None
+                    return result if result else None
         except Exception as e:
             print(f"[DB ERROR] Cannot fetch code for submission {submission_id}: {e}")
             return None
         
-    def submit_to_judge(self, problem_id, language, submission_id, timelimit_ms, memorylimit_kb, contest_id):
+    def submit_to_judge(self, submission_id):
         _judge_id = judge_queue.get()
         source_path = None
 
         try:
-            code = self.fetch_code_from_db(submission_id)
+            submission_info = self.fetch_submission_info_from_db(submission_id)
+            if not submission_info:
+                raise Exception("Submission not found")
+
+            code = submission_info['code']
+            language = submission_info['language']
+            contest_id = submission_info['contest_id']
+            problem_id = submission_info['problem_id']
+            timelimit_ms = 1000
+            memorylimit_kb = 256
+
             if not code:
                 raise Exception("Code not found in database")
 
@@ -100,7 +119,7 @@ class JudgeClient:
             with open(source_path, 'w', encoding='utf-8') as f:
                 f.write(code)
 
-            print(f"[Judge] Đang xử lý submission {submission_id}...")
+            print(f"[Judge] Processing submission {submission_id}...")
 
             self.socket.connect((JUDGE_SERVER[_judge_id]['host'], JUDGE_SERVER[_judge_id]['port']))
             request = {
@@ -166,20 +185,10 @@ def submit_code():
     try:
         data = request.get_json()
 
-        problem_id = data['problem_id']
         submission_id = data['submission_id']
-        language = data['language']
-        timelimit_ms = data['timelimit_ms']
-        memorylimit_kb = data['memorylimit_kb']
-        contest_id = data.get('contest_id')
 
         job = {
-            'problem_id': problem_id,
             'submission_id': submission_id,
-            'language': language,
-            'timelimit_ms': timelimit_ms,
-            'memorylimit_kb': memorylimit_kb,
-            'contest_id': contest_id,
         }
 
         submission_queue.put(job)
@@ -266,5 +275,25 @@ def upload_testcase():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+
+@app.route('/rejudge', methods=['POST'])
+def rejudge_many():
+    try:
+        data = request.get_json()
+        submission_ids = data.get('submission_ids', [])
+
+        if not submission_ids or not isinstance(submission_ids, list):
+            return jsonify({"error": "Invalid or missing submission_ids"}), 400
+       
+        for subId in submission_ids:
+            submission_queue.put({
+                'submission_id': subId,
+            })
+
+        return jsonify({"status": "rejudging", "count": len(submission_ids)})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

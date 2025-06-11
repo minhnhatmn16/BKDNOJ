@@ -7,6 +7,7 @@ import UpdateContestModal from "./UpdateContestModal";
 import ProblemRejudgeModal from "./ProblemRejudgeModal";
 import Pagination from "../../../components/pagination/Pagination";
 import { Pencil, RefreshCw } from "lucide-react";
+import { notifyError, notifySuccess } from "../../../components/utils/ApiNotifier";
 
 const AdminContestPage = () => {
   const navigate = useNavigate();
@@ -52,13 +53,15 @@ const AdminContestPage = () => {
     }
   };
 
-  const handleRejudgeProblem = async (contestId: number) => {
+  const handleRejudgeProblem = async (contestProblemId: number) => {
     try {
-      await api.post(`/admin/problem/${contestId}/rejudge`);
-      alert(`Rejudge for problem ${contestId} started.`);
+      await api.post(`/admin/contest/rejudge`, {
+        contest_problem_id: contestProblemId,
+      });
+      notifySuccess(`Rejudge for problem started.`);
     } catch (err) {
       console.error("Rejudge failed", err);
-      alert("Failed to rejudge.");
+      notifyError("Failed to rejudge.");
     }
   };
 
