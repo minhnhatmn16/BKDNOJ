@@ -359,7 +359,7 @@ exports.getAllSubmission = async (req, res) => {
         },
         {
           model: models.Problem,
-          attributes: ["problem_name"],
+          attributes: ["problem_name", "problem_id"],
         },
       ],
       order: [["submit_time", "DESC"]],
@@ -424,7 +424,7 @@ exports.getMySubmissions = async (req, res) => {
         },
         {
           model: models.Problem,
-          attributes: ["problem_name"],
+          attributes: ["problem_name", "problem_id"],
         },
       ],
       order: [["submit_time", "DESC"]],
