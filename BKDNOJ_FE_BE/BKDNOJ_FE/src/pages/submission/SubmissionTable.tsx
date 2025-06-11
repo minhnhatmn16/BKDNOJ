@@ -10,6 +10,7 @@ interface SubmissionTableProps {
   onPageChange: (page: number) => void;
   onSubmissionClick: (submissionId: number) => void;
   currentUserId: number;
+  contest_id?: number;
 }
 
 const SubmissionTable = ({
@@ -20,6 +21,7 @@ const SubmissionTable = ({
   onPageChange,
   onSubmissionClick,
   currentUserId,
+  contest_id,
 }: SubmissionTableProps) => {
   return (
     <div className="one-column-element mb-6">
@@ -117,7 +119,11 @@ const SubmissionTable = ({
                   </td>
                   <td className="border border-gray-300 px-2 py-1">
                     <Link
-                      to={`/problem/${sub.Problem.problem_id}`}
+                      to={
+                        contest_id
+                          ? `/contest/${contest_id}/problem/${sub.Problem.problem_id}`
+                          : `/problem/${sub.Problem.problem_id}`
+                      }
                       className="text-blue-600 hover:underline"
                     >
                       {sub.Problem.problem_name}

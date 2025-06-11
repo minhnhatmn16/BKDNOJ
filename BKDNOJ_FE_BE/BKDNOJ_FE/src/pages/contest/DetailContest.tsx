@@ -163,6 +163,7 @@ const DetailContest = ({
           onPageChange={handlePageChange}
           onSubmissionClick={(id) => setViewingId(id)}
           currentUserId={user_id || -1}
+          contest_id={detail_contest.contest_id}
         />
       )}
       {activeTab === "status" && (
@@ -174,6 +175,7 @@ const DetailContest = ({
           onPageChange={handlePageChange}
           onSubmissionClick={(id) => setViewingId(id)}
           currentUserId={user_id || -1}
+          contest_id={detail_contest.contest_id}
         />
       )}
       {activeTab === "standing" && (
@@ -182,6 +184,7 @@ const DetailContest = ({
           problems={problems}
           standings={standings}
           format={format}
+          contest_id={detail_contest.contest_id}
         />
       )}
       {activeTab === "detailproblem" && detailProblem && (
