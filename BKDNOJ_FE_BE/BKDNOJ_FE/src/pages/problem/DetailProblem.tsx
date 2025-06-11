@@ -3,7 +3,7 @@ import { Problem, Submission } from "../types";
 import api from "../../api";
 import SubmissionTable from "../submission/SubmissionTable";
 import SubmitPage from "../submit/SubmitPage";
-import PdfViewer from "./PdfViewer";
+import PdfViewer from "../../components/utils/PdfViewer";
 import { useLocation, useNavigate } from "react-router-dom";
 import Pagination from "../../components/pagination/Pagination";
 import SubmissionCodeModal from "../submission/SubmissionCodeModal";

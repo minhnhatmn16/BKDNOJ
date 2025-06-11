@@ -5,7 +5,7 @@ import { Contest } from "../types";
 import DetailContest from "./DetailContest";
 
 const DetailContestWrapper = () => {
-  const { contest_id, tab } = useParams();
+  const { contest_id, tab: rawTab, problem_id } = useParams();
   const navigate = useNavigate();
   const [detailContest, setDetailContest] = useState<Contest>();
 
@@ -23,16 +23,22 @@ const DetailContestWrapper = () => {
   }, [fetchContest]);
 
   useEffect(() => {
-    if (!["problems", "mysubmissions", "status", "standing"].includes(tab || "")) {
+    const validTabs = ["problems", "mysubmissions", "status", "standing"];
+    if (!(contest_id && problem_id) && !validTabs.includes(rawTab || "")) {
       navigate(`/contest/${contest_id}/problems`, { replace: true });
     }
-  }, [tab, contest_id, navigate]);
+  }, [rawTab, contest_id, navigate]);
+
+  const tab = problem_id
+    ? "detailproblem"
+    : (rawTab as "problems" | "mysubmissions" | "status" | "standing");
 
   return detailContest ? (
     <DetailContest
       title="Contest"
       detail_contest={detailContest}
-      activeTab={tab as "problems" | "mysubmissions" | "status" | "standing"}
+      activeTab={tab as "problems" | "mysubmissions" | "status" | "standing" | "detailproblem"}
+      selectedProblemId={problem_id}
     />
   ) : (
     <div>Loading contest...</div>

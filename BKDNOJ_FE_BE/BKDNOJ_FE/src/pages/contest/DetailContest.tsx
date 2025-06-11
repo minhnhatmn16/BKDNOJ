@@ -8,25 +8,34 @@ import SubmissionTable from "../submission/SubmissionTable";
 import StandingTable from "../standings/StandingTable";
 import ContestStatusTimer from "../../components/layout/ContestStatusTimer";
 import SubmissionCodeModal from "../submission/SubmissionCodeModal";
+import DetailProblemInContest from "./DetailProblemInContest";
 
 interface DetailContestProps {
   title: string;
   detail_contest: Contest;
-  activeTab: "problems" | "status" | "standing" | "mysubmissions";
+  activeTab: "problems" | "status" | "standing" | "mysubmissions" | "detailproblem";
+  selectedProblemId?: string;
 }
 
-const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps) => {
+const DetailContest = ({
+  title,
+  detail_contest,
+  activeTab,
+  selectedProblemId,
+}: DetailContestProps) => {
   const navigate = useNavigate();
 
   const [mysubmissions, setMySubmissions] = useState<Submission[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [problems, setProblems] = useState<Problem[]>([]);
   const [standings, setStandings] = useState<Standing[]>([]);
+  const [detailProblem, setDetailProblem] = useState<Problem>();
   const [format, setFormat] = useState(detail_contest.format);
   const [hasLoaded, setHasLoaded] = useState({
     mysubmissions: false,
     status: false,
     standing: false,
+    detailproblem: false,
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -77,13 +86,18 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
           setProblems(res.data.data.problems);
           setHasLoaded((prev) => ({ ...prev, standing: true }));
         }
+        if (activeTab === "detailproblem" && !hasLoaded.detailproblem) {
+          const res = await api.get(`/problem/${selectedProblemId}`);
+          setDetailProblem(res.data.data);
+          setHasLoaded((prev) => ({ ...prev, detailproblem: true }));
+        }
       } catch (err) {
         console.error("Failed to fetch data:", err);
       }
     };
 
     fetchData();
-  }, [activeTab, detail_contest.contest_id, hasLoaded]);
+  }, [activeTab, detail_contest.contest_id, hasLoaded, selectedProblemId]);
 
   return (
     <div className="one-column-element mb-6">
@@ -158,6 +172,9 @@ const DetailContest = ({ title, detail_contest, activeTab }: DetailContestProps)
           standings={standings}
           format={format}
         />
+      )}
+      {activeTab === "detailproblem" && detailProblem && (
+        <DetailProblemInContest title="Detail Problem" detail_problem={detailProblem} />
       )}
       <SubmissionCodeModal
         open={viewingId !== null}

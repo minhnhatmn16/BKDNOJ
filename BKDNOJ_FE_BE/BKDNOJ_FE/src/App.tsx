@@ -44,12 +44,8 @@ function App() {
             <Route path="/contest/:contest_id" element={<DetailContestPage />}>
               <Route index element={<DetailContestWrapper />} />
               <Route path=":tab" element={<DetailContestWrapper />} />
+              <Route path="problem/:problem_id" element={<DetailContestWrapper />} />
             </Route>
-
-            <Route
-              path="/contest/:contest_id/problem/:problem_id"
-              element={<DetailProblemPage />}
-            />
 
             <Route path="/submissions" element={<SubmissionPage />} />
 
