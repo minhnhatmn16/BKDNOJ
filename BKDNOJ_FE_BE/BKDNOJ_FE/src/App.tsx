@@ -9,7 +9,7 @@ import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ListProblemsPage from "./pages/list_problem/ListProblemPage";
-import SubssmionPage from "./pages/submission/SubmissionPage";
+import SubmissionPage from "./pages/submission/SubmissionPage";
 import SubmitForm from "./pages/SubmitForm";
 import SomeProblemPage from "./pages/SomeProblemPage ";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
@@ -51,7 +51,7 @@ function App() {
               element={<DetailProblemPage />}
             />
 
-            <Route path="/submissions" element={<SubssmionPage />} />
+            <Route path="/submissions" element={<SubmissionPage />} />
 
             <Route path="/submit" element={<SubmitForm />} />
 
