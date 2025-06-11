@@ -524,16 +524,21 @@ exports.getProblemByNameOrder = async (req, res) => {
   try {
     const contestProblem = await ContestProblem.findOne({
       where: {
-        order: problem_id,
+        problem_id: problem_id,
         contest_id: contest_id,
       },
+      include: [
+        {
+          model: models.Problem,
+        },
+      ],
     });
-    const problem = await Problem.findByPk(contestProblem.problem_id);
-    if (!problem) return res.status(404).json({ message: "Problem not found" });
+    if (!contestProblem)
+      return res.status(404).json({ message: "Problem not found" });
 
     res.status(200).json({
       message: "Problem fetched successfully",
-      data: { problem },
+      data: contestProblem,
     });
   } catch (err) {
     res.status(500).json({

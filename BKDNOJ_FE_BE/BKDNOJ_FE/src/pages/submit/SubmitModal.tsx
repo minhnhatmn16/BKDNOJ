@@ -4,7 +4,6 @@ import { Problem } from "../types";
 interface SubmitModalProps {
   isOpen: boolean;
   onClose: () => void;
-  // onSubmit: (language: string, code: string, file?: File | null) => void;
   onSubmit: (problem_id: number, language: string, code: string) => void;
   problem: Problem | null;
 }
@@ -59,14 +58,6 @@ const SubmitModal = ({ isOpen, onClose, onSubmit, problem }: SubmitModalProps) =
               onChange={(e) => setCode(e.target.value)}
             />
           </div>
-          {/* <div className="mb-4">
-            <label className="mb-1 block font-medium">Attach File (Optional):</label>
-            <input
-              type="file"
-              onChange={handleFileChange}
-              className="w-full rounded border border-gray-300 px-2 py-1"
-            />
-          </div> */}
           {problem?.problem_name && (
             <div className="flex justify-end space-x-3">
               <button onClick={onClose} className="rounded bg-gray-300 px-4 py-2 hover:bg-gray-400">

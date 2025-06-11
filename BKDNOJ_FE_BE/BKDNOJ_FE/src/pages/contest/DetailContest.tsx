@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Contest, Problem, Standing, Submission } from "../types";
+import { Contest, Problem, Standing, Submission, ContestProblem } from "../types";
 import api from "../../api";
 
 import ListProblemsTable from "./ListProblemsTable";
@@ -29,7 +29,7 @@ const DetailContest = ({
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [problems, setProblems] = useState<Problem[]>([]);
   const [standings, setStandings] = useState<Standing[]>([]);
-  const [detailProblem, setDetailProblem] = useState<Problem>();
+  const [detailProblem, setDetailProblem] = useState<ContestProblem>();
   const [format, setFormat] = useState(detail_contest.format);
   const [hasLoaded, setHasLoaded] = useState({
     mysubmissions: false,
@@ -95,18 +95,20 @@ const DetailContest = ({
   }, [activeTab, detail_contest.contest_id, hasLoaded]);
 
   useEffect(() => {
-    const fetchDetailProblem = async () => {
-      if (activeTab === "detailproblem" && selectedProblemId) {
+    if (activeTab === "detailproblem" && selectedProblemId) {
+      const fetchDetailProblem = async () => {
         try {
-          const res = await api.get(`/problem/${selectedProblemId}`);
+          const res = await api.get(
+            `/contest/${detail_contest.contest_id}/problem/${selectedProblemId}`,
+          );
           setDetailProblem(res.data.data);
         } catch (err) {
           console.error("Failed to fetch detail problem:", err);
         }
-      }
-    };
-    fetchDetailProblem();
-  }, [activeTab, selectedProblemId]);
+      };
+      fetchDetailProblem();
+    }
+  }, [activeTab, selectedProblemId, detail_contest.contest_id]);
 
   return (
     <div className="one-column-element mb-6">
@@ -183,7 +185,11 @@ const DetailContest = ({
         />
       )}
       {activeTab === "detailproblem" && detailProblem && (
-        <DetailProblemInContest title="Detail Problem" detail_problem={detailProblem} />
+        <DetailProblemInContest
+          title="Detail Problem"
+          contest_id={detail_contest.contest_id}
+          detail_problem={detailProblem}
+        />
       )}
       <SubmissionCodeModal
         open={viewingId !== null}
