@@ -6,9 +6,10 @@ interface StandingTableProps {
   problems: Problem[];
   standings: Standing[];
   format: string;
+  contest_id: number;
 }
 
-const StandingTable = ({ title, problems, standings, format }: StandingTableProps) => {
+const StandingTable = ({ title, problems, standings, format, contest_id }: StandingTableProps) => {
   const maxProblemCount = problems.length;
 
   const problemLabels = Array.from({ length: maxProblemCount }, (_, i) =>
@@ -29,7 +30,7 @@ const StandingTable = ({ title, problems, standings, format }: StandingTableProp
                 {problemLabels.map((label, idx) => (
                   <th key={idx} className="w-[7%] border border-gray-300 p-3 text-center">
                     <Link
-                      to={`/problem/${problems[idx].problem_id}`}
+                      to={`/contest/${contest_id}/problem/${problems[idx].problem_id}`}
                       className="text-black hover:underline"
                     >
                       {label}
