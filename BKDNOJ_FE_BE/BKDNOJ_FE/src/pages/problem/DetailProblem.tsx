@@ -6,6 +6,7 @@ import SubmitPage from "../submit/SubmitPage";
 import PdfViewer from "./PdfViewer";
 import { useLocation, useNavigate } from "react-router-dom";
 import Pagination from "../../components/pagination/Pagination";
+import SubmissionCodeModal from "../submission/SubmissionCodeModal";
 
 interface DetailProblemProps {
   title: string;
@@ -32,11 +33,23 @@ const DetailProblem = ({ title, detail_problem, activeTab }: DetailProblemProps)
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  const [user_id, setUserId] = useState<number>();
+  const [viewingId, setViewingId] = useState<number | null>(null);
+
   const handleTabChange = (tab: string) => {
     if (tab === "problem") {
       navigate(`/problem/${detail_problem.problem_id}`);
     } else {
       navigate(`/problem/${detail_problem.problem_id}/${tab}`);
+    }
+  };
+
+  const fetchMyProfile = async () => {
+    try {
+      const res = await api.get(`/auth/profile`);
+      setUserId(res.data.data.profile.user_id);
+    } catch (error) {
+      console.error("Failed to fetch profile", error);
     }
   };
 
@@ -57,10 +70,12 @@ const DetailProblem = ({ title, detail_problem, activeTab }: DetailProblemProps)
         } else if (activeTab === "submit" && !hasLoaded.submit) {
           setHasLoaded((prev) => ({ ...prev, submit: true }));
         } else if (activeTab === "mysubmissions" && !hasLoaded.mysubmissions) {
+          fetchMyProfile();
           const res = await api.get(`/problem/${detail_problem.problem_id}/mysubmissions`);
           setMySubmissions(res.data.data.mysubmissions);
           setHasLoaded((prev) => ({ ...prev, mysubmissions: true }));
         } else if (activeTab === "status" && !hasLoaded.status) {
+          fetchMyProfile();
           const res = await api.get(`/problem/${detail_problem.problem_id}/submissions`);
           setSubmissions(res.data.data.submissions);
           setHasLoaded((prev) => ({ ...prev, status: true }));
@@ -122,6 +137,8 @@ const DetailProblem = ({ title, detail_problem, activeTab }: DetailProblemProps)
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange}
+          onSubmissionClick={(id) => setViewingId(id)}
+          currentUserId={user_id || -1}
         />
       )}
       {activeTab === "status" && (
@@ -131,8 +148,15 @@ const DetailProblem = ({ title, detail_problem, activeTab }: DetailProblemProps)
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange}
+          onSubmissionClick={(id) => setViewingId(id)}
+          currentUserId={user_id || -1}
         />
       )}
+      <SubmissionCodeModal
+        open={viewingId !== null}
+        submissionId={viewingId}
+        onClose={() => setViewingId(null)}
+      />
     </div>
   );
 };
