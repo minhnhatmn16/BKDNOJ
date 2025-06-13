@@ -28,10 +28,9 @@ export const Navbar = () => {
         <div className="container flex flex-wrap items-center justify-between">
           {/* Left side */}
           <div className="flex items-center space-x-8">
-            <div id="brand" className="text-2xl font-semibold text-gray-800 hover:text-primary">
+            <Link className="text-2xl font-semibold text-gray-800 hover:text-primary" to="/">
               bkdnOJ
-            </div>
-
+            </Link>
             {/* Desktop nav items */}
             <div className="hidden space-x-6 md:flex">
               <Link className={navLinkClass("/problems")} to="/problems">

@@ -32,11 +32,6 @@ const User = sequelize.define(
       allowNull: false,
       defaultValue: "user",
     },
-    can_create_contest: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
   },
   {
     tableName: "users",
@@ -46,7 +41,6 @@ const User = sequelize.define(
 
 User.associate = function (models) {
   User.hasMany(models.Submission, { foreignKey: "user_id" });
-  User.hasMany(models.Contest, { foreignKey: "create_by" });
   User.hasMany(models.ContestParticipant, { foreignKey: "user_id" });
 };
 

@@ -31,7 +31,7 @@ function App() {
       <Router>
         <Layout>
           <Routes>
-            {/* <Route path="/" element={<HomePage />} /> */}
+            <Route path="/" element={<HomePage />} />
             <Route path="/problems" element={<ListProblemsPage />} />
 
             <Route path="/problem/:problem_id" element={<DetailProblemPage />}>

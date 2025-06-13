@@ -34,10 +34,6 @@ const Contest = sequelize.define(
       type: DataTypes.INTEGER,
       defaultValue: 20,
     },
-    created_by: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
     format: {
       type: DataTypes.ENUM("ICPC", "IOI"),
       allowNull: false,
@@ -50,7 +46,6 @@ const Contest = sequelize.define(
 );
 
 Contest.associate = function (models) {
-  Contest.belongsTo(models.User, { foreignKey: "created_by" });
   Contest.hasMany(models.Submission, { foreignKey: "contest_id" });
   Contest.hasMany(models.ContestProblem, { foreignKey: "contest_id" });
   Contest.hasMany(models.ContestParticipant, { foreignKey: "contest_id" });

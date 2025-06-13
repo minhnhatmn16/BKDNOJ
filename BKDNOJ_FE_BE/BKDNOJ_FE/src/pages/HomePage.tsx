@@ -9,17 +9,13 @@ export const HomePage = () => {
           <div>
             <p className="text-sm text-gray-500">Welcome to</p>
             <h1 className="text-3xl font-extrabold text-gray-800">
-              Bách Khoa Đà Nẵng Online Judge 2.0
+              Bách Khoa Đà Nẵng Online Judge 3.0
             </h1>
-            <p className="mt-2 text-base text-gray-600">
-              A modern platform for programming practice and contest hosting, tailored for students
-              in Vietnam's Central Region.
-            </p>
           </div>
 
           <div className="flex items-center space-x-4">
             <span className="rounded bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700">
-              Phase: <span className="font-semibold">openBETA</span>
+              <div className="font-semibold"> Phase: openBETA</div>
             </span>
             <span className="text-sm text-gray-400">Oct 20, 2022</span>
           </div>

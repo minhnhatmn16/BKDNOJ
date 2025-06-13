@@ -14,10 +14,10 @@ export const Footer = () => {
               />
             </div>
             <div className="col-span-1 flex items-center md:col-span-9">
-              <p className="text-sm opacity-80">
+              {/* <p className="text-sm opacity-80">
                 bkdnOJ v2.0 - open.Beta - 2022 | Built by BKDN Informatics Olympic & ICPC Team,
                 University of Science and Technology - University of Danang
-              </p>
+              </p> */}
             </div>
           </div>
         </div>
