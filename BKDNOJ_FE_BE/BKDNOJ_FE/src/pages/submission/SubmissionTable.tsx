@@ -135,8 +135,8 @@ const SubmissionTable = ({
                       <div className="text-sm text-gray-500">---</div>
                     ) : (
                       <>
-                        <div className="text-xs">{sub.time_ms}s</div>
-                        <div className="text-xs">{sub.memory_kb}MB</div>
+                        <div className="text-xs">{sub.time_ms.toFixed(2)} s</div>
+                        <div className="text-xs">{sub.memory_kb.toFixed(0)} KB</div>
                       </>
                     )}
                   </td>

@@ -101,7 +101,6 @@ exports.CreateContest = async (req, res) => {
       password: hash,
       penalty,
       format,
-      created_by: user_id,
     });
 
     if (Array.isArray(problems) && problems.length > 0) {
@@ -142,12 +141,6 @@ exports.UpdateContest = async (req, res) => {
     const contest = await Contest.findByPk(contest_id);
     if (!contest) {
       return res.status(404).json({ error: "Contest not found" });
-    }
-
-    if (contest.created_by !== user_id) {
-      return res
-        .status(403)
-        .json({ error: "You do not have permission to update this contest" });
     }
 
     if (new Date(contest.start_time) < new Date() && (start_time || duration)) {
@@ -206,7 +199,6 @@ exports.GetContestById = async (req, res) => {
         "duration",
         "is_public",
         "penalty",
-        "created_by",
         "format",
       ],
       include: [

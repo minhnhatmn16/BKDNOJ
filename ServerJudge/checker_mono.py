@@ -69,13 +69,17 @@ class JudgeProcessor:
             count_testcase = 0
             count_testpassed = 0
             results = []
-            firstStatus = ""
+            firstStatus = "AC"
             isFirstStatus = False
+            memory_max = 0
+            time_max = 0
             for input_file in input_files:
                 print("Testcase " ,count_testcase)
 
                 input_path = os.path.join(input_dir, input_file)
                 output_path = os.path.join(output_dir, input_file.split(".")[0]+".out")
+
+                timelimit_ms = timelimit_ms / 1000
 
                 temp = MonoProcessMonitor(100, timelimit_ms, timelimit_ms * 3, 2, source_path, input_path, output_path, language)
                 result  = temp.run()
@@ -86,15 +90,20 @@ class JudgeProcessor:
                 if (result["status"] == "AC"):
                     count_testpassed += 1
 
-                if isFirstStatus == False:
+                if isFirstStatus == False and result["status"] != "AC":
                     isFirstStatus  = True
                     firstStatus = result["status"]
+
+                memory_max = max(memory_max, result["memory_kb"])
+                time_max = max(time_max, result["time_ms"])
 
             return {
                 "status": firstStatus,
                 "submission_id" : submission_id,
                 "passed": count_testpassed,
                 "total": count_testcase,
+                "time_ms": time_max,
+                "memory_kb": memory_max
             }
         except Exception as e:
             return {"status": "error tai checker_mono", "message": str(e)}

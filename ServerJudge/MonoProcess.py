@@ -65,6 +65,7 @@ class MonoProcessMonitor:
             "cpu_time_ms": 0,
             "wall_time_ms": 0,
             "output_size_kb": 0,
+            "time_ms": 0,
             "stdout": "",
             "stderr": "",
             "returncode": ""
@@ -160,10 +161,15 @@ class MonoProcessMonitor:
         # if process.returncode != 0 and result["status"] == "OK":
         #     result["status"] = "RE"
         #     return result
+        result["memory_kb"] = memory_usage * 1024
+        result["time_ms"] = cpu_time
 
-        if (result["status"] == "OK"):
+        if (result["status"] == "CTLE" or result["status"] == "RTLE"):
+            result["status"] = "TLE"
+        elif (result["status"] == "OK"):
             result["status"] = check(self.output_file,stdout_lines)
-        # result["memory_kb"] = memory_usage
+
+
         # result["time_ms"] = cpu_time
         # result["wall_time"] = wall_time
         # result["wall_time"] = time.time() - start_time
