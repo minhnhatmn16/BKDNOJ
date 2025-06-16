@@ -73,13 +73,13 @@ class JudgeProcessor:
             isFirstStatus = False
             memory_max = 0
             time_max = 0
+            timelimit_ms = timelimit_ms / 1000
+
             for input_file in input_files:
                 print("Testcase " ,count_testcase)
 
                 input_path = os.path.join(input_dir, input_file)
                 output_path = os.path.join(output_dir, input_file.split(".")[0]+".out")
-
-                timelimit_ms = timelimit_ms / 1000
 
                 temp = MonoProcessMonitor(100, timelimit_ms, timelimit_ms * 3, 2, source_path, input_path, output_path, language)
                 result  = temp.run()
