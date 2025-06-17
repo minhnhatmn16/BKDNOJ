@@ -3,6 +3,7 @@ import subprocess
 import psutil
 import time
 import platform
+from logger import log_time3
 
 from MonoProcess import MonoProcessMonitor
 
@@ -75,8 +76,9 @@ class JudgeProcessor:
             time_max = 0
             timelimit_ms = timelimit_ms / 1000
 
+            start = time.time()
             for input_file in input_files:
-                print("Testcase " ,count_testcase)
+                # print("Testcase " ,count_testcase)
 
                 input_path = os.path.join(input_dir, input_file)
                 output_path = os.path.join(output_dir, input_file.split(".")[0]+".out")
@@ -96,6 +98,8 @@ class JudgeProcessor:
 
                 memory_max = max(memory_max, result["memory_kb"])
                 time_max = max(time_max, result["time_ms"])
+
+            log_time3(submission_id, time.time() - start)
 
             return {
                 "status": firstStatus,

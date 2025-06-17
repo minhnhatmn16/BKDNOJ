@@ -10,7 +10,7 @@ import time
 from queue import Queue
 from threading import Thread
 import pymysql
-
+from logger import log_time4
 submission_queue = Queue()
 
 
@@ -25,12 +25,12 @@ JUDGE_SERVER_HOST = 'localhost'
 JUDGE_SERVER = [
     {'host': 'localhost', 'port': 5555, 'active': False, 'core' : 0},
     {'host': 'localhost', 'port': 5556, 'active': False, 'core' : 1},
-    {'host': 'localhost', 'port': 5557, 'active': False, 'core' : 2}
+    {'host': 'localhost', 'port': 5557, 'active': False, 'core' : 2},
+    {'host': 'localhost', 'port': 5558, 'active': False, 'core' : 3}
 ]
 judge_queue = Queue()
 for i, judge in enumerate(JUDGE_SERVER):
     judge_queue.put(i)
-    
     
 class JudgeClient:
     def __init__(self):
@@ -38,6 +38,7 @@ class JudgeClient:
     
     def update_submission(self, submission_id, status, passed, total, time_ms, memory_kb, contest_id):
         try:
+            log_time4(submission_id, time.time())
             conn = pymysql.connect(
                 host="127.0.0.1",
                 port=4306,
