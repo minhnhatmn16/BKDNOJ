@@ -27,12 +27,10 @@ const DetailProblem = ({ title, detail_problem, contest_id }: DetailProblemProps
       const res = await api.post(`/contest/${contest_id}/${problem_id}`, { language, code });
       navigate(`/contest/${contest_id}/mysubmissions`);
       window.location.reload();
-    } catch (err: any) {
-      if (err.response?.data?.message) {
-        notifyError(err.response.data.message);
-      } else {
-        notifyError("Login failed. Please try again.");
-      }
+    } catch (error: any) {
+      console.error("Submission failed:", error);
+      const message = error.response?.data?.error || error.message || "Submission failed.";
+      notifyError(`${message}`);
     }
   };
 

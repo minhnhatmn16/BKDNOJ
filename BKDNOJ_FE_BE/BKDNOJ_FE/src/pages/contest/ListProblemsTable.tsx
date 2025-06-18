@@ -4,6 +4,7 @@ import Pagination from "../../components/pagination/Pagination";
 import SubmitModal from "../submit/SubmitModal";
 import { useState } from "react";
 import api from "../../api";
+import { notifyError, notifySuccess } from "../../components/utils/ApiNotifier";
 
 interface ListProblemsTableProps {
   title: string;
@@ -32,12 +33,10 @@ const ProblemsTable = ({
       const res = await api.post(`/contest/${contest_id}/${problem_id}`, { language, code });
       navigate(`/contest/${contest_id}/mysubmissions`);
       window.location.reload();
-    } catch (err: any) {
-      if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else {
-        setError("Login failed. Please try again.");
-      }
+    } catch (error: any) {
+      console.error("Submission failed:", error);
+      const message = error.response?.data?.error || error.message || "Submission failed.";
+      notifyError(`${message}`);
     }
   };
 

@@ -60,9 +60,17 @@ async function getUserStatusMap(contest_id, problemIds, user_id) {
   return statusMap;
 }
 
+const checkUserRegistered = async (user_id, contest_id) => {
+  const participant = await ContestParticipant.findOne({
+    where: { user_id, contest_id },
+  });
+
+  return !!participant;
+};
+
 // Lấy thông tin cuộc thi
 exports.getContestById = async (req, res) => {
-  const { user_id = null } = req.user;
+  const { user_id = null, role = null } = req.user;
   const { id } = req.params;
   try {
     const contest = await Contest.findByPk(id, {
@@ -92,22 +100,37 @@ exports.getContestById = async (req, res) => {
       return res.status(404).json({ error: "Contest not found" });
     }
 
-    const problemIds = contest.Contest_Problems.map((cp) => cp.problem_id);
+    const now = new Date();
+    const startTime = new Date(contest.start_time);
+    const endTime = new Date(
+      startTime.getTime() + contest.duration * 60 * 1000
+    );
 
-    const [acMap, statusMap] = await Promise.all([
-      getAcceptedUserCountMap(id, problemIds),
-      getUserStatusMap(id, problemIds, user_id),
-    ]);
-    contest.Contest_Problems.forEach((cp) => {
-      const pid = cp.problem_id;
-      cp.Problem.dataValues.acceptedUserCount = acMap[pid] || 0;
-      cp.Problem.dataValues.userStatus = statusMap[pid] || "none";
-    });
+    let canViewProblems = true;
+
+    if (role !== "admin" && now < startTime) canViewProblems = false;
+
+    if (canViewProblems === false) {
+      contest.setDataValue("Contest_Problems", []);
+    } else {
+      const problemIds = contest.Contest_Problems.map((cp) => cp.problem_id);
+
+      const [acMap, statusMap] = await Promise.all([
+        getAcceptedUserCountMap(id, problemIds),
+        getUserStatusMap(id, problemIds, user_id),
+      ]);
+      contest.Contest_Problems.forEach((cp) => {
+        const pid = cp.problem_id;
+        cp.Problem.dataValues.acceptedUserCount = acMap[pid] || 0;
+        cp.Problem.dataValues.userStatus = statusMap[pid] || "none";
+      });
+    }
 
     if (contest) {
-      res
-        .status(200)
-        .json({ message: "Contest fetched successfully", data: contest });
+      res.status(200).json({
+        message: "Contest fetched successfully",
+        data: contest,
+      });
     } else {
       res.status(404).json({ error: "Contest not found" });
     }
@@ -543,7 +566,7 @@ exports.getProblemByNameOrder = async (req, res) => {
 
 // Submit
 exports.addSubmit = async (req, res) => {
-  const user_id = req.user.user_id;
+  const { user_id, role } = req.user;
   const { problem_id, contest_id } = req.params;
   const { language, code } = req.body;
   const timelimit_ms = 1000;
@@ -556,20 +579,31 @@ exports.addSubmit = async (req, res) => {
         contest_id,
       },
     });
-    if (!problemInContest) {
-      return res.status(404).json({ message: "Problem or contest not found" });
+    const contest = await Contest.findByPk(contest_id);
+
+    if (!problemInContest || !contest) {
+      return res.status(404).json({ message: "Problem or contest not found." });
     }
 
-    const userInContest = await ContestParticipant.findOne({
-      where: {
-        contest_id,
+    const now = new Date();
+    const startTime = new Date(contest.start_time);
+    const endTime = new Date(
+      startTime.getTime() + contest.duration * 60 * 1000
+    );
+
+    if (role !== "admin") {
+      if (now < startTime) {
+        return res.status(403).json({ error: "Contest has not started yet." });
+      }
+      const isRegistered = await checkUserRegistered(
         user_id,
-      },
-    });
-    if (!userInContest) {
-      return res
-        .status(404)
-        .json({ message: "You haven't registered for this contest yet." });
+        contest.contest_id
+      );
+      if (now < endTime && !isRegistered) {
+        return res
+          .status(403)
+          .json({ error: "You have not registered for this contest." });
+      }
     }
     const newSubmission = await Submission.create({
       user_id,

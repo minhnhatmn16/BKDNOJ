@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import api from "../../api";
 import { Contest } from "../types";
 import DetailContest from "./DetailContest";
+import { notifyError, notifySuccess } from "../../components/utils/ApiNotifier";
 
 const DetailContestWrapper = () => {
   const { contest_id, tab: rawTab, problem_id } = useParams();
@@ -13,8 +14,12 @@ const DetailContestWrapper = () => {
     try {
       const res = await api.get(`/contest/${contest_id}`);
       setDetailContest(res.data.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to fetch contest:", error);
+      const message =
+        error.response?.data?.error || error.message || "Unable to load contest information.";
+      notifyError(`${message}`);
+      navigate("/contests");
     }
   }, [contest_id]);
 

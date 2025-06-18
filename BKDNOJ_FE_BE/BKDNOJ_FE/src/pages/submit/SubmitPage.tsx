@@ -30,11 +30,8 @@ const SubmitPage = ({ problem }: SubmitPageProps) => {
       navigate("/submissions");
     } catch (error: any) {
       console.error("Submission failed:", error);
-      if (error.response?.status === 503) {
-        notifyError("Saved, but judge server is offline.");
-      } else {
-        notifyError("Submission failed.");
-      }
+      const message = error.response?.data?.error || error.message || "Submission failed.";
+      notifyError(`${message}`);
     }
   };
 

@@ -136,7 +136,7 @@ const UpdateProblemModal = ({ isOpen, onClose, problem }: UpdateProblemModalProp
           </div>
 
           <div className="grid grid-cols-3 items-center">
-            <label className="pr-4 text-right">Memory Limit (KB)</label>
+            <label className="pr-4 text-right">Memory Limit (MB)</label>
             <input
               type="number"
               min={1}

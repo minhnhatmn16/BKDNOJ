@@ -17,7 +17,7 @@ export const HomePage = () => {
             <span className="rounded bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700">
               <div className="font-semibold"> Phase: openBETA</div>
             </span>
-            <span className="text-sm text-gray-400">Oct 20, 2022</span>
+            <span className="text-sm text-gray-400">April 1, 2025</span>
           </div>
 
           <Link
