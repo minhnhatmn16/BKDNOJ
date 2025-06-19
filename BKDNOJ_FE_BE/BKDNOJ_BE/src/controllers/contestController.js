@@ -537,6 +537,8 @@ exports.getAllParticipant = async (req, res) => {
 // Tìm kiếm bài tập theo tên
 exports.getProblemByNameOrder = async (req, res) => {
   const { contest_id, problem_id } = req.params;
+  const { user_id = null, role = null } = req.user;
+
   try {
     const contestProblem = await ContestProblem.findOne({
       where: {
@@ -549,8 +551,17 @@ exports.getProblemByNameOrder = async (req, res) => {
         },
       ],
     });
-    if (!contestProblem)
-      return res.status(404).json({ message: "Problem not found" });
+    const contest = await Contest.findByPk(contest_id);
+
+    if (!contestProblem || !contest)
+      return res.status(404).json({ message: "Problem or contest not found." });
+
+    const now = new Date();
+    const startTime = new Date(contest.start_time);
+
+    if (role !== "admin" && now < startTime) {
+      return res.status(403).json({ error: "Contest has not started yet" });
+    }
 
     res.status(200).json({
       message: "Problem fetched successfully",

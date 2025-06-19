@@ -6,7 +6,11 @@ const { Op, literal } = require("sequelize");
 
 // Tất cả các bài tập
 exports.getAllProblem = async (req, res) => {
-  const user_id = req.user.user_id;
+  let user_id = null;
+  if (req.user) {
+    user_id = req.user.user_id;
+  }
+
   const { search = "", page = 1, hide_solved = false } = req.query;
   const hideSolved = hide_solved === "true";
 
@@ -21,15 +25,16 @@ exports.getAllProblem = async (req, res) => {
         problem_name: {
           [Op.like]: `%${search}%`,
         },
-        ...(hideSolved && {
-          problem_id: {
-            [Op.notIn]: literal(`(
+        ...(hideSolved &&
+          user_id !== null && {
+            problem_id: {
+              [Op.notIn]: literal(`(
               SELECT DISTINCT problem_id
               FROM submissions
               WHERE status = 'AC' AND user_id = ${user_id}
             )`),
-          },
-        }),
+            },
+          }),
       },
       attributes: [
         "problem_id",

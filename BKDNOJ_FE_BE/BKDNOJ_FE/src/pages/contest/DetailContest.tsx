@@ -9,6 +9,7 @@ import StandingTable from "../standings/StandingTable";
 import ContestStatusTimer from "../../components/layout/ContestStatusTimer";
 import SubmissionCodeModal from "../submission/SubmissionCodeModal";
 import DetailProblemInContest from "./DetailProblemInContest";
+import { notifyError, notifySuccess } from "../../components/utils/ApiNotifier";
 
 interface DetailContestProps {
   title: string;
@@ -102,8 +103,11 @@ const DetailContest = ({
             `/contest/${detail_contest.contest_id}/problem/${selectedProblemId}`,
           );
           setDetailProblem(res.data.data);
-        } catch (err) {
-          console.error("Failed to fetch detail problem:", err);
+        } catch (error: any) {
+          console.error("Problem failed:", error);
+          const message = error.response?.data?.error || error.message || "Problem not found.";
+          notifyError(`${message}`);
+          navigate(`/contest/${detail_contest.contest_id}/problems}`);
         }
       };
       fetchDetailProblem();

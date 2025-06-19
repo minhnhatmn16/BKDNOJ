@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import api from "../../api";
 import { Problem } from "../types";
 import DetailProblem from "./DetailProblem";
+import { notifyError, notifySuccess } from "../../components/utils/ApiNotifier";
 
 const DetailContestWrapper = () => {
   const { problem_id, tab } = useParams();
@@ -13,8 +14,11 @@ const DetailContestWrapper = () => {
     try {
       const res = await api.get(`/problem/${problem_id}`);
       setDetailProblem(res.data.data);
-    } catch (error) {
-      console.error("Failed to fetch contest:", error);
+    } catch (error: any) {
+      console.error("Problem failed:", error);
+      const message = error.response?.data?.error || error.message || "Problem not found.";
+      notifyError(`${message}`);
+      navigate(`/problems`);
     }
   }, [problem_id]);
 

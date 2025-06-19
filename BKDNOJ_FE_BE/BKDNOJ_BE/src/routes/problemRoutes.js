@@ -3,6 +3,7 @@ const router = express.Router();
 const problemController = require("../controllers/problemController");
 const authenticateToken = require("../middleware/authenticateToken");
 const checkCreatePermission = require("../middleware/checkCreatePermission");
+const optionalAuthenticateToken = require("../middleware/optionalAuthenticateToken");
 
 router.post(
   "/",
@@ -18,7 +19,7 @@ router.put(
   problemController.updateProblem
 ); // Update problem
 
-router.get("/:id", problemController.getProblemById); // Lấy bài theo ID
+router.get("/:id", optionalAuthenticateToken, problemController.getProblemById); // Lấy bài theo ID
 
 router.post("/:id/submit", authenticateToken, problemController.addSubmit); // Submit
 

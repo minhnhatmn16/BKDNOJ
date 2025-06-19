@@ -64,10 +64,12 @@ exports.updateProblem = async (req, res) => {
 
 // Lấy bài theo ID
 exports.getProblemById = async (req, res) => {
+  const user = req.user;
   const { id } = req.params;
   try {
     const problem = await Problem.findByPk(id);
-    if (!problem) return res.status(404).json({ message: "Problem not found" });
+    if (!problem || (user?.role !== "admin" && !problem.is_public))
+      return res.status(404).json({ error: "Problem not found" });
 
     res.status(200).json({
       message: "Problem fetched successfully",

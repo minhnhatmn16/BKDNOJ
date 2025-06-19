@@ -1,6 +1,7 @@
 import { Profile, HeatmapDay } from "../types";
 import { useState } from "react";
 import api from "../../api";
+import LoadingOverlay from "../../components/utils/LoadingOverlay";
 
 interface UserProfileProps {
   title: string;
@@ -15,6 +16,7 @@ const UserProfilePage = ({ title, profile, sumissionsInYear }: UserProfileProps)
     if (count < 6) return "bg-green-400";
     return "bg-green-600";
   };
+  const [loading, setLoading] = useState(false);
 
   const yearCur = new Date().getFullYear();
 
@@ -97,6 +99,7 @@ const UserProfilePage = ({ title, profile, sumissionsInYear }: UserProfileProps)
   const handleUpload = async () => {
     if (!selectedFile) return;
     console.log("Uploading:", selectedFile);
+    setLoading(true);
     try {
       const formData = new FormData();
       if (selectedFile) {
@@ -107,6 +110,7 @@ const UserProfilePage = ({ title, profile, sumissionsInYear }: UserProfileProps)
       });
       window.location.reload();
     } catch (err) {
+      setLoading(false);
       console.error("Update problem failed", err);
     }
   };
@@ -200,6 +204,7 @@ const UserProfilePage = ({ title, profile, sumissionsInYear }: UserProfileProps)
           </div>
         </div>
       </div>
+      {loading && <LoadingOverlay message="Uploading..." />}
     </div>
   );
 };
