@@ -43,7 +43,7 @@ exports.getAllProblem = async (req, res) => {
           literal(`(
             SELECT COUNT(DISTINCT user_id)
             FROM submissions
-            WHERE submissions.problem_id = problem.problem_id
+            WHERE submissions.problem_id = Problem.problem_id
               AND submissions.status = 'AC'
           )`),
           "acceptedUserCount",
@@ -54,13 +54,13 @@ exports.getAllProblem = async (req, res) => {
               CASE
                 WHEN EXISTS (
                   SELECT 1 FROM submissions
-                  WHERE submissions.problem_id = problem.problem_id
+                  WHERE submissions.problem_id = Problem.problem_id
                     AND submissions.user_id = ${user_id}
                     AND submissions.status = 'AC'
                 ) THEN 'ac'
                 WHEN EXISTS (
                   SELECT 1 FROM submissions
-                  WHERE submissions.problem_id = problem.problem_id
+                  WHERE submissions.problem_id = Problem.problem_id
                     AND submissions.user_id = ${user_id}
                 ) THEN 'sub'
                 ELSE 'none'
