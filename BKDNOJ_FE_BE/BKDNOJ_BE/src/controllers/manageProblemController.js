@@ -6,6 +6,7 @@ const fs = require("fs");
 const { google } = require("googleapis");
 const axios = require("axios");
 const FormData = require("form-data");
+const getJudgeServerUrl = require("../utils/getJudgeServerUrls");
 
 const KEYFILEPATH = "srcsecurity\bkdnoj-461512-668e7fc6c984.json";
 const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
@@ -104,12 +105,15 @@ exports.CreateProblem = async (req, res) => {
       req.files.zip_testcase &&
       req.files.zip_testcase.length > 0
     ) {
+      let url = await getJudgeServerUrl();
+      url = url + "/uploadTestcase";
+
       const zipFile = req.files.zip_testcase[0];
       const formData = new FormData();
       formData.append("zip_file", fs.createReadStream(zipFile.path));
       formData.append("problem_id", newProblem.problem_id);
 
-      await axios.post("http://localhost:5000/uploadTestcase", formData, {
+      await axios.post(url, formData, {
         headers: formData.getHeaders(),
       });
 
@@ -167,13 +171,16 @@ exports.UpdateProblem = async (req, res) => {
       req.files.zip_testcase &&
       req.files.zip_testcase.length > 0
     ) {
+      let url = await getJudgeServerUrl();
+      url = url + "/uploadTestcase";
+
       updateProblem.has_testcase = false;
       const zipFile = req.files.zip_testcase[0];
       const formData = new FormData();
       formData.append("zip_file", fs.createReadStream(zipFile.path));
       formData.append("problem_id", updateProblem.problem_id);
 
-      await axios.post("http://localhost:5000/uploadTestcase", formData, {
+      await axios.post(url, formData, {
         headers: formData.getHeaders(),
       });
 

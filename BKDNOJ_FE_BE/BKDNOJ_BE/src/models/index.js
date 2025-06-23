@@ -5,6 +5,7 @@ const Submission = require("./submission");
 const Contest = require("./contest");
 const ContestParticipant = require("./contest_participant");
 const ContestProblem = require("./contest_problem");
+const JudgeServer = require("./judgeserver");
 
 const models = {
   User,
@@ -13,6 +14,7 @@ const models = {
   Contest,
   ContestParticipant,
   ContestProblem,
+  JudgeServer,
 };
 
 Object.keys(models).forEach((modelName) => {

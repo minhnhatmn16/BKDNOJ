@@ -4,6 +4,7 @@ const Submission = require("../models/submission");
 const User = require("../models/user");
 const { models } = require("../models");
 const axios = require("axios");
+const getJudgeServerUrl = require("../utils/getJudgeServerUrls");
 
 // Thêm problem
 exports.createProblem = async (req, res) => {
@@ -100,10 +101,13 @@ exports.addSubmit = async (req, res) => {
     });
 
     try {
-      await axios.post("http://localhost:5000/submit", {
+      let url = await getJudgeServerUrl();
+      url = url + "/submit";
+      await axios.post(url, {
         submission_id: newSubmission.submission_id,
       });
     } catch (judgeError) {
+      console.error(url);
       console.error("Judge server unreachable:", judgeError.message);
       return res.status(503).json({
         message: "Judge server is not available",

@@ -6,6 +6,7 @@ const { models } = require("../models");
 const { Op, fn, col } = require("sequelize");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
+const getJudgeServerUrl = require("../utils/getJudgeServerUrls");
 
 const {
   calculateICPCRanking,
@@ -625,7 +626,10 @@ exports.addSubmit = async (req, res) => {
     });
 
     try {
-      await axios.post("http://localhost:5000/submit", {
+      let url = await getJudgeServerUrl();
+      url = url + "/submit";
+
+      await axios.post(url, {
         submission_id: newSubmission.submission_id,
       });
     } catch (judgeError) {

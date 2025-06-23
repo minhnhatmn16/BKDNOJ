@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const { Op, literal } = require("sequelize");
 const { models } = require("../models");
 const axios = require("axios");
+const getJudgeServerUrl = require("../utils/getJudgeServerUrls");
 
 // Lấy tất cả các contest
 exports.GetAllContest = async (req, res) => {
@@ -259,7 +260,9 @@ exports.RejudgeSubmission = async (req, res) => {
     for (const sub of submissions) submissionIds.push(sub.submission_id);
 
     try {
-      await axios.post("http://localhost:5000/rejudge", {
+      let url = await getJudgeServerUrl();
+      url = url + "/rejudge";
+      await axios.post(url, {
         submission_ids: submissionIds,
       });
     } catch (judgeError) {
