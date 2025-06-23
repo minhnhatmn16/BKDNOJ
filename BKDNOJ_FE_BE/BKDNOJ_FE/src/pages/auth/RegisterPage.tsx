@@ -1,19 +1,50 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../../api";
+import { notifyError, notifySuccess } from "../../components/utils/ApiNotifier";
 
-export const RegisterPage = () => {
+const RegisterPage = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    try {
+      await api.post("/auth/register", {
+        user_name: username,
+        email,
+        password,
+      });
+
+      notifySuccess("Registration successful! Please login.");
+      navigate("/login");
+    } catch (err: any) {
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Registration failed. Please try again.");
+      }
+    }
   };
 
   return (
     <div className="mx-auto max-w-md rounded-md bg-white p-8 shadow">
       <h2 className="mb-6 text-2xl font-bold">Register</h2>
+      {error && (
+        <div className="mb-4 rounded-md bg-red-100 px-4 py-2 text-sm text-red-700">{error}</div>
+      )}
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="username" className="mb-2 block text-sm font-medium">
@@ -22,7 +53,7 @@ export const RegisterPage = () => {
           <input
             type="text"
             id="username"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full rounded-md border border-gray-300 px-3 py-2"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
@@ -35,7 +66,7 @@ export const RegisterPage = () => {
           <input
             type="email"
             id="email"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full rounded-md border border-gray-300 px-3 py-2"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -48,7 +79,7 @@ export const RegisterPage = () => {
           <input
             type="password"
             id="password"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full rounded-md border border-gray-300 px-3 py-2"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -61,7 +92,7 @@ export const RegisterPage = () => {
           <input
             type="password"
             id="confirmPassword"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full rounded-md border border-gray-300 px-3 py-2"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
@@ -69,7 +100,7 @@ export const RegisterPage = () => {
         </div>
         <button
           type="submit"
-          className="w-full rounded-md bg-primary px-4 py-2 text-white hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          className="w-full rounded-md bg-blue-600 py-2 text-white hover:bg-blue-700"
         >
           Register
         </button>
