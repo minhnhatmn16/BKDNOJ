@@ -80,14 +80,17 @@ class JudgeClient:
             with conn:
                 with conn.cursor() as cursor:
                     sql = """
-                    SELECT 
-                        submission_id,
-                        problem_id,
-                        language,
-                        code,
-                        contest_id
-                    FROM submissions
-                    WHERE submission_id = %s
+                SELECT 
+                    s.submission_id,
+                    s.problem_id,
+                    s.language,
+                    s.code,
+                    s.contest_id,
+                    p.timelimit_ms,
+                    p.memorylimit_kb
+                FROM submissions s
+                JOIN problems p ON s.problem_id = p.problem_id
+                WHERE s.submission_id = %s
                 """
                     cursor.execute(sql, (submission_id,))
                     result = cursor.fetchone()
@@ -109,9 +112,9 @@ class JudgeClient:
             language = submission_info['language']
             contest_id = submission_info['contest_id']
             problem_id = submission_info['problem_id']
-            timelimit_ms = 1000
-            memorylimit_kb = 256
-
+            timelimit_ms = submission_info['timelimit_ms']
+            memorylimit_kb = submission_info['memorylimit_kb']
+            
             if not code:
                 raise Exception("Code not found in database")
 
