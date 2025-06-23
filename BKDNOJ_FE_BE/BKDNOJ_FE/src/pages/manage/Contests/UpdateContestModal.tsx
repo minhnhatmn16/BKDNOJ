@@ -100,8 +100,9 @@ const UpdateContestModal = ({ isOpen, onClose, contest }: UpdateContestModalProp
       return;
     }
 
-    if (Number(duration) <= 0) {
-      notifyError("Duration must be greater than 0.");
+    const durationNumber = Number(duration);
+    if (!Number.isInteger(durationNumber) || durationNumber <= 0) {
+      notifyError("Duration must be a positive integer.");
       return;
     }
 
