@@ -38,8 +38,8 @@ class JudgeProcessor:
             raise RuntimeError(f"Compilation error")
 
     def get_command(self, source_file, language):
-        if language == 'python':
-            return ['python', source_file]
+        if language == 'py':
+            return ['py', source_file]
         elif language == 'cpp':
             try:
                 executable = self.compile_cpp(source_file)
@@ -110,4 +110,4 @@ class JudgeProcessor:
                 "memory_kb": memory_max
             }
         except Exception as e:
-            return {"status": "error tai checker_mono", "message": str(e)}
+            return {"status": "SE", "message": str(e)}

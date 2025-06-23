@@ -45,7 +45,7 @@ class MonoProcessMonitor:
         return executable
 
     def get_command(self):
-        if self.language == 'python':
+        if self.language == 'py':
             return ['python3', self.source_file]
         elif self.language == 'cpp':
             return [self.compile_cpp(self.source_file)]
