@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import HomePage from "./pages/HomePage";
 import ListContestsPage from "./pages/list_contest/ListContestsPage";
-import StandingPage from "./pages/standings/StandingPage";
+// import StandingPage from "./pages/standings/StandingPage";
 import StatusPage from "./pages/status/StatusPage";
 import OrganizationPage from "./pages/organization/OrganizationPage";
 import LoginPage from "./pages/auth/LoginPage";
@@ -53,7 +53,7 @@ function App() {
 
             <Route path="/submitForm" element={<SomeProblemPage />} />
 
-            <Route path="/standing" element={<StandingPage />} />
+            {/* <Route path="/standing" element={<StandingPage />} /> */}
 
             <Route path="/orgs" element={<OrganizationPage />} />
 
