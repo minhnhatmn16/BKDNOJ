@@ -31,7 +31,7 @@ exports.GetAllContest = async (req, res) => {
         "format",
         [
           literal(
-            `(SELECT COUNT(*) FROM contest_participants cp WHERE cp.contest_id = contest.contest_id)`
+            `(SELECT COUNT(*) FROM contest_participants cp WHERE cp.contest_id = Contest.contest_id)`
           ),
           "participantCount",
         ],
