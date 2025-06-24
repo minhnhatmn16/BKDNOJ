@@ -32,7 +32,7 @@ const LoginPage = () => {
       const userRes = await api.get(`/auth/profile/${decoded.user_name}`);
       setUser(userRes.data.data);
 
-      navigate("/problems");
+      navigate("/");
       window.location.reload();
     } catch (err: any) {
       if (err.response?.data?.message) {
