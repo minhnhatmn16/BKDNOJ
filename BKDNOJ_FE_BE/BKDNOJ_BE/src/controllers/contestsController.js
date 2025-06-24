@@ -19,13 +19,13 @@ exports.getAllContest = async (req, res) => {
         "is_public",
         [
           literal(
-            `EXISTS(SELECT 1 FROM contest_participants WHERE contest_id = contest.contest_id AND user_id = ${user_id})`
+            `EXISTS(SELECT 1 FROM contest_participants WHERE contest_id = Contest.contest_id AND user_id = ${user_id})`
           ),
           "isRegistered",
         ],
         [
           literal(
-            `(SELECT COUNT(*) FROM contest_participants cp WHERE cp.contest_id = contest.contest_id)`
+            `(SELECT COUNT(*) FROM contest_participants cp WHERE cp.contest_id = Contest.contest_id)`
           ),
           "participantCount",
         ],
@@ -43,13 +43,13 @@ exports.getAllContest = async (req, res) => {
         "is_public",
         [
           literal(
-            `EXISTS(SELECT 1 FROM contest_participants WHERE contest_id = contest.contest_id AND user_id = ${user_id})`
+            `EXISTS(SELECT 1 FROM contest_participants WHERE contest_id = Contest.contest_id AND user_id = ${user_id})`
           ),
           "isRegistered",
         ],
         [
           literal(
-            `(SELECT COUNT(*) FROM contest_participants cp WHERE cp.contest_id = contest.contest_id)`
+            `(SELECT COUNT(*) FROM contest_participants cp WHERE cp.contest_id = Contest.contest_id)`
           ),
           "participantCount",
         ],
